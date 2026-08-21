@@ -1,0 +1,45 @@
+# Configuração comum a todos os perfis.
+# Nenhum segredo aqui: tudo vem de variável de ambiente (${VAR}).
+spring:
+  application:
+    name: api
+  # Se nenhum perfil for informado, assume dev (na máquina local).
+  # Em prod, ativar com SPRING_PROFILES_ACTIVE=prod.
+  profiles:
+    default: dev
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+  jpa:
+    hibernate:
+      # validate: o Hibernate só CONFERE se as entidades batem com o schema.
+      # Quem cria/altera tabela é o Flyway, via migration. Nunca 'update'.
+      ddl-auto: validate
+    # Desliga o anti-pattern Open Session in View: sem isso, o Spring mantém
+    # a sessão do Hibernate aberta durante toda a request e mascara lazy loading
+    # fora da transação — o que esconde exatamente os N+1 que queremos ver.
+    open-in-view: false
+  flyway:
+    enabled: true
+
+---
+# Documento ativado só quando o perfil dev está ativo
+spring:
+  config:
+    activate:
+      on-profile: dev
+  jpa:
+    # Ver as queries geradas é regra do projeto (seção 8.4 do CLAUDE.md)
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+  jpa:
+    show-sql: false
