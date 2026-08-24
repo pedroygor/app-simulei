@@ -22,6 +22,11 @@ spring:
     open-in-view: false
   flyway:
     enabled: true
+  data:
+    web:
+      pageable:
+        # Teto do ?size= nas listagens paginadas (o default do Spring é 2000)
+        max-page-size: 100
 
 jwt:
   # Segredo HMAC do JWT: só via ambiente, mínimo 32 bytes (HS256)

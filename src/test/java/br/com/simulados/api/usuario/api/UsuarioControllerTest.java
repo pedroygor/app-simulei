@@ -70,6 +70,30 @@ class UsuarioControllerTest {
                 .andExpect(jsonPath("$.path").value("/usuarios"));
     }
 
+    // Regressão do bug de dispatch: erros fora do @Valid (JSON quebrado, enum
+    // inexistente) devem ser 400 no NOSSO formato — não o 401 que o Security
+    // devolvia quando o forward pro /error era bloqueado
+    @Test
+    void jsonMalformadoRetorna400ComCorpoPadronizado() throws Exception {
+        mockMvc.perform(post("/usuarios")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"nome\": \"Ana\", "))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.mensagem").value("Corpo da requisição inválido ou malformado"));
+    }
+
+    @Test
+    void roleInexistenteRetorna400ENao401() throws Exception {
+        mockMvc.perform(post("/usuarios")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"nome":"Ana","email":"role.x@teste.com","senha":"senha-forte-123","role":"FOO"}
+                                """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400));
+    }
+
     @Test
     void retorna400ComListaDeCamposQuandoPayloadInvalido() throws Exception {
         mockMvc.perform(post("/usuarios")

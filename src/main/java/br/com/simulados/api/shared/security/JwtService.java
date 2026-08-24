@@ -7,11 +7,10 @@ import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.security.oauth2.jwt.JwtException;
+import org.springframework.security.oauth2.jwt.JwtValidators;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.stereotype.Service;
 
-import javax.crypto.spec.SecretKeySpec;
-import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -19,6 +18,10 @@ import java.util.UUID;
 // (JwtDecoder no SecurityConfig); aqui só validamos refresh token.
 @Service
 public class JwtService {
+
+    // Quem emitiu o token. Validado nos dois decoders: um JWT assinado com o
+    // mesmo segredo mas emitido por outro sistema não passa
+    public static final String ISSUER = "simulei";
 
     static final String CLAIM_TIPO = "tipo";
     static final String TIPO_ACCESS = "access";
@@ -33,8 +36,11 @@ public class JwtService {
     public JwtService(JwtEncoder jwtEncoder, JwtProperties props) {
         this.jwtEncoder = jwtEncoder;
         this.props = props;
-        var chave = new SecretKeySpec(props.secret().getBytes(StandardCharsets.UTF_8), "HmacSHA256");
-        this.refreshDecoder = NimbusJwtDecoder.withSecretKey(chave).macAlgorithm(MacAlgorithm.HS256).build();
+        this.refreshDecoder = NimbusJwtDecoder.withSecretKey(props.chaveHmac())
+                .macAlgorithm(MacAlgorithm.HS256)
+                .build();
+        // Além de assinatura/expiração, o refresh também exige o nosso issuer
+        this.refreshDecoder.setJwtValidator(JwtValidators.createDefaultWithIssuer(ISSUER));
     }
 
     public String gerarAccessToken(Usuario usuario) {
@@ -66,7 +72,7 @@ public class JwtService {
     private String gerar(Usuario usuario, String tipo, long ttlSegundos) {
         var agora = Instant.now();
         var claims = JwtClaimsSet.builder()
-                .issuer("simulei")
+                .issuer(ISSUER)
                 .subject(usuario.getId().toString())
                 .issuedAt(agora)
                 .expiresAt(agora.plusSeconds(ttlSegundos))

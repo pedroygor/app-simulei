@@ -1,7 +1,9 @@
 package br.com.simulados.api.config;
 
 import br.com.simulados.api.shared.security.JwtProperties;
+import br.com.simulados.api.shared.security.JwtService;
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
+import jakarta.servlet.DispatcherType;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,10 +30,6 @@ import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
-
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
-import java.nio.charset.StandardCharsets;
 
 @Configuration
 @EnableWebSecurity
@@ -61,6 +59,10 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        // O Security também filtra o dispatch de ERRO (o forward interno
+                        // pro /error). Sem liberar, qualquer erro que escape do
+                        // GlobalExceptionHandler vira 401 em vez de 400/500
+                        .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
                         .requestMatchers(HttpMethod.POST, "/usuarios").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/login", "/auth/refresh").permitAll()
                         .anyRequest().authenticated())
@@ -73,13 +75,13 @@ public class SecurityConfig {
 
     @Bean
     JwtEncoder jwtEncoder(JwtProperties props) {
-        return new NimbusJwtEncoder(new ImmutableSecret<>(chaveHmac(props)));
+        return new NimbusJwtEncoder(new ImmutableSecret<>(props.chaveHmac()));
     }
 
     // Decoder usado pelo filtro acima em TODA request autenticada
     @Bean
     JwtDecoder jwtDecoder(JwtProperties props) {
-        var decoder = NimbusJwtDecoder.withSecretKey(chaveHmac(props))
+        var decoder = NimbusJwtDecoder.withSecretKey(props.chaveHmac())
                 .macAlgorithm(MacAlgorithm.HS256)
                 .build();
         // Além de assinatura/expiração (default), exige tipo=access:
@@ -89,7 +91,10 @@ public class SecurityConfig {
                         ? OAuth2TokenValidatorResult.success()
                         : OAuth2TokenValidatorResult.failure(
                                 new OAuth2Error("invalid_token", "Token não é de acesso", null));
-        decoder.setJwtValidator(new DelegatingOAuth2TokenValidator<>(JwtValidators.createDefault(), tipoAccess));
+        // createDefaultWithIssuer: só aceita token emitido por nós — um JWT de
+        // outro sistema que por azar compartilhe o segredo não passa
+        decoder.setJwtValidator(new DelegatingOAuth2TokenValidator<>(
+                JwtValidators.createDefaultWithIssuer(JwtService.ISSUER), tipoAccess));
         return decoder;
     }
 
@@ -103,7 +108,4 @@ public class SecurityConfig {
         return converter;
     }
 
-    private SecretKey chaveHmac(JwtProperties props) {
-        return new SecretKeySpec(props.secret().getBytes(StandardCharsets.UTF_8), "HmacSHA256");
-    }
 }

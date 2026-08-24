@@ -3,10 +3,7 @@ package br.com.simulados.api.usuario.api;
 import br.com.simulados.api.usuario.application.UsuarioService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -43,13 +40,5 @@ public class UsuarioController {
     public UsuarioResponse me(@AuthenticationPrincipal Jwt jwt) {
         var usuario = usuarioService.buscarPorId(UUID.fromString(jwt.getSubject()));
         return usuarioMapper.toResponse(usuario);
-    }
-
-    // Listagem administrativa provisória — existe pra exercitar autorização por
-    // role na Etapa 1; deve ser repensada quando Turma existir (Etapa 4)
-    @GetMapping
-    @PreAuthorize("hasRole('PROFESSOR')")
-    public Page<UsuarioResponse> listar(Pageable pageable) {
-        return usuarioService.listar(pageable).map(usuarioMapper::toResponse);
     }
 }

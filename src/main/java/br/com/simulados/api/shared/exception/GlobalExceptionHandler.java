@@ -1,10 +1,10 @@
 package br.com.simulados.api.shared.exception;
 
 import br.com.simulados.api.shared.security.TokenInvalidoException;
-import br.com.simulados.api.usuario.domain.EmailJaCadastradoException;
-import br.com.simulados.api.usuario.domain.UsuarioNaoEncontradoException;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -12,7 +12,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 // Um lugar só traduz exceção -> HTTP. Controllers e services nunca montam
-// resposta de erro na mão.
+// resposta de erro na mão. Este handler conhece apenas as BASES semânticas
+// (RecursoNaoEncontrado -> 404, Conflito -> 409): domínio novo cria exceções
+// estendendo as bases e nada muda aqui.
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -27,11 +29,15 @@ public class GlobalExceptionHandler {
                 request.getRequestURI(), campos);
     }
 
-    // 409: o payload é válido, mas conflita com estado existente
-    @ExceptionHandler(EmailJaCadastradoException.class)
-    @ResponseStatus(HttpStatus.CONFLICT)
-    public ErroResponse trataEmailJaCadastrado(EmailJaCadastradoException ex, HttpServletRequest request) {
-        return ErroResponse.de(HttpStatus.CONFLICT, ex.getMessage(), request.getRequestURI());
+    // JSON malformado ou valor impossível de converter (ex: role inexistente).
+    // Sem este handler o Spring despacharia pro /error — e viraria 401 (ver
+    // dispatcherTypeMatchers no SecurityConfig). Mensagem genérica de propósito:
+    // o parse do Jackson vaza detalhe de implementação
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErroResponse trataCorpoIlegivel(HttpMessageNotReadableException ex, HttpServletRequest request) {
+        return ErroResponse.de(HttpStatus.BAD_REQUEST, "Corpo da requisição inválido ou malformado",
+                request.getRequestURI());
     }
 
     // Cobre login com credencial errada e usuário inativo. Mensagem única de
@@ -48,13 +54,29 @@ public class GlobalExceptionHandler {
         return ErroResponse.de(HttpStatus.UNAUTHORIZED, ex.getMessage(), request.getRequestURI());
     }
 
-    @ExceptionHandler(UsuarioNaoEncontradoException.class)
+    @ExceptionHandler(RecursoNaoEncontradoException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErroResponse trataUsuarioNaoEncontrado(UsuarioNaoEncontradoException ex, HttpServletRequest request) {
+    public ErroResponse trataNaoEncontrado(RecursoNaoEncontradoException ex, HttpServletRequest request) {
         return ErroResponse.de(HttpStatus.NOT_FOUND, ex.getMessage(), request.getRequestURI());
     }
 
-    // Fallback pra regras de negócio sem tratamento mais específico acima
+    @ExceptionHandler(ConflitoException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErroResponse trataConflito(ConflitoException ex, HttpServletRequest request) {
+        return ErroResponse.de(HttpStatus.CONFLICT, ex.getMessage(), request.getRequestURI());
+    }
+
+    // Backstop pra corrida: a checagem amigável do service pode perder pra uma
+    // request concorrente, e aí a constraint do banco estoura aqui. Mensagem
+    // genérica: a exceção do driver vaza nome de constraint e SQL
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErroResponse trataIntegridade(DataIntegrityViolationException ex, HttpServletRequest request) {
+        return ErroResponse.de(HttpStatus.CONFLICT, "A operação conflita com dados já existentes",
+                request.getRequestURI());
+    }
+
+    // Fallback pra regras de negócio sem base semântica específica
     @ExceptionHandler(NegocioException.class)
     @ResponseStatus(HttpStatus.UNPROCESSABLE_CONTENT)
     public ErroResponse trataNegocio(NegocioException ex, HttpServletRequest request) {

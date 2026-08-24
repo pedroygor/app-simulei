@@ -6,12 +6,16 @@ import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
+import org.springframework.security.oauth2.jwt.JwsHeader;
+import org.springframework.security.oauth2.jwt.JwtClaimsSet;
+import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -61,6 +65,26 @@ class JwtServiceTest {
         var access = jwtService.gerarAccessToken(usuario);
 
         assertThatThrownBy(() -> jwtService.validarRefreshToken(access))
+                .isInstanceOf(TokenInvalidoException.class);
+    }
+
+    @Test
+    void rejeitaRefreshTokenDeOutroIssuer() {
+        // Token assinado com o MESMO segredo, mas emitido por "outro sistema":
+        // a validação de issuer precisa barrar
+        var chave = new SecretKeySpec(SEGREDO.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
+        var encoderExterno = new NimbusJwtEncoder(new ImmutableSecret<>(chave));
+        var claims = JwtClaimsSet.builder()
+                .issuer("outro-sistema")
+                .subject(usuario.getId().toString())
+                .issuedAt(Instant.now())
+                .expiresAt(Instant.now().plusSeconds(3600))
+                .claim("tipo", "refresh")
+                .build();
+        var token = encoderExterno.encode(JwtEncoderParameters.from(
+                JwsHeader.with(MacAlgorithm.HS256).build(), claims)).getTokenValue();
+
+        assertThatThrownBy(() -> jwtService.validarRefreshToken(token))
                 .isInstanceOf(TokenInvalidoException.class);
     }
 

@@ -6,8 +6,6 @@ import br.com.simulados.api.usuario.domain.Usuario;
 import br.com.simulados.api.usuario.domain.UsuarioNaoEncontradoException;
 import br.com.simulados.api.usuario.infrastructure.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,10 +43,5 @@ public class UsuarioService {
     public Usuario buscarPorId(UUID id) {
         return usuarioRepository.findById(id)
                 .orElseThrow(() -> new UsuarioNaoEncontradoException(id));
-    }
-
-    @Transactional(readOnly = true)
-    public Page<Usuario> listar(Pageable pageable) {
-        return usuarioRepository.findAll(pageable);
     }
 }

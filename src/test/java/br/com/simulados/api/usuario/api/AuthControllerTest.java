@@ -1,5 +1,6 @@
 package br.com.simulados.api.usuario.api;
 
+import br.com.simulados.api.RotasDeTesteConfiguration;
 import br.com.simulados.api.TestcontainersConfiguration;
 // Jackson 3 (Boot 4): o pacote mudou de com.fasterxml.jackson pra tools.jackson
 import tools.jackson.databind.ObjectMapper;
@@ -24,7 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 // com Bearer -> refresh via cookie -> autorização por role
 @SpringBootTest
 @AutoConfigureMockMvc
-@Import(TestcontainersConfiguration.class)
+@Import({TestcontainersConfiguration.class, RotasDeTesteConfiguration.class})
 class AuthControllerTest {
 
     private static final String SENHA = "senha-forte-123";
@@ -85,19 +86,18 @@ class AuthControllerTest {
     }
 
     @Test
-    void listagemDeUsuariosExigeRoleProfessor() throws Exception {
+    void rotaDeProfessorRejeitaAlunoCom403() throws Exception {
         cadastrar("Duda", "auth.duda@teste.com", "ALUNO");
         cadastrar("Edu", "auth.edu@teste.com", "PROFESSOR");
 
         var tokenAluno = extrairAccessToken(login("auth.duda@teste.com", SENHA).andReturn());
         var tokenProfessor = extrairAccessToken(login("auth.edu@teste.com", SENHA).andReturn());
 
-        mockMvc.perform(get("/usuarios").header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenAluno))
+        mockMvc.perform(get("/teste/so-professor").header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenAluno))
                 .andExpect(status().isForbidden());
 
-        mockMvc.perform(get("/usuarios").header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenProfessor))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content").isArray());
+        mockMvc.perform(get("/teste/so-professor").header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenProfessor))
+                .andExpect(status().isOk());
     }
 
     @Test
