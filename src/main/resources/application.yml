@@ -23,6 +23,12 @@ spring:
   flyway:
     enabled: true
 
+jwt:
+  # Segredo HMAC do JWT: só via ambiente, mínimo 32 bytes (HS256)
+  secret: ${JWT_SECRET}
+  access-ttl: 30m
+  refresh-ttl: 7d
+
 ---
 # Documento ativado só quando o perfil dev está ativo
 spring:
