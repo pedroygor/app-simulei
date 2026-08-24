@@ -9,7 +9,10 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?defina POSTGRES_PASSWORD no .env}
       POSTGRES_DB: ${POSTGRES_DB:?defina POSTGRES_DB no .env}
     ports:
-      - "5432:5432"
+      # Amarrado no loopback: o banco de dev não fica exposto na rede local.
+      # 5433 no host porque a máquina já tem um Postgres do sistema na 5432.
+      # Trocar via POSTGRES_PORT no .env (o DB_URL precisa acompanhar).
+      - "127.0.0.1:${POSTGRES_PORT:-5433}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
