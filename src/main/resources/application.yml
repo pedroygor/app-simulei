@@ -3,6 +3,12 @@
 spring:
   application:
     name: api
+  config:
+    # Carrega o .env da raiz como fonte de propriedades no startup, pra não
+    # depender de 'source .env' no shell antes de rodar. 'optional:' faz o Boot
+    # seguir em frente quando o arquivo não existe (prod), e variável de
+    # ambiente de verdade tem precedência maior que este arquivo.
+    import: optional:file:.env[.properties]
   # Se nenhum perfil for informado, assume dev (na máquina local).
   # Em prod, ativar com SPRING_PROFILES_ACTIVE=prod.
   profiles:
