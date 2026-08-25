@@ -1,0 +1,24 @@
+meta {
+  name: 01 - Listar provas
+  type: http
+  seq: 1
+}
+
+get {
+  url: https://api.enem.dev/v1/exams
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 200
+}
+
+docs {
+  API PÚBLICA de terceiro (não é a nossa). Útil pra explorar a fonte antes do
+  job de importação.
+
+  Devolve um array de provas: { title, year, disciplines[], languages[] }.
+  As 4 disciplines são: linguagens, ciencias-humanas, ciencias-natureza,
+  matematica — exatamente o nosso enum Area.
+}

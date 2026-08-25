@@ -1,0 +1,31 @@
+meta {
+  name: 03 - Meu perfil (protegido)
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/usuarios/me
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{accessToken}}
+}
+
+assert {
+  res.status: eq 200
+  res.body.email: eq {{email}}
+  res.body.senhaHash: isUndefined
+}
+
+docs {
+  Endpoint PROTEGIDO. Rode o "Login" antes — ele preenche {{accessToken}}.
+
+  A identidade sai da claim `sub` do token, nunca de parâmetro na URL:
+  não existe jeito de pedir o perfil de outra pessoa.
+
+  Sem o header Authorization: 401 com corpo vazio (é o resource server
+  respondendo, não o nosso GlobalExceptionHandler).
+}

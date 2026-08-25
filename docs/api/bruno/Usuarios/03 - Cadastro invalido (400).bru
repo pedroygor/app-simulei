@@ -1,0 +1,44 @@
+meta {
+  name: 03 - Cadastro invalido (400)
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/usuarios
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "nome": "",
+    "email": "nao-e-email",
+    "senha": "curta",
+    "role": "ALUNO"
+  }
+}
+
+assert {
+  res.status: eq 400
+  res.body.campos: length 3
+}
+
+docs {
+  Bean Validation em ação: 400 com a lista de campos inválidos.
+
+  {
+    "timestamp": "...", "status": 400, "erro": "Bad Request",
+    "mensagem": "Há campos inválidos na requisição",
+    "path": "/usuarios",
+    "campos": [
+      {"campo": "email", "mensagem": "deve ser um endereço de e-mail bem formado"},
+      {"campo": "nome",  "mensagem": "não deve estar em branco"},
+      {"campo": "senha", "mensagem": "tamanho deve ser entre 8 e 72"}
+    ]
+  }
+}

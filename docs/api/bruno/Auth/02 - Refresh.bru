@@ -1,0 +1,57 @@
+meta {
+  name: 02 - Refresh
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/auth/refresh
+  body: none
+  auth: none
+}
+
+headers {
+  Cookie: refresh_token={{refreshToken}}
+}
+
+script:post-response {
+  // Rotação: cada refresh emite um par novo. Atualizamos as duas variáveis
+  // pra poder encadear refresh após refresh.
+  bru.setEnvVar("accessToken", res.body.accessToken);
+
+  const setCookie = res.getHeader("set-cookie");
+  const raw = Array.isArray(setCookie) ? setCookie[0] : setCookie;
+  if (raw) {
+    const match = raw.match(/refresh_token=([^;]+)/);
+    if (match) {
+      bru.setEnvVar("refreshToken", match[1]);
+    }
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body.accessToken: isDefined
+}
+
+docs {
+  Endpoint PÚBLICO (a credencial é o próprio cookie). Rode o "01 - Login" antes.
+
+  SOBRE O COOKIE: o header abaixo usa {{refreshToken}}, preenchido pelo script
+  do Login. Mas atenção — o Bruno tem cookie jar próprio, e quando ele está
+  ligado (o padrão) o cookie guardado SOBRESCREVE esse header. Nos dois casos
+  o request funciona; só não se iluda achando que é sempre o header que vale.
+
+  Isso importa pro frontend: o cookie vem marcado Secure, e o navegador só o
+  reenvia em contexto seguro — localhost conta como seguro, então em dev
+  funciona com `credentials: 'include'` no fetch.
+
+  Rotação: cada refresh devolve um par novo (access + refresh). O script
+  atualiza as duas variáveis, então dá pra encadear refresh após refresh.
+
+  Cenários de erro (todos 401 no nosso formato JSON):
+  - sem o header Cookie
+  - refresh_token adulterado (ver request 05)
+  - mandar um ACCESS token aqui (a claim `tipo` bloqueia o uso cruzado)
+  - usuário desativado no banco depois do login
+}

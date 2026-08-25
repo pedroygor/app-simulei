@@ -1,0 +1,24 @@
+meta {
+  name: 06 - Endpoint protegido sem token (401)
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/usuarios/me
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 401
+}
+
+docs {
+  401 SEM corpo, com header WWW-Authenticate: Bearer.
+
+  Esse é o resource server do Spring Security respondendo antes de chegar no
+  nosso controller — por isso não segue o JSON de erro padronizado. Está na
+  lista de pendências do CLAUDE.md pra resolver junto com o frontend
+  (AuthenticationEntryPoint custom).
+}

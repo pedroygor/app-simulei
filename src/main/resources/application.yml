@@ -34,6 +34,10 @@ jwt:
   access-ttl: 30m
   refresh-ttl: 7d
 
+# URL pública, não é segredo — pode viver no yml
+enem-dev:
+  base-url: https://api.enem.dev/v1
+
 ---
 # Documento ativado só quando o perfil dev está ativo
 spring:
