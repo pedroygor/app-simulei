@@ -23,6 +23,12 @@ body:json {
   }
 }
 
+vars:pre-request {
+  baseUrl: http://localhost:8080
+  email: john.doe@email.com
+  senha: senha-sempre-forte@123
+}
+
 tests {
   test("cria o professor, ou 409 se ele já existir de uma rodada anterior", function() {
     expect([201, 409]).to.include(res.getStatus());
@@ -31,9 +37,9 @@ tests {
 
 docs {
   Endpoint PÚBLICO. Cria o usuário usado pelos demais requests.
-
+  
   201 Created + header Location: /usuarios/{id}
   A resposta NUNCA traz senhaHash — o DTO de saída não tem esse campo.
-
+  
   Rodar duas vezes devolve 409 (ver request "05 - Cadastrar duplicado").
 }

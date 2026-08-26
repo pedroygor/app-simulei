@@ -47,7 +47,8 @@ public class Questao {
 
     private String assunto;
 
-    @Column(nullable = false)
+    // Nullable: 5% das questões da enem.dev não têm texto-base — a pergunta
+    // inteira fica no `comando`. CHECK no banco garante que um dos dois exista.
     private String enunciado;
 
     private String comando;

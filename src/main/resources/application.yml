@@ -44,6 +44,14 @@ jwt:
 enem-dev:
   base-url: https://api.enem.dev/v1
 
+storage:
+  imagens:
+    # Onde as imagens baixadas da enem.dev são gravadas. Fora do src, e no
+    # .gitignore: são ~980 arquivos de dado importado, não de código.
+    diretorio: ${STORAGE_IMAGENS_DIR:./storage/imagens}
+    # Prefixo das URLs gravadas no markdown das questões
+    base-url: /imagens
+
 ---
 # Documento ativado só quando o perfil dev está ativo
 spring:
