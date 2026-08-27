@@ -49,8 +49,13 @@ storage:
     # Onde as imagens baixadas da enem.dev são gravadas. Fora do src, e no
     # .gitignore: são ~980 arquivos de dado importado, não de código.
     diretorio: ${STORAGE_IMAGENS_DIR:./storage/imagens}
-    # Prefixo das URLs gravadas no markdown das questões
+    # Prefixo das URLs gravadas no markdown das questões.
+    # Em produção isto vira o host do CDN/bucket (ex: https://img.simulei.com.br)
+    # e a aplicação para de servir arquivo estático — ver ADR de 26/08/2026.
     base-url: /imagens
+    # Teto por arquivo. A maior imagem do ENEM 2023 tem ~540KB; 5MB é folga
+    # generosa e ainda protege contra resposta gigante da fonte.
+    tamanho-maximo: 5MB
 
 ---
 # Documento ativado só quando o perfil dev está ativo

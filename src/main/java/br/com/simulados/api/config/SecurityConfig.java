@@ -65,6 +65,11 @@ public class SecurityConfig {
                         .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
                         .requestMatchers(HttpMethod.POST, "/usuarios").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/login", "/auth/refresh").permitAll()
+                        // Imagens das questões são públicas de propósito: são
+                        // provas do ENEM (domínio público) e precisam carregar
+                        // num <img src> simples. Exigir Bearer aqui obrigaria o
+                        // frontend a baixar cada imagem por fetch autenticado.
+                        .requestMatchers(HttpMethod.GET, "/imagens/**").permitAll()
                         .anyRequest().authenticated())
                 // Liga o filtro do resource server: extrai o Bearer do header,
                 // valida com o jwtDecoder e povoa o SecurityContext — sem filtro nosso

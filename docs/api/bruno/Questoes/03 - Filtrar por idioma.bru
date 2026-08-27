@@ -1,0 +1,31 @@
+meta {
+  name: 03 - Filtrar por idioma
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/questoes?idioma=INGLES
+  body: none
+  auth: none
+}
+
+params:query {
+  idioma: INGLES
+}
+
+headers {
+  Authorization: Bearer {{accessToken}}
+}
+
+assert {
+  res.status: eq 200
+}
+
+docs {
+  INGLES ou ESPANHOL. São as questões de língua estrangeira, que repetem o
+  MESMO número no mesmo ano nas duas versões — por isso o idioma faz parte da
+  chave natural (ano, numero, idioma) lá no banco.
+
+  Com 2023 importado: 5 em inglês e 5 em espanhol.
+}

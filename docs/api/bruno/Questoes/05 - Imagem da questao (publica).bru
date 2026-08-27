@@ -1,0 +1,43 @@
+meta {
+  name: 05 - Imagem da questao (publica)
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}{{imagemUrl}}
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 200
+  res.headers['x-content-type-options']: eq nosniff
+  res.headers['cross-origin-resource-policy']: eq same-site
+}
+
+docs {
+  Rode o request 04 antes — ele preenche {{imagemUrl}}.
+
+  Repare: SEM header Authorization, e funciona.
+
+  As imagens são públicas de propósito. São provas do ENEM (domínio público) e
+  precisam carregar num <img src> simples — exigir Bearer aqui obrigaria o
+  frontend a baixar cada imagem por fetch autenticado e montar object URLs.
+
+  Estas URLs são as que o job de importação gravou dentro do markdown do
+  enunciado, substituindo as do enem.dev. É o que torna a plataforma
+  independente da fonte.
+
+  O caminho é {ab}/{cd}/{sha256}.{ext}: o nome do arquivo é o HASH DO
+  CONTEÚDO, não algo derivado da URL da fonte. Três ganhos:
+
+  - nenhum pedaço de input externo entra no caminho em disco (path traversal
+    deixa de ser possível por construção, não por higienização)
+  - conteúdo repetido é gravado uma vez só
+  - `Cache-Control: immutable` fica honesto — URL diferente = bytes diferentes
+
+  Repare também nos cabeçalhos da resposta: nosniff, CSP com sandbox e
+  Cross-Origin-Resource-Policy. Conteúdo público não quer dizer conteúdo sem
+  defesa. Ver o ADR de 26/08/2026 no CLAUDE.md.
+}

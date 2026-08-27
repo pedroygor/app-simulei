@@ -6,10 +6,15 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.beans.TypeMismatchException;
+
+import java.util.Arrays;
+import java.util.List;
 
 // Um lugar só traduz exceção -> HTTP. Controllers e services nunca montam
 // resposta de erro na mão. Este handler conhece apenas as BASES semânticas
@@ -23,7 +28,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErroResponse trataValidacao(MethodArgumentNotValidException ex, HttpServletRequest request) {
         var campos = ex.getBindingResult().getFieldErrors().stream()
-                .map(erro -> new ErroResponse.CampoInvalido(erro.getField(), erro.getDefaultMessage()))
+                .map(erro -> new ErroResponse.CampoInvalido(erro.getField(), mensagemDe(erro)))
                 .toList();
         return ErroResponse.de(HttpStatus.BAD_REQUEST, "Há campos inválidos na requisição",
                 request.getRequestURI(), campos);
@@ -38,6 +43,17 @@ public class GlobalExceptionHandler {
     public ErroResponse trataCorpoIlegivel(HttpMessageNotReadableException ex, HttpServletRequest request) {
         return ErroResponse.de(HttpStatus.BAD_REQUEST, "Corpo da requisição inválido ou malformado",
                 request.getRequestURI());
+    }
+
+    /**
+     * Requisição malformada por algo que o Bean Validation não alcança — hoje,
+     * ordenação por campo inexistente. Antes da whitelist isso chegava ao
+     * Hibernate e virava 500.
+     */
+    @ExceptionHandler(RequisicaoInvalidaException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErroResponse trataRequisicaoInvalida(RequisicaoInvalidaException ex, HttpServletRequest request) {
+        return ErroResponse.de(HttpStatus.BAD_REQUEST, ex.getMessage(), request.getRequestURI());
     }
 
     // Cobre login com credencial errada e usuário inativo. Mensagem única de
@@ -64,6 +80,33 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErroResponse trataConflito(ConflitoException ex, HttpServletRequest request) {
         return ErroResponse.de(HttpStatus.CONFLICT, ex.getMessage(), request.getRequestURI());
+    }
+
+    /**
+     * Erro de conversão de tipo (enum inexistente, texto em campo numérico)
+     * chega junto com os de Bean Validation. A mensagem padrão do Spring cita
+     * nomes de classe Java — detalhe interno que não deve vazar pra API.
+     * Quando o campo é enum, devolvemos os valores aceitos: é o que o
+     * frontend precisa pra mostrar erro útil.
+     */
+    private String mensagemDe(FieldError erro) {
+        if (!erro.isBindingFailure()) {
+            return erro.getDefaultMessage();
+        }
+        var valoresAceitos = valoresAceitosDe(erro);
+        return valoresAceitos.isEmpty()
+                ? "valor inválido"
+                : "valor inválido; use um de: " + String.join(", ", valoresAceitos);
+    }
+
+    private List<String> valoresAceitosDe(FieldError erro) {
+        if (erro.contains(TypeMismatchException.class)) {
+            var tipo = erro.unwrap(TypeMismatchException.class).getRequiredType();
+            if (tipo != null && tipo.isEnum()) {
+                return Arrays.stream(tipo.getEnumConstants()).map(Object::toString).toList();
+            }
+        }
+        return List.of();
     }
 
     // Backstop pra corrida: a checagem amigável do service pode perder pra uma

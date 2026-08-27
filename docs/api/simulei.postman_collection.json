@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "Simulei API",
-    "description": "Endpoints da API do Simulei (Etapa 1 — auth e usuários) + a fonte externa enem.dev.\n\nORDEM: rode a pasta Usuários primeiro (cria os usuários de teste), depois Auth — o request 'Login' preenche as variáveis accessToken e refreshToken automaticamente, e os demais dependem delas.\n\nPré-requisitos: docker compose up -d e a aplicação rodando em http://localhost:8080.\n\nCOOKIE JAR: o refresh token vem em cookie httpOnly+Secure. O Postman guarda esse cookie e pode sobrescrever o header Cookie explícito dos requests. Nos cenários negativos (request 05 de Auth), limpe os cookies antes pra ver o 401.",
+    "description": "Endpoints da API do Simulei (Etapa 1 — auth e usuários) + a fonte externa enem.dev.\n\nORDEM: rode a pasta Usuários primeiro (cria os usuários de teste), depois Auth, depois Questões — o request 'Login' preenche as variáveis accessToken e refreshToken automaticamente, e os demais dependem delas.\n\nPré-requisitos: docker compose up -d e a aplicação rodando em http://localhost:8080.\n\nCOOKIE JAR: o refresh token vem em cookie httpOnly+Secure. O Postman guarda esse cookie e pode sobrescrever o header Cookie explícito dos requests. Nos cenários negativos (request 05 de Auth), limpe os cookies antes pra ver o 401.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -24,6 +24,14 @@
     {
       "key": "refreshToken",
       "value": ""
+    },
+    {
+      "key": "questaoId",
+      "value": ""
+    },
+    {
+      "key": "imagemUrl",
+      "value": ""
     }
   ],
   "item": [
@@ -35,7 +43,10 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -43,8 +54,12 @@
             },
             "url": {
               "raw": "{{baseUrl}}/usuarios",
-              "host": ["{{baseUrl}}"],
-              "path": ["usuarios"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "usuarios"
+              ]
             },
             "description": "Endpoint PÚBLICO. Cria o usuário usado pelos demais requests.\n\n201 Created + header Location: /usuarios/{id}. A resposta NUNCA traz senhaHash — o DTO de saída não tem esse campo.\n\nRodar de novo devolve 409 (é o request 04)."
           }
@@ -54,7 +69,10 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -62,8 +80,12 @@
             },
             "url": {
               "raw": "{{baseUrl}}/usuarios",
-              "host": ["{{baseUrl}}"],
-              "path": ["usuarios"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "usuarios"
+              ]
             },
             "description": "Mesmo endpoint, role ALUNO. Todo usuário nasce plano FREE e ativo=true — defaults da entidade, não vêm do payload."
           }
@@ -73,7 +95,10 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -81,8 +106,12 @@
             },
             "url": {
               "raw": "{{baseUrl}}/usuarios",
-              "host": ["{{baseUrl}}"],
-              "path": ["usuarios"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "usuarios"
+              ]
             },
             "description": "Bean Validation em ação: 400 com a lista de campos inválidos no array campos[]:\n\n{\"campo\": \"email\", \"mensagem\": \"deve ser um endereço de e-mail bem formado\"}\n{\"campo\": \"nome\",  \"mensagem\": \"não deve estar em branco\"}\n{\"campo\": \"senha\", \"mensagem\": \"tamanho deve ser entre 8 e 72\"}"
           }
@@ -92,7 +121,10 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -100,8 +132,12 @@
             },
             "url": {
               "raw": "{{baseUrl}}/usuarios",
-              "host": ["{{baseUrl}}"],
-              "path": ["usuarios"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "usuarios"
+              ]
             },
             "description": "Rode depois do 01: e-mail já existe -> 409 Conflict.\n\nErro é exceção no service (EmailJaCadastradoException), traduzida pra HTTP num lugar só (GlobalExceptionHandler). O service não conhece status code."
           }
@@ -111,7 +147,10 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -119,8 +158,12 @@
             },
             "url": {
               "raw": "{{baseUrl}}/usuarios",
-              "host": ["{{baseUrl}}"],
-              "path": ["usuarios"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "usuarios"
+              ]
             },
             "description": "Regressão do bug que a revisão pós-Etapa 1 pegou: antes da correção isso devolvia 401 (o Security bloqueava o forward interno pro /error).\n\nAgora: 400 no nosso formato. Um \"role\": \"FOO\" (enum inexistente) cai no mesmo handler."
           }
@@ -165,7 +208,10 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -173,8 +219,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/auth/login",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "login"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
             },
             "description": "Endpoint PÚBLICO. Devolve:\n\n- corpo: { accessToken, tokenType: \"Bearer\", expiresIn: 1800 } (30 min)\n- header Set-Cookie: refresh_token=...; Path=/auth/refresh; Max-Age=604800; Secure; HttpOnly; SameSite=Lax (7 dias)\n\nO access token vai no corpo porque o JS do frontend precisa lê-lo pra montar o header Authorization. O refresh fica em cookie httpOnly, que o JS não enxerga — é o que limita o estrago de um XSS."
           }
@@ -208,12 +259,20 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Cookie", "value": "refresh_token={{refreshToken}}" }
+              {
+                "key": "Cookie",
+                "value": "refresh_token={{refreshToken}}"
+              }
             ],
             "url": {
               "raw": "{{baseUrl}}/auth/refresh",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "refresh"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "refresh"
+              ]
             },
             "description": "Rode o Login antes.\n\nSOBRE O COOKIE: o header usa {{refreshToken}}, preenchido pelo script do Login. Mas o Postman também tem cookie jar, e o cookie guardado pode sobrescrever esse header. Nos dois casos o request funciona.\n\nRotação: cada refresh devolve um par novo (access + refresh)."
           }
@@ -239,12 +298,20 @@
           "request": {
             "method": "GET",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
             ],
             "url": {
               "raw": "{{baseUrl}}/usuarios/me",
-              "host": ["{{baseUrl}}"],
-              "path": ["usuarios", "me"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "usuarios",
+                "me"
+              ]
             },
             "description": "Endpoint PROTEGIDO. Rode o Login antes — ele preenche {{accessToken}}.\n\nA identidade sai da claim sub do token, nunca de parâmetro na URL: não existe jeito de pedir o perfil de outra pessoa."
           }
@@ -254,7 +321,10 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -262,8 +332,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/auth/login",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "login"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
             },
             "description": "401 \"E-mail ou senha inválidos\".\n\nTroque o e-mail por um que NÃO existe: a resposta é idêntica, byte a byte. Deliberado — mensagem diferente entregaria quais e-mails estão cadastrados."
           }
@@ -273,12 +348,20 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Cookie", "value": "refresh_token=token-invalido" }
+              {
+                "key": "Cookie",
+                "value": "refresh_token=token-invalido"
+              }
             ],
             "url": {
               "raw": "{{baseUrl}}/auth/refresh",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "refresh"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "refresh"
+              ]
             },
             "description": "401 \"Refresh token inválido ou expirado\", no nosso formato JSON.\n\nATENÇÃO — cookie jar: se o Postman tiver o cookie válido guardado do Login, ele pode sobrescrever este header e devolver 200. Limpe os cookies (ícone Cookies abaixo do botão Send) pra ver o 401.\n\nVariação que vale testar: Cookie: refresh_token={{accessToken}} — a claim tipo impede usar access token como refresh."
           }
@@ -290,10 +373,267 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/usuarios/me",
-              "host": ["{{baseUrl}}"],
-              "path": ["usuarios", "me"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "usuarios",
+                "me"
+              ]
             },
             "description": "401 SEM corpo, com header WWW-Authenticate: Bearer.\n\nÉ o resource server do Spring Security respondendo antes de chegar no nosso controller — por isso não segue o JSON de erro padronizado. Está na lista de pendências do CLAUDE.md pra resolver junto com o frontend."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Questoes",
+      "item": [
+        {
+          "name": "01 - Listar",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/questoes?size=50",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "questoes"
+              ],
+              "query": [
+                {
+                  "key": "size",
+                  "value": "50"
+                }
+              ]
+            },
+            "description": "Listagem paginada. Exige autenticação — rode o Login antes.\n\nNÃO traz alternativas de propósito: incluí-las faria cada questão da página virar um SELECT extra (N+1). Quem quer a questão inteira chama GET /questoes/{id}.\n\nA `previa` é cortada no banco (substring), não em Java — o enunciado de uma questão do ENEM chega a milhares de caracteres e não precisa trafegar só pra montar uma lista."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 com pagina', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.content).to.be.an('array');",
+                  "});",
+                  "",
+                  "// Guarda um id real pros requests seguintes. Ids são sequenciais do",
+                  "// banco e mudam a cada reimportação — nunca chute um valor fixo.",
+                  "// Prefere uma questão COM imagem, pra cadeia 04 -> 05 poder testar",
+                  "// o servidor de imagens.",
+                  "const itens = pm.response.json().content || [];",
+                  "const comImagem = itens.find(q => (q.previa || '').includes('/imagens/'));",
+                  "const escolhida = comImagem || itens[0];",
+                  "if (escolhida) { pm.collectionVariables.set('questaoId', escolhida.id); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "02 - Filtrar por area e ano",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/questoes?area=MATEMATICA&anoInicial=2023&anoFinal=2023&size=5",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "questoes"
+              ],
+              "query": [
+                {
+                  "key": "area",
+                  "value": "MATEMATICA"
+                },
+                {
+                  "key": "anoInicial",
+                  "value": "2023"
+                },
+                {
+                  "key": "anoFinal",
+                  "value": "2023"
+                },
+                {
+                  "key": "size",
+                  "value": "5"
+                }
+              ]
+            },
+            "description": "Filtros combináveis: area, idioma, anoInicial, anoFinal, materia. Todos opcionais.\n\nÁreas: LINGUAGENS, CIENCIAS_HUMANAS, CIENCIAS_NATUREZA, MATEMATICA\n\nQuestões ANULADAS nunca aparecem — não é filtro seu, é regra do produto.\n\nIntervalo invertido é tolerado: anoInicial=2023&anoFinal=2020 devolve o mesmo que 2020..2023.\n\nSobre `materia`: o filtro existe mas a enem.dev não fornece o dado — devolve zero até o enriquecimento."
+          }
+        },
+        {
+          "name": "03 - Filtrar por idioma",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/questoes?idioma=INGLES",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "questoes"
+              ],
+              "query": [
+                {
+                  "key": "idioma",
+                  "value": "INGLES"
+                }
+              ]
+            },
+            "description": "INGLES ou ESPANHOL. São as questões de língua estrangeira, que repetem o MESMO número no mesmo ano nas duas versões — daí o idioma fazer parte da chave natural (ano, numero, idioma).\n\nCom 2023 importado: 5 em inglês, 5 em espanhol."
+          }
+        },
+        {
+          "name": "04 - Detalhe da questao",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/questoes/{{questaoId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "questoes",
+                "{{questaoId}}"
+              ]
+            },
+            "description": "Questão completa: enunciado em markdown, comando, gabarito e as 5 alternativas ordenadas.\n\nTudo em UMA query graças ao JOIN FETCH. O {{questaoId}} é preenchido pelo request 01.\n\nQuestão anulada devolve 404: do ponto de vista do produto ela não existe.\n\nATENÇÃO pro futuro: este DTO traz o gabarito porque hoje quem consome é o professor. A tela de prova do aluno (Etapa 3) vai precisar de um DTO SEM gabarito."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 com alternativas', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    pm.expect(pm.response.json().alternativas).to.have.lengthOf(5);",
+                  "});",
+                  "",
+                  "// Extrai a primeira imagem do enunciado pro request 05. As URLs são",
+                  "// derivadas do hash do conteúdo, então não dá pra chutar.",
+                  "const md = pm.response.json().enunciado || '';",
+                  "const achou = md.match(/\\((\\/imagens\\/[^)]+)\\)/);",
+                  "if (achou) { pm.collectionVariables.set('imagemUrl', achou[1]); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "05 - Imagem da questao (publica)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}{{imagemUrl}}",
+            "description": "Rode o request 04 antes — ele preenche {{imagemUrl}}.\n\nRepare: SEM header Authorization, e funciona.\n\nImagens são públicas de propósito — prova do ENEM é domínio público e precisa carregar num <img src> simples. Exigir Bearer aqui protegeria conteúdo que qualquer um baixa da fonte, ao custo de complexidade real no frontend.\n\nO caminho é {ab}/{cd}/{sha256}.{ext}: o nome é o HASH DO CONTEÚDO, não algo derivado da URL da fonte. Isso elimina path traversal por construção, deduplica conteúdo repetido e torna honesto o Cache-Control: immutable.\n\nRepare nos cabeçalhos: nosniff, CSP com sandbox e Cross-Origin-Resource-Policy. Conteúdo público não quer dizer conteúdo sem defesa. Ver o ADR de 26/08/2026 no CLAUDE.md."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 e com cabecalhos de seguranca', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    pm.expect(pm.response.headers.get('X-Content-Type-Options')).to.eql('nosniff');",
+                  "    pm.expect(pm.response.headers.get('Cross-Origin-Resource-Policy')).to.eql('same-site');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "06 - Validacao de filtros (400)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/questoes?anoInicial=1500&area=FILOSOFIA_QUANTICA",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "questoes"
+              ],
+              "query": [
+                {
+                  "key": "anoInicial",
+                  "value": "1500"
+                },
+                {
+                  "key": "area",
+                  "value": "FILOSOFIA_QUANTICA"
+                }
+              ]
+            },
+            "description": "Query param é entrada de usuário igual a corpo de request — e leva Bean Validation igual.\n\nRepare na mensagem do campo `area`: lista os valores aceitos. A mensagem padrão do Spring vazaria o nome da classe interna; o GlobalExceptionHandler substitui."
+          }
+        },
+        {
+          "name": "07 - Ordenacao invalida (400)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/questoes?sort=campoQueNaoExiste",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "questoes"
+              ],
+              "query": [
+                {
+                  "key": "sort",
+                  "value": "campoQueNaoExiste"
+                }
+              ]
+            },
+            "description": "Ordenação só nos campos da whitelist (id, ano, numero, area, idioma).\n\nNasceu de um bug real: com @Query explícita o Spring Data concatena o ?sort= no JPQL sem validar, e campo inexistente estourava no Hibernate como 500."
           }
         }
       ]
@@ -309,8 +649,15 @@
             "url": {
               "raw": "https://api.enem.dev/v1/exams",
               "protocol": "https",
-              "host": ["api", "enem", "dev"],
-              "path": ["v1", "exams"]
+              "host": [
+                "api",
+                "enem",
+                "dev"
+              ],
+              "path": [
+                "v1",
+                "exams"
+              ]
             },
             "description": "API PÚBLICA de terceiro (não é a nossa). Devolve array de provas: { title, year, disciplines[], languages[] }.\n\nAs 4 disciplines (linguagens, ciencias-humanas, ciencias-natureza, matematica) são exatamente o nosso enum Area."
           }
@@ -323,12 +670,30 @@
             "url": {
               "raw": "https://api.enem.dev/v1/exams/2023/questions?limit=5&offset=0&language=ingles",
               "protocol": "https",
-              "host": ["api", "enem", "dev"],
-              "path": ["v1", "exams", "2023", "questions"],
+              "host": [
+                "api",
+                "enem",
+                "dev"
+              ],
+              "path": [
+                "v1",
+                "exams",
+                "2023",
+                "questions"
+              ],
               "query": [
-                { "key": "limit", "value": "5" },
-                { "key": "offset", "value": "0" },
-                { "key": "language", "value": "ingles" }
+                {
+                  "key": "limit",
+                  "value": "5"
+                },
+                {
+                  "key": "offset",
+                  "value": "0"
+                },
+                {
+                  "key": "language",
+                  "value": "ingles"
+                }
               ]
             },
             "description": "Formato: { metadata: {limit, offset, total, hasMore}, questions: [...] }\n\nO parâmetro language (ingles|espanhol) controla qual variante das questões 1-5 de linguagens vem — elas têm o MESMO número no mesmo ano. Por isso a chave natural do nosso banco é (ano, numero, idioma), e o job vai varrer cada ano duas vezes.\n\nOmitindo o parâmetro, a API devolve espanhol."
@@ -342,8 +707,18 @@
             "url": {
               "raw": "https://api.enem.dev/v1/exams/2023/questions/170",
               "protocol": "https",
-              "host": ["api", "enem", "dev"],
-              "path": ["v1", "exams", "2023", "questions", "170"]
+              "host": [
+                "api",
+                "enem",
+                "dev"
+              ],
+              "path": [
+                "v1",
+                "exams",
+                "2023",
+                "questions",
+                "170"
+              ]
             },
             "description": "Questão de matemática com imagens — mostra o que o job de importação vai ter que resolver:\n\n1. files[] traz URLs hospedadas no enem.dev, e o markdown do context referencia elas. Vamos baixar e reescrever pro nosso storage.\n\n2. alternatives[].file pode vir preenchido com text: null (alternativa só-imagem). Daí o CHECK da tabela: texto OU imagem_url NOT NULL."
           }

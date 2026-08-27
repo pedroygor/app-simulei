@@ -52,7 +52,7 @@ class ImportadorDeQuestoesTest {
         // Conversor real: queremos o comportamento de verdade dele aqui
         importador = new ImportadorDeQuestoes(client, new ConversorQuestaoEnemDev(), imagemStorage, questaoRepository);
         when(questaoRepository.buscarChavesDoAno(anyInt())).thenReturn(List.of());
-        when(imagemStorage.guardar(anyString(), anyInt(), anyInt())).thenReturn("/imagens/local/x.png");
+        when(imagemStorage.guardar(anyString())).thenReturn("/imagens/ab/cd/abcd.png");
     }
 
     @Test
@@ -131,7 +131,7 @@ class ImportadorDeQuestoesTest {
 
     @Test
     void mantemUrlDaFonteQuandoDownloadDeImagemFalha() {
-        when(imagemStorage.guardar(anyString(), anyInt(), anyInt()))
+        when(imagemStorage.guardar(anyString()))
                 .thenThrow(new ImagemIndisponivelException("https://enem.dev/x.png", new RuntimeException("404")));
         var comImagem = new QuestaoEnemDev(1, 2023, "matematica", null,
                 "Veja ![](https://enem.dev/2023/questions/1/x.png)", "comando", "A",
@@ -149,6 +149,28 @@ class ImportadorDeQuestoesTest {
         // Fallback: perder a questão inteira por causa de um PNG fora do ar
         // seria pior do que continuar apontando pra fonte
         assertThat(capturada.getValue().getEnunciado()).contains("https://enem.dev/2023/questions/1/x.png");
+    }
+
+    @Test
+    void mantemUrlDaFonteQuandoImagemEhRecusadaPelaAllowlist() {
+        // SVG recusado no storage: a questão continua entrando, e o conteúdo
+        // recusado passa a ser servido pelo domínio da fonte, não pelo nosso
+        when(imagemStorage.guardar(anyString()))
+                .thenThrow(new ImagemRejeitadaException("https://enem.dev/broken-image.svg", "formato fora da allowlist"));
+        var comSvg = new QuestaoEnemDev(1, 2023, "matematica", null,
+                "Veja ![](https://enem.dev/broken-image.svg)", "comando", "A",
+                List.of("https://enem.dev/broken-image.svg"), alternativas());
+        responderComPagina("espanhol", comSvg);
+        responderComPagina("ingles");
+
+        var resultado = importador.importarAno(2023);
+
+        assertThat(resultado.importadas()).isEqualTo(1);
+        assertThat(resultado.imagensComFalha()).isEqualTo(1);
+
+        var capturada = ArgumentCaptor.forClass(Questao.class);
+        verify(questaoRepository).save(capturada.capture());
+        assertThat(capturada.getValue().getEnunciado()).contains("https://enem.dev/broken-image.svg");
     }
 
     @Test

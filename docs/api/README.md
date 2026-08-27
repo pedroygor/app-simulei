@@ -34,7 +34,7 @@ cd docs/api/bruno
 npx @usebruno/cli run --env local --disable-cookies
 ```
 
-Deve dar **14 requests, 20 assertions, PASS**. O `--disable-cookies` é
+Deve dar **20 requests, 25 assertions, PASS** (com 2023 importado). O `--disable-cookies` é
 necessário pros cenários negativos — veja a seção sobre o cookie jar abaixo.
 
 ## Postman
@@ -87,3 +87,12 @@ Se um dia apontar a collection pra staging/produção, **não edite o
 | POST | `/auth/login` | pública | 200 com tokens / 401 senha errada |
 | POST | `/auth/refresh` | cookie | 200 rotação / 401 token inválido |
 | GET | `/usuarios/me` | Bearer | 200 perfil / 401 sem token |
+| GET | `/questoes` | Bearer | 200 paginado / filtros / 400 validação / 400 sort inválido |
+| GET | `/questoes/{id}` | Bearer | 200 com alternativas / 404 anulada ou inexistente |
+| GET | `/imagens/**` | pública | 200 imagem da questão |
+
+A pasta **Questões** precisa das questões importadas no banco:
+
+```bash
+./mvnw spring-boot:run -Dspring-boot.run.arguments="--importar-questoes --anos=2023"
+```

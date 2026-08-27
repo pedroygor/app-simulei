@@ -91,8 +91,7 @@ public class ImportadorDeQuestoes {
         try {
             // Imagens são baixadas AQUI, fora de qualquer transação: são
             // centenas de downloads e não podem segurar conexão do pool
-            var questao = conversor.converter(origem,
-                    url -> contadorDeImagens.guardar(url, origem.year(), origem.index()));
+            var questao = conversor.converter(origem, contadorDeImagens::guardar);
             questaoRepository.save(questao);
             return new ResultadoImportacao(1, 0, 0, contadorDeImagens.guardadas, contadorDeImagens.falhas);
         } catch (QuestaoInvalidaException e) {
@@ -135,20 +134,24 @@ public class ImportadorDeQuestoes {
         return "ingles".equals(language) ? Idioma.INGLES : Idioma.ESPANHOL;
     }
 
-    // Guarda imagem contando sucessos e falhas. Falha de imagem NÃO derruba a
-    // questão: mantemos a URL original da fonte e seguimos — perder o texto
-    // inteiro por causa de um PNG fora do ar seria pior.
+    // Guarda imagem contando sucessos e recusas. Nenhuma das duas derruba a
+    // questão: perder o texto inteiro por causa de um PNG fora do ar (ou de um
+    // SVG que recusamos) seria pior.
     private final class ContadorDeImagens {
         private int guardadas;
         private int falhas;
 
-        private String guardar(String urlOrigem, int ano, int numero) {
+        private String guardar(String urlOrigem) {
             try {
-                var urlLocal = imagemStorage.guardar(urlOrigem, ano, numero);
+                var urlLocal = imagemStorage.guardar(urlOrigem);
                 guardadas++;
                 return urlLocal;
-            } catch (ImagemIndisponivelException e) {
-                log.warn("Imagem não baixada ({}), mantendo URL da fonte: {}", e.getMessage(), urlOrigem);
+            } catch (ImagemIndisponivelException | ImagemRejeitadaException e) {
+                // Fallback deliberado: mantemos a URL da FONTE. A questão
+                // continua utilizável, e o conteúdo recusado (um SVG, por
+                // exemplo) passa a ser servido pelo domínio deles, não pelo
+                // nosso — que é exatamente o ponto da recusa.
+                log.warn("{} — mantendo URL da fonte", e.getMessage());
                 falhas++;
                 return urlOrigem;
             }

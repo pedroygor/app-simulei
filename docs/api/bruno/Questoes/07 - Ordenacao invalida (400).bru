@@ -1,0 +1,34 @@
+meta {
+  name: 07 - Ordenacao invalida (400)
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{baseUrl}}/questoes?sort=campoQueNaoExiste
+  body: none
+  auth: none
+}
+
+params:query {
+  sort: campoQueNaoExiste
+}
+
+headers {
+  Authorization: Bearer {{accessToken}}
+}
+
+assert {
+  res.status: eq 400
+}
+
+docs {
+  Ordenação só é aceita nos campos da whitelist (id, ano, numero, area,
+  idioma); qualquer outro devolve 400 dizendo quais valem.
+
+  Isso nasceu de um bug encontrado testando: com @Query explícita, o Spring
+  Data concatena o ?sort= no JPQL SEM validar nada, e um campo inexistente
+  estourava lá no Hibernate como 500. A whitelist barra antes de chegar no
+  banco — e de quebra limita a superfície: ordenar por campo interno não é
+  funcionalidade que alguém pediu.
+}
