@@ -1,43 +1,22 @@
-HELP.md
-target/
-.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
-
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
-
-### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
-*.ipr
-
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
-
-### VS Code ###
-.vscode/
-
 ### Segredos — NUNCA commitar ###
+# .env.* pega .env.local, .env.prod etc; a exceção libera só o exemplo
 .env
 .env.*
 !.env.example
-application-local.yml
-application-local.properties
 
-### Imagens importadas da enem.dev (dado, não código) ###
+### Dado importado da enem.dev (não é código; ~116 arquivos, 6MB) ###
 storage/
+
+### Rede de segurança: build do Maven só deve existir em backend/, mas se
+### alguém rodar da raiz por engano, não vai parar num commit ###
+target/
+
+### IDEs ###
+.idea/
+*.iws
+*.iml
+*.ipr
+.vscode/
+
+### Sistema operacional ###
+.DS_Store

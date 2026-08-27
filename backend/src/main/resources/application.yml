@@ -4,11 +4,17 @@ spring:
   application:
     name: api
   config:
-    # Carrega o .env da raiz como fonte de propriedades no startup, pra não
-    # depender de 'source .env' no shell antes de rodar. 'optional:' faz o Boot
-    # seguir em frente quando o arquivo não existe (prod), e variável de
-    # ambiente de verdade tem precedência maior que este arquivo.
-    import: optional:file:.env[.properties]
+    # Carrega o .env da raiz do repositório como fonte de propriedades no
+    # startup, pra não depender de 'source .env' no shell antes de rodar.
+    #
+    # São DOIS caminhos porque o .env mora na raiz e o backend é um nível
+    # abaixo: '../.env' cobre o comando normal (cd backend && ./mvnw) e '.env'
+    # cobre quem rodar da raiz. Os dois são 'optional:', então o que não existir
+    # é ignorado em silêncio — inclusive em produção, onde não há .env nenhum e
+    # tudo vem de variável de ambiente de verdade (que tem precedência maior).
+    import:
+      - optional:file:.env[.properties]
+      - optional:file:../.env[.properties]
   # Se nenhum perfil for informado, assume dev (na máquina local).
   # Em prod, ativar com SPRING_PROFILES_ACTIVE=prod.
   profiles:
@@ -46,9 +52,13 @@ enem-dev:
 
 storage:
   imagens:
-    # Onde as imagens baixadas da enem.dev são gravadas. Fora do src, e no
-    # .gitignore: são ~980 arquivos de dado importado, não de código.
-    diretorio: ${STORAGE_IMAGENS_DIR:./storage/imagens}
+    # Onde as imagens baixadas da enem.dev são gravadas: na RAIZ do repositório,
+    # fora de backend/ e no .gitignore — é dado importado, não código, e não
+    # pertence a nenhuma das duas aplicações em particular.
+    #
+    # O default é relativo ao diretório de execução, e o comando canônico roda
+    # de backend/ (daí o '../'). Rodando de outro lugar, defina STORAGE_IMAGENS_DIR.
+    diretorio: ${STORAGE_IMAGENS_DIR:../storage/imagens}
     # Prefixo das URLs gravadas no markdown das questões.
     # Em produção isto vira o host do CDN/bucket (ex: https://img.simulei.com.br)
     # e a aplicação para de servir arquivo estático — ver ADR de 26/08/2026.

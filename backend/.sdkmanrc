@@ -1,0 +1,8 @@
+# Enable auto-env through the sdkman_auto_env config
+# Add key=value pairs of SDKs to use below
+#
+# Duplicado de propósito (existe um igual na raiz): o auto_env do SDKMAN lê o
+# .sdkmanrc do diretório em que você ENTRA, e não sobe a árvore. Só na raiz,
+# abrir um terminal direto aqui cairia no Java 11 global e o Maven quebraria
+# com "class file version 61.0". Ao trocar a versão do Java, trocar nos dois.
+java=21.0.12+1.1-tem

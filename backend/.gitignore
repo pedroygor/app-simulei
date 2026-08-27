@@ -1,0 +1,7 @@
+### Build do Maven ###
+target/
+!.mvn/wrapper/maven-wrapper.jar
+
+### Config local com segredo (nunca commitar) ###
+application-local.yml
+application-local.properties
