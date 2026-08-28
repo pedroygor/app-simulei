@@ -46,6 +46,13 @@ jwt:
   access-ttl: 30m
   refresh-ttl: 7d
 
+app:
+  cors:
+    # Origens do frontend. Lista explícita, nunca "*": com allowCredentials
+    # (necessário pro cookie de refresh) o navegador recusa o curinga.
+    # Em produção: CORS_ORIGENS=https://app.simulei.com.br
+    origens: ${CORS_ORIGENS:http://localhost:3000}
+
 # URL pública, não é segredo — pode viver no yml
 enem-dev:
   base-url: https://api.enem.dev/v1

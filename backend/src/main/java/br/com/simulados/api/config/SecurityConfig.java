@@ -30,6 +30,7 @@ import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
@@ -52,8 +53,13 @@ public class SecurityConfig {
     }
 
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain securityFilterChain(HttpSecurity http,
+                                            CorsConfigurationSource corsConfigurationSource,
+                                            RespostaDeErroDeSeguranca respostaDeErro) throws Exception {
         http
+                // Liga o filtro de CORS com a nossa fonte (origens explícitas,
+                // credenciais permitidas — ver CorsConfig)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource))
                 // CSRF protege sessão em cookie; nossa API é stateless com token
                 // no header, onde esse ataque não se aplica
                 .csrf(csrf -> csrf.disable())
@@ -74,7 +80,15 @@ public class SecurityConfig {
                 // Liga o filtro do resource server: extrai o Bearer do header,
                 // valida com o jwtDecoder e povoa o SecurityContext — sem filtro nosso
                 .oauth2ResourceServer(oauth2 -> oauth2
-                        .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())));
+                        .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()))
+                        // O resource server tem o próprio entry point; sem
+                        // sobrescrever aqui também, o 401 de token inválido
+                        // continuaria saindo sem corpo
+                        .authenticationEntryPoint(respostaDeErro))
+                // 401/403 no nosso JSON padronizado, em vez de corpo vazio
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(respostaDeErro)
+                        .accessDeniedHandler(respostaDeErro));
         return http.build();
     }
 
