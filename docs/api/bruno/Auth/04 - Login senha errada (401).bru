@@ -1,0 +1,35 @@
+meta {
+  name: 04 - Login senha errada (401)
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/auth/login
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "email": "{{email}}",
+    "senha": "senha-errada-999"
+  }
+}
+
+assert {
+  res.status: eq 401
+  res.body.mensagem: eq E-mail ou senha inválidos
+}
+
+docs {
+  401 com mensagem "E-mail ou senha inválidos".
+
+  Troque o e-mail por um que NÃO existe: a resposta é idêntica, byte a byte.
+  Isso é deliberado — mensagem diferente para "e-mail não existe" entregaria
+  de bandeja quais e-mails estão cadastrados na plataforma.
+}

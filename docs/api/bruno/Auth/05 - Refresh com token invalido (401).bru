@@ -1,0 +1,34 @@
+meta {
+  name: 05 - Refresh com token invalido (401)
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/auth/refresh
+  body: none
+  auth: none
+}
+
+headers {
+  Cookie: refresh_token=token-invalido
+}
+
+assert {
+  res.status: eq 401
+}
+
+docs {
+  401 "Refresh token inválido ou expirado", no nosso formato JSON padronizado.
+
+  ATENÇÃO — cookie jar: com o jar ligado (padrão do Bruno), o cookie válido
+  guardado no Login SOBRESCREVE este header e o request devolve 200, não 401.
+  Pra ver o 401 de verdade, faça uma das duas:
+    - limpe os cookies (Preferences > Cookies) antes de rodar; ou
+    - rode pela CLI com --disable-cookies.
+
+  Outras variações que caem no mesmo 401 — vale testar na mão:
+  - `Cookie: refresh_token={{accessToken}}` — a claim `tipo` impede que um
+    access token seja usado como refresh (e vice-versa no Authorization).
+  - remover o header Cookie por completo (mesmo aviso do jar acima).
+}

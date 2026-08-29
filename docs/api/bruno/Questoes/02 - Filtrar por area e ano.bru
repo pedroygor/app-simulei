@@ -1,0 +1,43 @@
+meta {
+  name: 02 - Filtrar por area e ano
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/questoes?area=MATEMATICA&anoInicial=2023&anoFinal=2023&size=5
+  body: none
+  auth: none
+}
+
+params:query {
+  area: MATEMATICA
+  anoInicial: 2023
+  anoFinal: 2023
+  size: 5
+}
+
+headers {
+  Authorization: Bearer {{accessToken}}
+}
+
+assert {
+  res.status: eq 200
+}
+
+docs {
+  Filtros combináveis: area, idioma, anoInicial, anoFinal, materia.
+  Todos opcionais — omitir é "não filtre por isso".
+
+  Áreas: LINGUAGENS, CIENCIAS_HUMANAS, CIENCIAS_NATUREZA, MATEMATICA
+
+  Questões ANULADAS nunca aparecem: não é um filtro que você controla, é regra
+  do produto (questão anulada não entra em simulado).
+
+  O intervalo invertido é tolerado: ?anoInicial=2023&anoFinal=2020 devolve o
+  mesmo que 2020..2023, em vez de lista vazia sem explicação.
+
+  Sobre `materia`: o filtro existe, mas a enem.dev não fornece esse dado — a
+  coluna está vazia até fazermos o enriquecimento. Filtrar por ela hoje
+  devolve zero resultados.
+}

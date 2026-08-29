@@ -1,0 +1,51 @@
+meta {
+  name: 01 - Listar
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/questoes?size=50
+  body: none
+  auth: none
+}
+
+params:query {
+  size: 50
+}
+
+headers {
+  Authorization: Bearer {{accessToken}}
+}
+
+assert {
+  res.status: eq 200
+  res.body.content: isDefined
+}
+
+script:post-response {
+  // Guarda um id real pros requests seguintes. Ids são sequenciais do banco e
+  // mudam a cada reimportação — nunca chute um valor fixo aqui.
+  const itens = res.body.content || [];
+  // Prefere uma questão COM imagem, pra cadeia 04 -> 05 conseguir testar o
+  // servidor de imagens; cai na primeira se nenhuma tiver.
+  const comImagem = itens.find(q => (q.previa || "").includes("/imagens/"));
+  const escolhida = comImagem || itens[0];
+  if (escolhida) {
+    bru.setEnvVar("questaoId", escolhida.id);
+  }
+}
+
+docs {
+  Listagem paginada. Exige autenticação — rode o Login antes.
+
+  A listagem NÃO traz alternativas de propósito: incluí-las faria cada questão
+  da página virar um SELECT extra (N+1). Quem quer a questão inteira chama
+  GET /questoes/{id}.
+
+  Cada item traz uma `previa` do enunciado, cortada no banco (substring), não
+  em Java — o texto completo de uma questão do ENEM chega a milhares de
+  caracteres e não precisa trafegar só pra montar uma lista.
+
+  Ordenação padrão: ano desc, numero desc.
+}

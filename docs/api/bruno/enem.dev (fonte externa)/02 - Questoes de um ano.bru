@@ -1,0 +1,33 @@
+meta {
+  name: 02 - Questoes de um ano
+  type: http
+  seq: 2
+}
+
+get {
+  url: https://api.enem.dev/v1/exams/2023/questions?limit=5&offset=0&language=ingles
+  body: none
+  auth: none
+}
+
+params:query {
+  limit: 5
+  offset: 0
+  language: ingles
+}
+
+assert {
+  res.status: eq 200
+  res.body.questions: length 5
+}
+
+docs {
+  Formato: { metadata: {limit, offset, total, hasMore}, questions: [...] }
+
+  O parâmetro `language` (ingles|espanhol) controla qual variante das questões
+  1-5 de linguagens vem — elas têm o MESMO número no mesmo ano. Por isso a
+  chave natural do nosso banco é (ano, numero, idioma), e o job de importação
+  vai varrer cada ano duas vezes, uma por idioma.
+
+  Omitindo o parâmetro, a API devolve espanhol por padrão.
+}

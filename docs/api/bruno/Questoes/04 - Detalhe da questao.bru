@@ -1,0 +1,49 @@
+meta {
+  name: 04 - Detalhe da questao
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/questoes/{{questaoId}}
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{accessToken}}
+}
+
+assert {
+  res.status: eq 200
+}
+
+script:post-response {
+  // Extrai a primeira imagem do enunciado pro request 05 usar.
+  // As URLs são derivadas do hash do conteúdo, então não dá pra chutar.
+  const md = res.body.enunciado || "";
+  const achou = md.match(/\((\/imagens\/[^)]+)\)/);
+  if (achou) {
+    bru.setEnvVar("imagemUrl", achou[1]);
+  }
+}
+
+docs {
+  Questão completa: enunciado em markdown, comando, gabarito e as 5
+  alternativas ordenadas por letra.
+
+  Tudo em UMA query graças ao JOIN FETCH. Sem ele seriam duas — uma pra
+  questão e outra disparada quando o mapper tocasse na lista lazy.
+
+  O {{questaoId}} vem do request 01 (Listar) — ids são sequenciais do banco e
+  mudam a cada reimportação, então não vale cravar um valor fixo aqui.
+
+  O script pós-resposta guarda a primeira URL de imagem em {{imagemUrl}}, que
+  o request 05 usa.
+
+  Questão anulada devolve 404: do ponto de vista do produto ela não existe.
+
+  ATENÇÃO pro futuro: este DTO traz o `gabarito`, porque hoje quem consome é o
+  professor montando simulado. A tela de prova do aluno (Etapa 3) vai precisar
+  de um DTO próprio, SEM gabarito.
+}

@@ -1,0 +1,59 @@
+meta {
+  name: 01 - Login
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/auth/login
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "email": "{{email}}",
+    "senha": "{{senha}}"
+  }
+}
+
+script:post-response {
+  // Guarda o access token pros requests protegidos
+  bru.setEnvVar("accessToken", res.body.accessToken);
+
+  // O refresh token vem no Set-Cookie (httpOnly). Extraímos na mão em vez de
+  // confiar no cookie jar do cliente: o cookie é Secure e alguns clientes
+  // não o reenviam sobre http://localhost.
+  const setCookie = res.getHeader("set-cookie");
+  const raw = Array.isArray(setCookie) ? setCookie[0] : setCookie;
+  if (raw) {
+    const match = raw.match(/refresh_token=([^;]+)/);
+    if (match) {
+      bru.setEnvVar("refreshToken", match[1]);
+    }
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body.tokenType: eq Bearer
+  res.body.expiresIn: eq 1800
+}
+
+docs {
+  Endpoint PÚBLICO. Devolve:
+
+  - corpo: { accessToken, tokenType: "Bearer", expiresIn: 1800 }  (30 min)
+  - header Set-Cookie: refresh_token=...; Path=/auth/refresh; Max-Age=604800;
+    Secure; HttpOnly; SameSite=Lax                                 (7 dias)
+
+  O access token vive no corpo porque o JS do frontend precisa lê-lo pra
+  montar o header Authorization. O refresh fica em cookie httpOnly, que o JS
+  não enxerga — é o que limita o estrago de um XSS.
+
+  O script acima preenche {{accessToken}} e {{refreshToken}} no ambiente.
+}

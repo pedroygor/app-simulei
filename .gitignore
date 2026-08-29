@@ -38,3 +38,6 @@ build/
 !.env.example
 application-local.yml
 application-local.properties
+
+### Imagens importadas da enem.dev (dado, não código) ###
+storage/

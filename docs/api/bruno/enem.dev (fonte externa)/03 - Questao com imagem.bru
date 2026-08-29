@@ -1,0 +1,28 @@
+meta {
+  name: 03 - Questao com imagem
+  type: http
+  seq: 3
+}
+
+get {
+  url: https://api.enem.dev/v1/exams/2023/questions/170
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 200
+}
+
+docs {
+  Questão de matemática com imagens — mostra as duas coisas que o job de
+  importação vai ter que resolver:
+
+  1. `files[]` traz URLs de imagem hospedadas no enem.dev, e o markdown do
+     `context` referencia essas URLs embutidas. Vamos baixar os arquivos e
+     reescrever as URLs pro nosso storage — senão a "independência da fonte"
+     seria só do texto.
+
+  2. `alternatives[].file` pode vir preenchido com `text: null` (alternativa
+     que é só imagem). Daí o CHECK da tabela: texto OU imagem_url NOT NULL.
+}
