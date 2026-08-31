@@ -1,0 +1,32 @@
+meta {
+  name: 07 - Logout
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{baseUrl}}/auth/logout
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 204
+}
+
+docs {
+  Expira o cookie de refresh no navegador (Set-Cookie com Max-Age=0).
+
+  ATENÇÃO ao que isto NÃO faz: o refresh token continua tecnicamente válido,
+  porque é stateless — quem tiver uma cópia consegue usá-la até expirar.
+  Revogação de verdade exigiria uma lista de tokens revogados no banco, e isso
+  só se paga quando houver requisito real (conta comprometida, encerrar sessão
+  remota).
+
+  Mesmo assim o endpoint importa: o aluno usa o computador compartilhado do
+  cursinho, e "sair" precisa impedir que o próximo da fila continue a sessão.
+  Sem apagar o cookie, um refresh traria tudo de volta.
+
+  É público de propósito: quem já perdeu o access token ainda precisa
+  conseguir apagar o cookie.
+}

@@ -70,7 +70,9 @@ public class SecurityConfig {
                         // GlobalExceptionHandler vira 401 em vez de 400/500
                         .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
                         .requestMatchers(HttpMethod.POST, "/usuarios").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/auth/login", "/auth/refresh").permitAll()
+                        // logout é público: quem já perdeu o token de acesso ainda
+                        // precisa conseguir apagar o cookie
+                        .requestMatchers(HttpMethod.POST, "/auth/login", "/auth/refresh", "/auth/logout").permitAll()
                         // Imagens das questões são públicas de propósito: são
                         // provas do ENEM (domínio público) e precisam carregar
                         // num <img src> simples. Exigir Bearer aqui obrigaria o

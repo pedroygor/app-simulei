@@ -42,6 +42,33 @@ public class AuthController {
         return respostaComCookie(tokens);
     }
 
+    /**
+     * Encerra a sessão no NAVEGADOR expirando o cookie de refresh.
+     *
+     * Não invalida o token no servidor — ele é stateless, e quem tiver uma
+     * cópia consegue usá-la até expirar. Para revogação de verdade seria
+     * preciso uma lista de tokens revogados no banco, o que só se paga quando
+     * houver requisito real (conta comprometida, sessão remota).
+     *
+     * Mesmo assim isto importa: o aluno usa o computador compartilhado do
+     * cursinho, e "sair" precisa impedir que o próximo da fila continue a
+     * sessão. Sem expirar o cookie, um refresh traria a sessão de volta.
+     */
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout() {
+        var cookieExpirado = ResponseCookie.from(COOKIE_REFRESH, "")
+                .httpOnly(true)
+                .secure(true)
+                .path("/auth/refresh")
+                // maxAge zero manda o navegador apagar o cookie agora
+                .maxAge(0)
+                .sameSite("Lax")
+                .build();
+        return ResponseEntity.noContent()
+                .header(HttpHeaders.SET_COOKIE, cookieExpirado.toString())
+                .build();
+    }
+
     private ResponseEntity<TokenResponse> respostaComCookie(AuthService.Tokens tokens) {
         var cookie = ResponseCookie.from(COOKIE_REFRESH, tokens.refreshToken())
                 // httpOnly: o JS do frontend nunca lê esse cookie (regra 8.1)

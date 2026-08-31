@@ -383,6 +383,39 @@
             },
             "description": "401 SEM corpo, com header WWW-Authenticate: Bearer.\n\nÉ o resource server do Spring Security respondendo antes de chegar no nosso controller — por isso não segue o JSON de erro padronizado. Está na lista de pendências do CLAUDE.md pra resolver junto com o frontend."
           }
+        },
+        {
+          "name": "07 - Logout",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('204 e cookie expirado', function () {",
+                  "    pm.response.to.have.status(204);",
+                  "    const setCookie = pm.response.headers.get('Set-Cookie') || '';",
+                  "    pm.expect(setCookie).to.include('Max-Age=0');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/logout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "logout"
+              ]
+            },
+            "description": "Expira o cookie de refresh no navegador (Set-Cookie com Max-Age=0).\n\nATENÇÃO ao que NÃO faz: o token continua tecnicamente válido, porque é stateless. Revogação real exigiria lista de revogados no banco — só se paga com requisito real.\n\nAinda assim importa: o aluno usa o computador compartilhado do cursinho, e 'sair' precisa impedir que o próximo continue a sessão.\n\nPúblico de propósito: quem perdeu o access token ainda precisa apagar o cookie."
+          }
         }
       ]
     },

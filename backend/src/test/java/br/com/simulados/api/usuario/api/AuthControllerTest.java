@@ -142,6 +142,28 @@ class AuthControllerTest {
                 .andExpect(status().isUnauthorized());
     }
 
+    @Test
+    void logoutExpiraOCookieDeRefresh() throws Exception {
+        cadastrar("Hugo", "auth.hugo@teste.com", "ALUNO");
+        var cookieRefresh = extrairCookieRefresh(login("auth.hugo@teste.com", SENHA).andReturn());
+
+        var resposta = mockMvc.perform(post("/auth/logout"))
+                .andExpect(status().isNoContent())
+                .andReturn();
+
+        // Max-Age=0 manda o navegador apagar o cookie. Importa no computador
+        // compartilhado do cursinho: sem isso o próximo aluno retomaria a sessão
+        var setCookie = resposta.getResponse().getHeader(HttpHeaders.SET_COOKIE);
+        assertThat(setCookie).contains("refresh_token=");
+        assertThat(setCookie).contains("Max-Age=0");
+        assertThat(setCookie).contains("Path=/auth/refresh");
+
+        // O token em si segue válido (é stateless) — o que muda é o navegador
+        // não tê-lo mais. Documentado como limitação consciente.
+        mockMvc.perform(post("/auth/refresh").cookie(cookieRefresh))
+                .andExpect(status().isOk());
+    }
+
     private void cadastrar(String nome, String email, String role) throws Exception {
         mockMvc.perform(post("/usuarios")
                         .contentType(MediaType.APPLICATION_JSON)

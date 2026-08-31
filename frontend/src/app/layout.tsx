@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Bricolage_Grotesque, Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
+import { AuthProvider } from "@/providers/auth-provider";
+import { QueryProvider } from "@/providers/query-provider";
+import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
 // Corpo: Geist. Vem com o Next e tem acentuação portuguesa bem desenhada.
@@ -47,7 +50,16 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          {/* QueryProvider fica por fora: o AuthProvider usa useQuery */}
+          <QueryProvider>
+            <AuthProvider>{children}</AuthProvider>
+          </QueryProvider>
+          {/* O rótulo padrão do sonner é em inglês; leitor de tela num app
+              em português precisa anunciar em português */}
+          <Toaster
+            containerAriaLabel="Notificações"
+            toastOptions={{ closeButton: true }}
+          />
         </ThemeProvider>
       </body>
     </html>
