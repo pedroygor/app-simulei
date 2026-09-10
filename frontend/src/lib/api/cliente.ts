@@ -13,6 +13,27 @@ type OpcoesDeRequisicao = Omit<RequestInit, "body"> & {
 };
 
 /**
+ * Quem quer saber que a sessão morreu.
+ *
+ * O cliente não conhece React nem TanStack Query — e não deveria. Em vez de
+ * importar o cache aqui, ele avisa quem se registrou. O AuthProvider é quem
+ * traduz esse aviso em "usuário virou null", e a RotaProtegida leva pro login.
+ *
+ * Sem isto, o refresh falhava, o token era limpo, e a interface continuava
+ * achando que havia sessão: o usuário ficava preso numa tela que não carrega.
+ */
+let aoPerderSessao: (() => void) | null = null;
+
+export function observarPerdaDeSessao(callback: (() => void) | null) {
+  aoPerderSessao = callback;
+}
+
+function avisarPerdaDeSessao() {
+  limparAccessToken();
+  aoPerderSessao?.();
+}
+
+/**
  * Uma renovação por vez.
  *
  * Numa tela com três consultas em paralelo, o token expira para as três ao
@@ -33,14 +54,18 @@ async function renovarSessao(): Promise<boolean> {
         credentials: "include",
       });
       if (!resposta.ok) {
-        limparAccessToken();
+        // Refresh recusado: o cookie venceu ou foi revogado. Fim de sessão.
+        avisarPerdaDeSessao();
         return false;
       }
       const { accessToken } = (await resposta.json()) as { accessToken: string };
       guardarAccessToken(accessToken);
       return true;
     } catch {
-      limparAccessToken();
+      // Falha de rede no refresh: não dá pra distinguir de sessão expirada
+      // sem heurística frágil. Tratamos como perda de sessão — pedir login de
+      // novo é melhor que deixar a tela travada sem explicação.
+      avisarPerdaDeSessao();
       return false;
     } finally {
       renovacaoEmAndamento = null;

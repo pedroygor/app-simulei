@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createContext, use, useMemo } from "react";
+import { createContext, use, useEffect, useMemo } from "react";
 import {
   cadastrar as cadastrarNaApi,
   entrar as entrarNaApi,
@@ -10,6 +10,7 @@ import {
   type DadosDeCadastro,
   type DadosDeLogin,
 } from "@/lib/api/auth";
+import { observarPerdaDeSessao } from "@/lib/api/cliente";
 import type { Usuario } from "@/lib/api/tipos";
 
 export const CHAVE_DA_SESSAO = ["sessao"] as const;
@@ -42,6 +43,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     retry: false,
     staleTime: Infinity,
   });
+
+  /**
+   * Liga o aviso do cliente HTTP ao cache de sessão.
+   *
+   * Quando a renovação automática falha (cookie vencido, backend reiniciado),
+   * o cliente avisa aqui, a sessão vira null e a RotaProtegida manda pro
+   * login. Antes disso, o usuário ficava numa tela protegida que não
+   * carregava nada e sem saber por quê.
+   */
+  useEffect(() => {
+    observarPerdaDeSessao(() => {
+      queryClient.setQueryData(CHAVE_DA_SESSAO, null);
+      // Some com o que já foi carregado: são dados de uma sessão que acabou
+      queryClient.removeQueries({ predicate: (q) => q.queryKey !== CHAVE_DA_SESSAO });
+    });
+    return () => observarPerdaDeSessao(null);
+  }, [queryClient]);
 
   const mutacaoDeLogin = useMutation({
     mutationFn: entrarNaApi,
