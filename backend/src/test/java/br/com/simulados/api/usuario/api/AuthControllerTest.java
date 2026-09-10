@@ -164,6 +164,47 @@ class AuthControllerTest {
                 .andExpect(status().isOk());
     }
 
+    @Test
+    void bloqueiaLoginDepoisDeVariasTentativasErradas() throws Exception {
+        // E-mail exclusivo deste teste: o limitador é singleton e guarda estado
+        // entre testes da mesma suíte
+        var alvo = "auth.brute@teste.com";
+        cadastrar("Alvo", alvo, "ALUNO");
+
+        // 5 falhas seguidas: as primeiras devolvem 401
+        for (var i = 0; i < 5; i++) {
+            login(alvo, "senha-errada-" + i).andExpect(status().isUnauthorized());
+        }
+
+        // A partir daí é 429, no nosso formato de erro
+        login(alvo, "senha-errada-final")
+                .andExpect(status().isTooManyRequests())
+                .andExpect(jsonPath("$.status").value(429))
+                .andExpect(jsonPath("$.mensagem").value(
+                        org.hamcrest.Matchers.containsString("Muitas tentativas")));
+
+        // E a senha CERTA também é barrada — senão o bloqueio não valeria nada
+        login(alvo, SENHA).andExpect(status().isTooManyRequests());
+    }
+
+    @Test
+    void bloqueioDeUmaContaNaoAfetaOutra() throws Exception {
+        // A turma do cursinho sai pelo mesmo IP: um aluno errando a senha não
+        // pode derrubar o login dos colegas. Por isso limitamos por conta.
+        var azarado = "auth.azarado@teste.com";
+        var colega = "auth.colega@teste.com";
+        cadastrar("Azarado", azarado, "ALUNO");
+        cadastrar("Colega", colega, "ALUNO");
+
+        for (var i = 0; i < 5; i++) {
+            login(azarado, "errada-" + i).andExpect(status().isUnauthorized());
+        }
+        login(azarado, SENHA).andExpect(status().isTooManyRequests());
+
+        // O colega entra normalmente
+        login(colega, SENHA).andExpect(status().isOk());
+    }
+
     private void cadastrar(String nome, String email, String role) throws Exception {
         mockMvc.perform(post("/usuarios")
                         .contentType(MediaType.APPLICATION_JSON)

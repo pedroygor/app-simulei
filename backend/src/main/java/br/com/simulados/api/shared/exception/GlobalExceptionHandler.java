@@ -76,6 +76,12 @@ public class GlobalExceptionHandler {
         return ErroResponse.de(HttpStatus.NOT_FOUND, ex.getMessage(), request.getRequestURI());
     }
 
+    @ExceptionHandler(MuitasRequisicoesException.class)
+    @ResponseStatus(HttpStatus.TOO_MANY_REQUESTS)
+    public ErroResponse trataMuitasRequisicoes(MuitasRequisicoesException ex, HttpServletRequest request) {
+        return ErroResponse.de(HttpStatus.TOO_MANY_REQUESTS, ex.getMessage(), request.getRequestURI());
+    }
+
     @ExceptionHandler(ConflitoException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErroResponse trataConflito(ConflitoException ex, HttpServletRequest request) {
