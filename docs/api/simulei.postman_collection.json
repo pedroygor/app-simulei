@@ -668,6 +668,43 @@
             },
             "description": "Ordenação só nos campos da whitelist (id, ano, numero, area, idioma).\n\nNasceu de um bug real: com @Query explícita o Spring Data concatena o ?sort= no JPQL sem validar, e campo inexistente estourava no Hibernate como 500."
           }
+        },
+        {
+          "name": "08 - Anos disponiveis",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 com lista de anos', () => {",
+                  "  pm.response.to.have.status(200);",
+                  "  pm.expect(pm.response.json()).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/questoes/anos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "questoes",
+                "anos"
+              ]
+            },
+            "description": "Anos com questões disponíveis, do mais recente pro mais antigo. Vem dos dados importados, não de constante — alimenta o filtro de ano da tela."
+          }
         }
       ]
     },

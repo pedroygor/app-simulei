@@ -6,6 +6,7 @@ import br.com.simulados.api.questao.domain.Questao;
 import br.com.simulados.api.questao.infrastructure.QuestaoRepository;
 import br.com.simulados.api.questao.infrastructure.enemdev.ConversorQuestaoEnemDev;
 import br.com.simulados.api.questao.infrastructure.enemdev.EnemDevClient;
+import br.com.simulados.api.questao.infrastructure.enemdev.ProvaEnemDev;
 import br.com.simulados.api.questao.infrastructure.enemdev.QuestaoEnemDev;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -15,7 +16,9 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Puxa as questões da enem.dev e persiste no nosso banco.
@@ -33,20 +36,19 @@ public class ImportadorDeQuestoes {
     // Teto da API: limit > 50 devolve 400
     private static final int TAMANHO_DA_PAGINA = 50;
 
-    // A fonte só entrega uma variante de idioma por vez. Sem a segunda passada
-    // perderíamos as questões de inglês — elas repetem o número da versão em
-    // espanhol, e por isso o idioma faz parte da chave natural.
-    private static final List<String> IDIOMAS_DA_FONTE = List.of("espanhol", "ingles");
-
     private final EnemDevClient client;
     private final ConversorQuestaoEnemDev conversor;
     private final ImagemStorage imagemStorage;
     private final QuestaoRepository questaoRepository;
 
     public ResultadoImportacao importarAnos(List<Integer> anos) {
+        // O catálogo de provas é consultado UMA vez por rodada, não uma por
+        // ano: é ele que diz quais variantes de idioma cada prova tem
+        var idiomasPorAno = idiomasDeclaradosPorAno();
+
         var total = ResultadoImportacao.vazio();
         for (var ano : anos) {
-            var resultado = importarAno(ano);
+            var resultado = importarAno(ano, idiomasPorAno);
             log.info("Ano {} concluído: {}", ano, resultado);
             total = total.mais(resultado);
         }
@@ -54,7 +56,19 @@ public class ImportadorDeQuestoes {
     }
 
     public ResultadoImportacao importarAno(int ano) {
-        log.info("Importando questões de {}", ano);
+        return importarAnos(List.of(ano));
+    }
+
+    private ResultadoImportacao importarAno(int ano, Map<Integer, List<String>> idiomasPorAno) {
+        var idiomas = idiomasPorAno.get(ano);
+        if (idiomas == null) {
+            // --anos=2030, por exemplo. Sem isto a chamada estouraria 404 lá
+            // na fonte e derrubaria a importação dos anos seguintes
+            log.warn("A enem.dev não tem a prova de {} — nada a importar", ano);
+            return ResultadoImportacao.vazio();
+        }
+        log.info("Importando questões de {} (variantes de idioma: {})", ano,
+                idiomas.isEmpty() ? "nenhuma" : idiomas);
 
         // UMA query pro ano inteiro. O caminho ingênuo — perguntar ao banco se
         // cada questão existe dentro do laço — seria 185 SELECTs por ano
@@ -63,13 +77,37 @@ public class ImportadorDeQuestoes {
         Set<ChaveNaturalQuestao> vistasNestaRodada = new HashSet<>();
 
         var resultado = ResultadoImportacao.vazio();
-        for (var idioma : IDIOMAS_DA_FONTE) {
-            for (var origem : buscarTodasAsQuestoes(ano, idioma)) {
-                resultado = resultado.mais(
-                        processar(origem, jaImportadas, vistasNestaRodada));
-            }
+        for (var origem : buscarQuestoesDeTodasAsVariantes(ano, idiomas)) {
+            resultado = resultado.mais(processar(origem, jaImportadas, vistasNestaRodada));
         }
         return resultado;
+    }
+
+    /**
+     * A fonte só entrega uma variante de idioma por vez: as questões de inglês
+     * repetem o número da versão em espanhol (por isso o idioma faz parte da
+     * chave natural), e cada variante exige uma passada própria.
+     *
+     * As variantes vêm do que a PROVA declara, não de uma lista fixa. A lista
+     * fixa ("espanhol", "ingles") funcionou enquanto só 2023 era importado e
+     * quebrou na primeira importação completa: 2011 só tem espanhol, e pedir
+     * inglês devolve 400. Prova sem variante nenhuma (2009) é varrida uma vez,
+     * sem o parâmetro.
+     */
+    private List<QuestaoEnemDev> buscarQuestoesDeTodasAsVariantes(int ano, List<String> idiomas) {
+        if (idiomas.isEmpty()) {
+            return buscarTodasAsQuestoes(ano, null);
+        }
+        var todas = new ArrayList<QuestaoEnemDev>();
+        for (var idioma : idiomas) {
+            todas.addAll(buscarTodasAsQuestoes(ano, idioma));
+        }
+        return todas;
+    }
+
+    private Map<Integer, List<String>> idiomasDeclaradosPorAno() {
+        return client.listarProvas().stream()
+                .collect(Collectors.toMap(ProvaEnemDev::year, ProvaEnemDev::idiomas));
     }
 
     private ResultadoImportacao processar(QuestaoEnemDev origem,

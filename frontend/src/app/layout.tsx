@@ -40,7 +40,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} ${bricolage.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
+      {/* Extensões de navegador (ColorZilla, Grammarly e afins) injetam atributo
+          no <body> antes do React hidratar, e a divergência vira erro no console.
+          Suprimir aqui é seguro porque suppressHydrationWarning vale só UM nível:
+          cobre os atributos deste elemento, não os dos filhos — divergência de
+          verdade na nossa árvore continua sendo acusada normalmente. */}
+      <body suppressHydrationWarning className="min-h-full flex flex-col">
         <ThemeProvider
           attribute="class"
           // Escuro é o padrão: o caso de uso real é o aluno estudando de

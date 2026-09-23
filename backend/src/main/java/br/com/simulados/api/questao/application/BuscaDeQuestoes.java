@@ -12,6 +12,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class BuscaDeQuestoes {
@@ -32,5 +34,10 @@ public class BuscaDeQuestoes {
         // 404. Do ponto de vista do produto ela não existe pra montar simulado.
         return questaoRepository.buscarComAlternativas(id)
                 .orElseThrow(() -> new QuestaoNaoEncontradaException(id));
+    }
+
+    @Transactional(readOnly = true)
+    public List<Integer> anosDisponiveis() {
+        return questaoRepository.buscarAnosDisponiveis();
     }
 }

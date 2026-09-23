@@ -97,4 +97,26 @@ public interface QuestaoRepository extends JpaRepository<Questao, Long> {
             WHERE q.id = :id AND q.anulada = false
             """)
     Optional<Questao> buscarComAlternativas(@Param("id") Long id);
+
+    /**
+     * Anos que têm ao menos uma questão utilizável, do mais recente pro mais
+     * antigo. Alimenta o filtro de ano da tela.
+     *
+     * Existe pra que o intervalo oferecido ao usuário venha dos DADOS, não de
+     * uma constante: o front tinha 2009–2030 fixo e oferecia 2024–2030, que
+     * não existem nem na fonte. Quando a importação trouxer uma prova nova, o
+     * ano aparece sozinho.
+     *
+     * Projeção escalar: o JPQL devolve só a coluna e o Spring Data mapeia
+     * direto pra List<Integer> — nenhuma entidade é carregada.
+     *
+     * Sem Pageable, e é exceção consciente à regra "toda listagem é paginada"
+     * (seção 8.4): o resultado é limitado POR CONSTRUÇÃO, uma linha por prova
+     * do ENEM (~15 hoje, uma a mais por ano).
+     *
+     * `anulada = false` pelo mesmo motivo da busca: um ano cujas questões
+     * fossem todas anuladas levaria o usuário a uma lista vazia.
+     */
+    @Query("SELECT DISTINCT q.ano FROM Questao q WHERE q.anulada = false ORDER BY q.ano DESC")
+    List<Integer> buscarAnosDisponiveis();
 }

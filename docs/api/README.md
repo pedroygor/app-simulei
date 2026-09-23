@@ -89,6 +89,7 @@ Se um dia apontar a collection pra staging/produção, **não edite o
 | GET | `/usuarios/me` | Bearer | 200 perfil / 401 sem token |
 | GET | `/questoes` | Bearer | 200 paginado / filtros / 400 validação / 400 sort inválido |
 | GET | `/questoes/{id}` | Bearer | 200 com alternativas / 404 anulada ou inexistente |
+| GET | `/questoes/anos` | Bearer | 200 com os anos que têm questão (vêm dos dados, não de constante) |
 | GET | `/imagens/**` | pública | 200 imagem da questão |
 
 A pasta **Questões** precisa das questões importadas no banco:

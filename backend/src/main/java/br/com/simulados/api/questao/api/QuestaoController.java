@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -62,6 +63,21 @@ public class QuestaoController {
         if (!invalidos.isEmpty()) {
             throw new OrdenacaoInvalidaException(invalidos, CAMPOS_ORDENAVEIS);
         }
+    }
+
+    /**
+     * Anos com questões disponíveis, do mais recente pro mais antigo.
+     *
+     * Não conflita com /{id} abaixo: as duas rotas casam com /questoes/anos,
+     * mas o Spring MVC escolhe o padrão mais ESPECÍFICO — segmento literal
+     * ganha de variável. Há teste garantindo isso, porque se a escolha
+     * invertesse, "anos" cairia no {id} e viraria 400 (não é um Long).
+     *
+     * Sem parâmetro de entrada, não há o que validar.
+     */
+    @GetMapping("/anos")
+    public List<Integer> anosDisponiveis() {
+        return buscaDeQuestoes.anosDisponiveis();
     }
 
     @GetMapping("/{id}")

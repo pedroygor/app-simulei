@@ -1,7 +1,6 @@
 import { ErroDaApi, ErroDeRede, type CorpoDeErro } from "./erros";
 import { guardarAccessToken, lerAccessToken, limparAccessToken } from "./token";
-
-const URL_DA_API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080";
+import { URL_DA_API } from "./url";
 
 /** Rotas que NÃO devem disparar refresh automático — senão vira laço. */
 const ROTAS_DE_AUTENTICACAO = ["/auth/login", "/auth/refresh"];

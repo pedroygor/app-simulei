@@ -3,11 +3,12 @@ import { resolve } from "node:path";
 
 export default defineConfig({
   test: {
-    // Ambiente node: os testes cobrem a camada de API (lógica pura sobre
-    // fetch), não componentes. Testar componente exigiria jsdom + testing
-    // library, o que entra quando houver tela com lógica que valha testar.
+    // Ambiente node mesmo com teste de componente: o TextoDaQuestao é
+    // verificado com renderToStaticMarkup, que devolve a STRING de HTML e não
+    // precisa de DOM. Para a pergunta que importa ali — "o <SCRIPT> da fonte
+    // virou tag?" — inspecionar a string é mais direto que montar jsdom.
     environment: "node",
-    include: ["src/**/*.test.ts"],
+    include: ["src/**/*.test.{ts,tsx}"],
   },
   resolve: {
     // Mesmo alias do tsconfig, pro import "@/..." funcionar nos testes

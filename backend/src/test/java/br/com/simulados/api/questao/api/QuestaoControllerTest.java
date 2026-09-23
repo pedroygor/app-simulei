@@ -277,6 +277,50 @@ class QuestaoControllerTest {
         }
     }
 
+    @Test
+    @WithMockUser
+    void listaAnosDisponiveisDoMaisRecenteProMaisAntigo() throws Exception {
+        mockMvc.perform(get("/questoes/anos"))
+                .andExpect(status().isOk())
+                // 2020 existe no banco, mas a única questão dele é anulada: um
+                // ano oferecido no filtro levaria o usuário a uma lista vazia
+                .andExpect(jsonPath("$").value(org.hamcrest.Matchers.contains(2023, 2022, 2021)));
+    }
+
+    @Test
+    @WithMockUser
+    void rotaDeAnosNaoCaiNaRotaDeId() throws Exception {
+        // /questoes/anos também casa com /questoes/{id}. Se o Spring escolhesse
+        // o padrão errado, "anos" viraria o id, a conversão pra Long falharia
+        // e a resposta seria 400 — não a lista.
+        mockMvc.perform(get("/questoes/anos"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray());
+    }
+
+    @Test
+    void anosExigemAutenticacao() throws Exception {
+        mockMvc.perform(get("/questoes/anos"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser
+    void anosNaoCarregamEntidadeNenhuma() throws Exception {
+        // Projeção escalar: 1 query, e nenhuma Questao hidratada. Se alguém
+        // trocar por findAll() + stream().map(getAno).distinct(), o número de
+        // entidades carregadas denuncia
+        var statistics = entityManager.unwrap(Session.class).getSessionFactory().getStatistics();
+        statistics.clear();
+
+        mockMvc.perform(get("/questoes/anos")).andExpect(status().isOk());
+
+        assertThat(statistics.getPrepareStatementCount()).isEqualTo(1);
+        assertThat(statistics.getEntityLoadCount())
+                .as("lista de anos não deve carregar entidade Questao")
+                .isZero();
+    }
+
     private Questao questao(int ano, int numero, Area area, Idioma idioma, boolean anulada) {
         var questao = new Questao();
         questao.setAno(ano);

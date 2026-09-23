@@ -8,6 +8,7 @@ import br.com.simulados.api.questao.infrastructure.enemdev.AlternativaEnemDev;
 import br.com.simulados.api.questao.infrastructure.enemdev.ConversorQuestaoEnemDev;
 import br.com.simulados.api.questao.infrastructure.enemdev.EnemDevClient;
 import br.com.simulados.api.questao.infrastructure.enemdev.PaginaDeQuestoesEnemDev;
+import br.com.simulados.api.questao.infrastructure.enemdev.ProvaEnemDev;
 import br.com.simulados.api.questao.infrastructure.enemdev.QuestaoEnemDev;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,6 +26,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -53,6 +55,62 @@ class ImportadorDeQuestoesTest {
         importador = new ImportadorDeQuestoes(client, new ConversorQuestaoEnemDev(), imagemStorage, questaoRepository);
         when(questaoRepository.buscarChavesDoAno(anyInt())).thenReturn(List.of());
         when(imagemStorage.guardar(anyString())).thenReturn("/imagens/ab/cd/abcd.png");
+        // Catálogo padrão: provas com as duas variantes, como a maioria dos anos
+        when(client.listarProvas()).thenReturn(List.of(
+                prova(2023, "espanhol", "ingles"),
+                prova(2022, "espanhol", "ingles")));
+    }
+
+    @Test
+    void varreSoAsVariantesQueAProvaDeclara() {
+        // Regressão do bug real: 2011 só tem espanhol, e pedir inglês faz a
+        // enem.dev responder 400 — o que abortava a importação inteira
+        when(client.listarProvas()).thenReturn(List.of(prova(2011, "espanhol")));
+        responderComPagina("espanhol", questao(2011, 1, "espanhol"), questao(2011, 6, null));
+
+        var resultado = importador.importarAno(2011);
+
+        assertThat(resultado.importadas()).isEqualTo(2);
+        verify(client, never()).buscarQuestoes(anyInt(), anyInt(), anyInt(), eq("ingles"));
+    }
+
+    @Test
+    void provaSemVarianteDeIdiomaEhVarridaUmaVezSemParametro() {
+        // 2009 não declara variante nenhuma: nem espanhol nem inglês existem
+        // pra ela na fonte. Uma passada, com o ?language= omitido (null)
+        when(client.listarProvas()).thenReturn(List.of(prova(2009)));
+        when(client.buscarQuestoes(eq(2009), anyInt(), anyInt(), isNull()))
+                .thenReturn(pagina(false, questao(2009, 1, null), questao(2009, 2, null)));
+
+        var resultado = importador.importarAno(2009);
+
+        assertThat(resultado.importadas()).isEqualTo(2);
+        verify(client, never()).buscarQuestoes(anyInt(), anyInt(), anyInt(), eq("espanhol"));
+        verify(client, never()).buscarQuestoes(anyInt(), anyInt(), anyInt(), eq("ingles"));
+    }
+
+    @Test
+    void anoQueAFonteNaoTemNaoEhConsultado() {
+        // --anos=2030: sem esta guarda, a chamada daria 404 na fonte e
+        // derrubaria os anos seguintes da mesma rodada
+        responderComPagina("espanhol", questao(2023, 1, null));
+        responderComPagina("ingles");
+
+        var resultado = importador.importarAnos(List.of(2030, 2023));
+
+        verify(client, never()).buscarQuestoes(eq(2030), anyInt(), anyInt(), any());
+        // ...e 2023, que vem DEPOIS do ano inexistente, ainda é importado
+        assertThat(resultado.importadas()).isEqualTo(1);
+    }
+
+    @Test
+    void consultaOCatalogoUmaVezPorRodadaNaoUmaPorAno() {
+        responderComPagina("espanhol");
+        responderComPagina("ingles");
+
+        importador.importarAnos(List.of(2023, 2022));
+
+        verify(client, times(1)).listarProvas();
     }
 
     @Test
@@ -188,6 +246,13 @@ class ImportadorDeQuestoesTest {
     private void responderComPagina(String idioma, QuestaoEnemDev... questoes) {
         when(client.buscarQuestoes(anyInt(), anyInt(), anyInt(), eq(idioma)))
                 .thenReturn(pagina(false, questoes));
+    }
+
+    private ProvaEnemDev prova(int ano, String... idiomas) {
+        var declarados = java.util.Arrays.stream(idiomas)
+                .map(idioma -> new ProvaEnemDev.IdiomaDaProva(idioma, idioma))
+                .toList();
+        return new ProvaEnemDev(ano, "ENEM " + ano, declarados);
     }
 
     private PaginaDeQuestoesEnemDev pagina(boolean temMais, QuestaoEnemDev... questoes) {

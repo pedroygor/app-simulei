@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { AlternadorDeTema } from "@/components/alternador-de-tema";
 import { RotaProtegida } from "@/components/auth/rota-protegida";
@@ -60,10 +61,9 @@ function ConteudoDaHome() {
               <dd>{usuario?.plano}</dd>
             </div>
           </dl>
-          <p className="text-muted-foreground mt-6 text-sm">
-            Atualize a página: a sessão continua de pé. O token de acesso vive só em memória e é
-            recuperado pelo cookie de refresh.
-          </p>
+          <Button asChild className="mt-6 w-full">
+            <Link href="/questoes">Explorar questões</Link>
+          </Button>
         </CardContent>
       </Card>
     </main>
