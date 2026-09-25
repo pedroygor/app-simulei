@@ -5,7 +5,11 @@ import type { QuestaoResumo } from "@/lib/api/questoes";
 import { NOME_DO_IDIOMA } from "@/lib/questoes/filtro-da-url";
 import { EtiquetaDeArea } from "./etiqueta-de-area";
 
-export function QuestaoCard({ questao }: { questao: QuestaoResumo }) {
+/**
+ * `href` vem de fora porque o cartão não sabe de que listagem faz parte — quem
+ * sabe é a lista, que monta o link levando os filtros pro "voltar" do detalhe.
+ */
+export function QuestaoCard({ questao, href }: { questao: QuestaoResumo; href: string }) {
   return (
     // relative ancora o link esticado do ::after abaixo; sem isto ele se
     // estenderia até o ancestral posicionado mais próximo, cobrindo a página
@@ -17,7 +21,7 @@ export function QuestaoCard({ questao }: { questao: QuestaoResumo }) {
           teclado, "abrir em nova aba", e leitor de tela anuncia como link.
         */}
         <Link
-          href={`/questoes/${questao.id}`}
+          href={href}
           className="after:absolute after:inset-0 focus-visible:outline-none"
         >
           <h2 className="font-heading text-base font-semibold">

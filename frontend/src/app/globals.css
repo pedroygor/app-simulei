@@ -4,6 +4,11 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Telas de pouca ALTURA — o notebook mais comum no Brasil é 1366×768. O
+   painel de acesso cresce com a largura, e sem isto o quadro da turma
+   passava da borda de baixo nessa resolução, cortando a conclusão dele. */
+@custom-variant tela-baixa (@media (max-height: 50rem));
+
 /* ---------------------------------------------------------------------------
    Identidade visual do Simulei — ver docs/identidade-visual.md
    ---------------------------------------------------------------------------

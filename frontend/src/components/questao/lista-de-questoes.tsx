@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
 import { buscarQuestoes, QUESTOES_POR_PAGINA, type FiltroDeQuestoes } from "@/lib/api/questoes";
 import { montarUrlDeQuestoes } from "@/lib/questoes/filtro-da-url";
+import { montarUrlDeDetalhe } from "@/lib/questoes/navegacao";
 import { FiltrosDeQuestoes } from "./filtros-de-questoes";
 import { Paginacao } from "./paginacao";
 import { QuestaoCard } from "./questao-card";
@@ -65,7 +66,7 @@ export function ListaDeQuestoes({ filtro }: { filtro: FiltroDeQuestoes }) {
           <ul className="space-y-3">
             {data.itens.map((questao) => (
               <li key={questao.id}>
-                <QuestaoCard questao={questao} />
+                <QuestaoCard questao={questao} href={montarUrlDeDetalhe(questao.id, filtro)} />
               </li>
             ))}
           </ul>

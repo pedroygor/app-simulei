@@ -1,12 +1,12 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { CartaoDeAutenticacao } from "@/components/auth/cartao-de-autenticacao";
+import { MolduraDeAcesso } from "@/components/auth/moldura-de-acesso";
 import { SeletorDePerfil } from "@/components/auth/seletor-de-perfil";
+import { CampoDeSenha } from "@/components/formulario/campo-de-senha";
 import { CampoDeTexto } from "@/components/formulario/campo-de-texto";
 import { Button } from "@/components/ui/button";
 import { ErroDaApi } from "@/lib/api/erros";
@@ -54,19 +54,12 @@ export default function PaginaDeCadastro() {
   }
 
   return (
-    <CartaoDeAutenticacao
+    <MolduraDeAcesso
       titulo="Criar conta"
-      descricao="Comece a treinar para o ENEM"
-      rodape={
-        <>
-          Já tem conta?{" "}
-          <Link href="/entrar" className="text-foreground font-medium underline underline-offset-4">
-            Entrar
-          </Link>
-        </>
-      }
+      subtitulo="Leva menos de um minuto. Depois é só escolher o simulado."
+      ativo="cadastro"
     >
-      <form onSubmit={handleSubmit(aoEnviar)} className="grid gap-4" noValidate>
+      <form onSubmit={handleSubmit(aoEnviar)} className="flex flex-1 flex-col gap-5" noValidate>
         {/* Controller é o caminho pra componente controlado customizado:
             watch() não é memoizável e o React Compiler avisa sobre isso */}
         <Controller
@@ -77,32 +70,35 @@ export default function PaginaDeCadastro() {
           )}
         />
         <CampoDeTexto
-          rotulo="Nome"
+          rotulo="Nome completo"
           autoComplete="name"
-          placeholder="Como você quer ser chamado"
+          // Nome completo: é como o professor identifica o aluno na turma
+          placeholder="Seu nome e sobrenome"
           erro={errors.nome?.message}
           {...register("nome")}
         />
         <CampoDeTexto
           rotulo="E-mail"
           type="email"
+          inputMode="email"
           autoComplete="email"
-          placeholder="voce@exemplo.com"
+          placeholder="voce@escola.com.br"
           erro={errors.email?.message}
           {...register("email")}
         />
-        <CampoDeTexto
+        <CampoDeSenha
           rotulo="Senha"
-          type="password"
           autoComplete="new-password"
           ajuda="Pelo menos 8 caracteres"
           erro={errors.senha?.message}
           {...register("senha")}
         />
-        <Button type="submit" disabled={isSubmitting} className="w-full">
-          {isSubmitting ? "Criando conta…" : "Criar conta"}
-        </Button>
+        <div className="mt-auto pt-4">
+          <Button type="submit" size="xl" disabled={isSubmitting} className="w-full">
+            {isSubmitting ? "Criando conta…" : "Criar minha conta"}
+          </Button>
+        </div>
       </form>
-    </CartaoDeAutenticacao>
+    </MolduraDeAcesso>
   );
 }

@@ -1,11 +1,11 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { CartaoDeAutenticacao } from "@/components/auth/cartao-de-autenticacao";
+import { MolduraDeAcesso } from "@/components/auth/moldura-de-acesso";
+import { CampoDeSenha } from "@/components/formulario/campo-de-senha";
 import { CampoDeTexto } from "@/components/formulario/campo-de-texto";
 import { Button } from "@/components/ui/button";
 import { ErroDaApi } from "@/lib/api/erros";
@@ -40,40 +40,37 @@ export default function PaginaDeLogin() {
   }
 
   return (
-    <CartaoDeAutenticacao
-      titulo="Entrar"
-      descricao="Acesse seus simulados"
-      rodape={
-        <>
-          Ainda não tem conta?{" "}
-          <Link href="/cadastro" className="text-foreground font-medium underline underline-offset-4">
-            Criar conta
-          </Link>
-        </>
-      }
+    <MolduraDeAcesso
+      titulo="Bom te ver de volta"
+      subtitulo="Entre para continuar de onde você parou."
+      ativo="entrar"
     >
-      <form onSubmit={handleSubmit(aoEnviar)} className="grid gap-4" noValidate>
+      {/* flex-1 + mt-auto no botão: no celular o formulário ocupa o resto da
+          tela e o botão principal desce pra perto do polegar */}
+      <form onSubmit={handleSubmit(aoEnviar)} className="flex flex-1 flex-col gap-5" noValidate>
         <CampoDeTexto
           rotulo="E-mail"
           type="email"
+          inputMode="email"
           autoComplete="email"
           // O aluno abre no celular pra entrar: já foca o primeiro campo
           autoFocus
-          placeholder="voce@exemplo.com"
+          placeholder="voce@escola.com.br"
           erro={errors.email?.message}
           {...register("email")}
         />
-        <CampoDeTexto
+        <CampoDeSenha
           rotulo="Senha"
-          type="password"
           autoComplete="current-password"
           erro={errors.senha?.message}
           {...register("senha")}
         />
-        <Button type="submit" disabled={isSubmitting} className="w-full">
-          {isSubmitting ? "Entrando…" : "Entrar"}
-        </Button>
+        <div className="mt-auto pt-4">
+          <Button type="submit" size="xl" disabled={isSubmitting} className="w-full">
+            {isSubmitting ? "Entrando…" : "Entrar"}
+          </Button>
+        </div>
       </form>
-    </CartaoDeAutenticacao>
+    </MolduraDeAcesso>
   );
 }

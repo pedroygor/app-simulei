@@ -1,6 +1,6 @@
 import Markdown from "react-markdown";
-import { resolverUrlDeImagem } from "@/lib/api/url";
 import { cn } from "@/lib/utils";
+import { ImagemDaQuestao } from "./imagem-da-questao";
 
 /**
  * Renderiza o markdown de enunciado, comando ou alternativa.
@@ -52,7 +52,7 @@ export function TextoDaQuestao({ texto, className }: Props) {
       <Markdown
         allowedElements={ELEMENTOS_PERMITIDOS}
         unwrapDisallowed
-        components={{ img: ImagemDaQuestao }}
+        components={{ img: ImagemDoMarkdown }}
       >
         {texto}
       </Markdown>
@@ -62,28 +62,13 @@ export function TextoDaQuestao({ texto, className }: Props) {
 
 /**
  * O `src` chega aqui JÁ higienizado pelo urlTransform padrão do
- * react-markdown, que barra protocolo perigoso (`javascript:`). O que falta é
- * resolver o caminho relativo contra a base da API — ver resolverUrlDeImagem.
+ * react-markdown, que barra protocolo perigoso (`javascript:`).
  */
-function ImagemDaQuestao({ src, alt }: { src?: string | Blob; alt?: string }) {
+function ImagemDoMarkdown({ src, alt }: { src?: string | Blob; alt?: string }) {
   if (typeof src !== "string" || !src) return null;
 
-  return (
-    // <img> e não next/image de propósito: o Image exige dimensão conhecida e
-    // host declarado em next.config, e aqui são centenas de imagens de
-    // terceiro, de tamanho arbitrário, servidas pela nossa própria API. O
-    // ganho de otimização não paga o acoplamento.
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
-      src={resolverUrlDeImagem(src)}
-      // A fonte quase sempre manda alt vazio (`![]()`). Um rótulo genérico ao
-      // menos anuncia que existe conteúdo visual ali; descrever de verdade
-      // exigiria curadoria humana e está fora de escopo.
-      alt={alt?.trim() || "Imagem da questão"}
-      // Questão pode ter várias imagens e o aluno está no 4G do interior
-      loading="lazy"
-      decoding="async"
-      className="mx-auto h-auto max-w-full rounded-md"
-    />
-  );
+  // A fonte quase sempre manda alt vazio (`![]()`). Um rótulo genérico ao
+  // menos anuncia que existe conteúdo visual ali; descrever de verdade
+  // exigiria curadoria humana e está fora de escopo.
+  return <ImagemDaQuestao src={src} alt={alt?.trim() || "Imagem da questão"} className="mx-auto" />;
 }
