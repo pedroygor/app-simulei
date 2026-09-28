@@ -53,14 +53,15 @@ public interface QuestaoRepository extends JpaRepository<Questao, Long> {
      * nada de buscar o assunto de cada questão depois (N+1). É LEFT e não
      * INNER porque questão ainda não classificada precisa continuar aparecendo.
      *
-     * `:materia` é o SLUG da matéria, que já é minúsculo por construção (V5).
+     * `:materia` e `:assunto` são SLUGS, minúsculos por construção (V5) e
+     * validados por @Pattern no filtro — chegam aqui prontos pra comparar.
      * Nunca envolver o PARÂMETRO num lower(): quando ele é null, o driver o
      * manda como bytea e o Postgres responde "function lower(bytea) does not
      * exist" (bug achado no passo 4 da Etapa 2).
      */
     @Query(value = """
             SELECT new br.com.simulados.api.questao.domain.ResumoDeQuestao(
-                       q.id, q.ano, q.numero, q.area, q.idioma, m.nome, a.nome,
+                       q.id, q.ano, q.numero, q.area, q.idioma, m.slug, m.nome, a.slug, a.nome,
                        substring(coalesce(q.enunciado, q.comando), 1, 300))
             FROM Questao q
             LEFT JOIN q.assunto a
@@ -71,6 +72,7 @@ public interface QuestaoRepository extends JpaRepository<Questao, Long> {
               AND (:anoInicial IS NULL OR q.ano >= :anoInicial)
               AND (:anoFinal IS NULL OR q.ano <= :anoFinal)
               AND (:materia IS NULL OR m.slug = :materia)
+              AND (:assunto IS NULL OR a.slug = :assunto)
             """,
             // countQuery explícita: sem ela o Spring tentaria derivar o count a
             // partir do SELECT com construtor e falharia. Os mesmos joins, senão
@@ -85,12 +87,14 @@ public interface QuestaoRepository extends JpaRepository<Questao, Long> {
               AND (:anoInicial IS NULL OR q.ano >= :anoInicial)
               AND (:anoFinal IS NULL OR q.ano <= :anoFinal)
               AND (:materia IS NULL OR m.slug = :materia)
+              AND (:assunto IS NULL OR a.slug = :assunto)
             """)
     Page<ResumoDeQuestao> buscar(@Param("area") Area area,
                                  @Param("idioma") Idioma idioma,
                                  @Param("anoInicial") Integer anoInicial,
                                  @Param("anoFinal") Integer anoFinal,
                                  @Param("materia") String materia,
+                                 @Param("assunto") String assunto,
                                  Pageable pageable);
 
     /**

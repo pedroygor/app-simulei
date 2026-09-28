@@ -24,8 +24,8 @@ public class BuscaDeQuestoes {
     // guarda snapshot das entidades carregadas
     @Transactional(readOnly = true)
     public Page<ResumoDeQuestao> buscar(Area area, Idioma idioma, Integer anoInicial,
-                                        Integer anoFinal, String materia, Pageable pageable) {
-        return questaoRepository.buscar(area, idioma, anoInicial, anoFinal, materia, pageable);
+                                        Integer anoFinal, String materia, String assunto, Pageable pageable) {
+        return questaoRepository.buscar(area, idioma, anoInicial, anoFinal, materia, assunto, pageable);
     }
 
     @Transactional(readOnly = true)

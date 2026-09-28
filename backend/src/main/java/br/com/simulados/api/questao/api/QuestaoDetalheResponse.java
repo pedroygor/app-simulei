@@ -14,8 +14,9 @@ public record QuestaoDetalheResponse(
         Integer numero,
         Area area,
         Idioma idioma,
-        String materia,
-        String assunto,
+        // {slug, nome}; null = questão ainda não classificada
+        RotuloResponse materia,
+        RotuloResponse assunto,
         String enunciado,
         String comando,
         String gabarito,

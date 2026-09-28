@@ -13,14 +13,21 @@ export type Area = (typeof AREAS)[number];
 export const IDIOMAS = ["INGLES", "ESPANHOL"] as const;
 export type Idioma = (typeof IDIOMAS)[number];
 
+/**
+ * Matéria ou assunto da taxonomia: o slug identifica (vai pro filtro e pra
+ * URL), o nome é pra exibir. Espelha RotuloResponse do backend.
+ */
+export type Rotulo = { slug: string; nome: string };
+
 export type QuestaoResumo = {
   id: number;
   ano: number;
   numero: number;
   area: Area;
   idioma: Idioma | null;
-  materia: string | null;
-  assunto: string | null;
+  /** null = questão ainda não classificada. */
+  materia: Rotulo | null;
+  assunto: Rotulo | null;
   /**
    * Prévia cortada no BANCO por substring — pode terminar no meio de um
    * `![](...)`. Medido: 9 das 182 questões de 2023 cortam dentro da sintaxe.
@@ -43,8 +50,9 @@ export type QuestaoDetalhe = {
   numero: number;
   area: Area;
   idioma: Idioma | null;
-  materia: string | null;
-  assunto: string | null;
+  /** null = questão ainda não classificada. */
+  materia: Rotulo | null;
+  assunto: Rotulo | null;
   /** Nullable: 5% das questões não têm texto-base (ver migration V3). */
   enunciado: string | null;
   comando: string | null;

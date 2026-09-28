@@ -4,6 +4,7 @@ import br.com.simulados.api.questao.domain.Area;
 import br.com.simulados.api.questao.domain.Idioma;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 /**
@@ -26,10 +27,18 @@ public record BuscarQuestoesFiltro(
 
         @Min(2009) @Max(2030) Integer anoFinal,
 
-        // Enriquecimento nosso, ainda não preenchido (a enem.dev não fornece).
-        // O filtro existe pro contrato não mudar quando os dados chegarem.
-        @Size(max = 40) String materia
+        // Slugs da taxonomia (docs/taxonomia.md): minúsculas, números e hífen.
+        // Validar o FORMATO aqui devolve 400 pra entrada malformada em vez de
+        // uma busca vazia sem explicação. Slug bem formado mas inexistente
+        // (?assunto=nao-existe) é só uma busca sem resultado — não é erro
+        // Teto de 60 = tamanho da coluna slug em assuntos (V4)
+        @Size(max = 60) @Pattern(regexp = SLUG, message = SLUG_INVALIDO) String materia,
+
+        @Size(max = 60) @Pattern(regexp = SLUG, message = SLUG_INVALIDO) String assunto
 ) {
+
+    static final String SLUG = "[a-z0-9]+(-[a-z0-9]+)*";
+    static final String SLUG_INVALIDO = "deve ser um identificador da taxonomia (ex.: probabilidade)";
 
     // Tolera o usuário mandando o intervalo invertido (?anoInicial=2023&anoFinal=2010)
     // em vez de devolver lista vazia sem explicação.
@@ -50,11 +59,5 @@ public record BuscarQuestoesFiltro(
             return anoFinal;
         }
         return Math.max(anoInicial, anoFinal);
-    }
-
-    // Normalizado aqui pra query poder comparar sem chamar lower() no
-    // parâmetro — ver comentário no QuestaoRepository
-    public String materiaNormalizada() {
-        return materia == null || materia.isBlank() ? null : materia.trim().toLowerCase();
     }
 }

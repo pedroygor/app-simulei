@@ -34,7 +34,9 @@ export function QuestaoCard({ questao, href }: { questao: QuestaoResumo; href: s
           {questao.idioma && (
             <Badge variant="outline">{NOME_DO_IDIOMA[questao.idioma]}</Badge>
           )}
-          {questao.materia && <span className="text-xs">{questao.materia}</span>}
+          {/* O assunto e não a matéria: "Probabilidade" diz mais que
+              "Matemática", e a área já aparece na etiqueta ao lado */}
+          {questao.assunto && <span className="text-xs">{questao.assunto.nome}</span>}
         </div>
 
         {questao.previa && (

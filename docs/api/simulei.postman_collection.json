@@ -705,6 +705,84 @@
             },
             "description": "Anos com questões disponíveis, do mais recente pro mais antigo. Vem dos dados importados, não de constante — alimenta o filtro de ano da tela."
           }
+        },
+        {
+          "name": "09 - Taxonomia",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 com as 4 áreas', () => {",
+                  "  pm.response.to.have.status(200);",
+                  "  pm.expect(pm.response.json()).to.have.lengthOf(4);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/taxonomia",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "taxonomia"
+              ]
+            },
+            "description": "Árvore área → matéria → assunto (4 áreas, 14 matérias, 118 assuntos) com quantas questões válidas cada assunto tem. Assuntos sem questão aparecem com 0. Uma query só, na ordem da taxonomia."
+          }
+        },
+        {
+          "name": "10 - Filtrar por assunto",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 paginado', () => {",
+                  "  pm.response.to.have.status(200);",
+                  "  pm.expect(pm.response.json().content).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/questoes?assunto=probabilidade",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "questoes"
+              ],
+              "query": [
+                {
+                  "key": "assunto",
+                  "value": "probabilidade"
+                }
+              ]
+            },
+            "description": "Filtra pelo SLUG do assunto (também aceita ?materia=). Slug malformado devolve 400; slug bem formado mas inexistente é só busca vazia. Na resposta, materia e assunto vêm como {slug, nome}, ou null se a questão não foi classificada."
+          }
         }
       ]
     },

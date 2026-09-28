@@ -224,8 +224,47 @@ class QuestaoControllerTest {
     void listagemTrazMateriaEAssuntoDaTaxonomia() throws Exception {
         mockMvc.perform(get("/questoes").param("area", "MATEMATICA").param("anoInicial", "2023"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content[0].materia").value("Matemática"))
-                .andExpect(jsonPath("$.content[0].assunto").value("Probabilidade"));
+                .andExpect(jsonPath("$.content[0].materia.slug").value("matematica"))
+                .andExpect(jsonPath("$.content[0].materia.nome").value("Matemática"))
+                .andExpect(jsonPath("$.content[0].assunto.slug").value("probabilidade"))
+                .andExpect(jsonPath("$.content[0].assunto.nome").value("Probabilidade"));
+    }
+
+    @Test
+    @WithMockUser
+    void questaoNaoClassificadaTemMateriaEAssuntoNulos() throws Exception {
+        // null, e não {slug: null, nome: null}: "não tem assunto" é diferente
+        // de "tem um assunto sem nome" — o frontend testa com um if simples
+        mockMvc.perform(get("/questoes").param("area", "LINGUAGENS").param("idioma", "INGLES"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].materia").value(org.hamcrest.Matchers.nullValue()))
+                .andExpect(jsonPath("$.content[0].assunto").value(org.hamcrest.Matchers.nullValue()));
+    }
+
+    @Test
+    @WithMockUser
+    void filtraPorSlugDoAssunto() throws Exception {
+        mockMvc.perform(get("/questoes").param("assunto", "probabilidade"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.page.totalElements").value(1))
+                .andExpect(jsonPath("$.content[0].numero").value(90));
+    }
+
+    @Test
+    @WithMockUser
+    void assuntoBemFormadoMasInexistenteDevolveListaVazia() throws Exception {
+        // Formato válido, só não existe: busca sem resultado, não erro
+        mockMvc.perform(get("/questoes").param("assunto", "astrologia"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.page.totalElements").value(0));
+    }
+
+    @Test
+    @WithMockUser
+    void rejeitaSlugMalformado() throws Exception {
+        mockMvc.perform(get("/questoes").param("assunto", "Probabilidade; DROP TABLE"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.campos[0].campo").value("assunto"));
     }
 
     @Test
@@ -260,8 +299,8 @@ class QuestaoControllerTest {
 
         mockMvc.perform(get("/questoes/{id}", id))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.materia").value("Matemática"))
-                .andExpect(jsonPath("$.assunto").value("Probabilidade"));
+                .andExpect(jsonPath("$.materia.slug").value("matematica"))
+                .andExpect(jsonPath("$.assunto.nome").value("Probabilidade"));
 
         // Assunto e matéria são LAZY. Sem o JOIN FETCH dos dois, o mapper
         // dispararia mais 2 SELECTs ao montar a resposta

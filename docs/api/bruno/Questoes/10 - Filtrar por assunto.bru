@@ -1,0 +1,36 @@
+meta {
+  name: 10 - Filtrar por assunto
+  type: http
+  seq: 10
+}
+
+get {
+  url: {{baseUrl}}/questoes?assunto=probabilidade
+  body: none
+  auth: none
+}
+
+params:query {
+  assunto: probabilidade
+}
+
+headers {
+  Authorization: Bearer {{accessToken}}
+}
+
+assert {
+  res.status: eq 200
+  res.body.content: isDefined
+}
+
+docs {
+  Filtra pelo SLUG do assunto (ver GET /taxonomia). Também aceita
+  `?materia=matematica`.
+
+  Slug é validado pelo formato (minúsculas, números e hífen, até 60
+  caracteres): `?assunto=Probabilidade` devolve 400. Slug bem formado mas
+  inexistente (`?assunto=astrologia`) é só uma busca vazia, não erro.
+
+  Na resposta, `materia` e `assunto` vêm como {slug, nome} — ou null, se a
+  questão ainda não foi classificada.
+}

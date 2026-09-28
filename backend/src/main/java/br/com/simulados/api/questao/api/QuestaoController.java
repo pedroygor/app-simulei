@@ -51,7 +51,7 @@ public class QuestaoController {
         validarOrdenacao(pageable);
         return buscaDeQuestoes
                 .buscar(filtro.area(), filtro.idioma(), filtro.menorAno(), filtro.maiorAno(),
-                        filtro.materiaNormalizada(), pageable)
+                        filtro.materia(), filtro.assunto(), pageable)
                 .map(questaoMapper::toResumo);
     }
 

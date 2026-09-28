@@ -14,8 +14,9 @@ public record QuestaoResumoResponse(
         Integer numero,
         Area area,
         Idioma idioma,
-        String materia,
-        String assunto,
+        // {slug, nome}; null = questão ainda não classificada
+        RotuloResponse materia,
+        RotuloResponse assunto,
         // Prévia pra tela de escolha de questões — o texto completo pode ter
         // milhares de caracteres e não cabe numa lista
         String previa
