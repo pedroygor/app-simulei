@@ -1,0 +1,246 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* Telas de pouca ALTURA — o notebook mais comum no Brasil é 1366×768. O
+   painel de acesso cresce com a largura, e sem isto o quadro da turma
+   passava da borda de baixo nessa resolução, cortando a conclusão dele. */
+@custom-variant tela-baixa (@media (max-height: 50rem));
+
+/* ---------------------------------------------------------------------------
+   Identidade visual do Simulei — ver docs/identidade-visual.md
+   ---------------------------------------------------------------------------
+   ESTRUTURA: :root é o tema CLARO e .dark é o ESCURO, porque é assim que os
+   componentes do shadcn esperam encontrar os tokens. O padrão do produto é o
+   escuro — quem decide isso é o ThemeProvider (defaultTheme="dark"), não o CSS.
+   Inverter aqui obrigaria a adaptar todo componente que instalarmos depois.
+
+   Os dois temas saem dos MESMOS papéis semânticos. O claro não é uma segunda
+   paleta inventada: é grafite virando texto e papel virando fundo.
+--------------------------------------------------------------------------- */
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-geist-mono);
+  /* Display: Bricolage Grotesque, uso restrito (título de tela, nota, número
+     grande). O fallback é a fonte de corpo, não uma serifada qualquer. */
+  --font-heading: var(--font-bricolage), var(--font-sans);
+
+  /* --- Cores que CODIFICAM a área do ENEM ---------------------------------
+     Nunca decoração: se a cor aparece, ela significa a área da questão. E como
+     ~8% dos meninos têm alguma deficiência de visão de cores — e esse é o
+     público — a cor nunca vem sozinha, sempre acompanhada do rótulo. */
+  --color-area-linguagens: var(--area-linguagens);
+  --color-area-humanas: var(--area-humanas);
+  --color-area-natureza: var(--area-natureza);
+  --color-area-matematica: var(--area-matematica);
+
+  /* --- Tokens-assinatura do produto -------------------------------------- */
+  /* O marca-texto no papel natural dele: fundo de destaque com texto escuro
+     por cima. Igual nos dois temas — é a cor que carrega a identidade. */
+  --color-marca-texto: var(--marca-texto);
+  --color-sobre-marca-texto: var(--sobre-marca-texto);
+  /* Contorno de CONTROLE (bolha vazia, checkbox). Separado de --border de
+     propósito: hairline decorativo pode ser sutil, contorno de controle
+     precisa de 3:1 (WCAG 1.4.11) senão o aluno não vê onde tocar. */
+  --color-contorno: var(--contorno);
+
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+/* =========================================================================
+   TEMA CLARO — obrigatório, não opcional: o professor projeta o painel no
+   datashow e imprime relatório, e escuro em projetor fica ilegível.
+   ========================================================================= */
+:root {
+  --background: #fbfcfd;          /* papel */
+  --foreground: #0f1216;          /* grafite vira o texto */
+  --card: #ffffff;
+  --card-foreground: #0f1216;
+  --popover: #ffffff;
+  --popover-foreground: #0f1216;
+
+  /* Ação primária: o limão fechado. O #D4F03C do tema escuro tem contraste
+     1.25 sobre fundo claro — um botão que some no papel. Este é a mesma
+     matiz, fechada até passar 3:1, com texto claro por cima (5.49 / 4.85). */
+  --primary: #5f6e0f;
+  --primary-foreground: #eceef1;
+
+  --secondary: #f1f3f5;
+  --secondary-foreground: #1a1f26;
+  --muted: #f1f3f5;
+  --muted-foreground: #5a6675;    /* lápis: metadados, legenda (5.85 sobre card) */
+  --accent: #f1f3f5;
+  --accent-foreground: #1a1f26;
+  --destructive: #c0243c;
+
+  --border: #e1e5ea;              /* hairline decorativo */
+  --contorno: #7c8794;            /* contorno de CONTROLE (3.56, passa 1.4.11) */
+  --input: #d7dce2;
+  --ring: #5f6e0f;
+
+  /* Marca-texto: idêntico nos dois temas. É o destaque, não o botão. */
+  --marca-texto: #d4f03c;
+  --sobre-marca-texto: #1f2812;
+
+  /* Áreas fechadas pro fundo claro (as do escuro ficam em ~2:1 aqui) */
+  --area-linguagens: #1f5fd0;
+  --area-humanas: #8a5a00;
+  --area-natureza: #0c7a5a;
+  --area-matematica: #b01f45;
+
+  --chart-1: var(--area-linguagens);
+  --chart-2: var(--area-humanas);
+  --chart-3: var(--area-natureza);
+  --chart-4: var(--area-matematica);
+  --chart-5: #5f6e0f;
+
+  --radius: 0.625rem;
+
+  --sidebar: #f7f9fa;
+  --sidebar-foreground: #0f1216;
+  --sidebar-primary: #5f6e0f;
+  --sidebar-primary-foreground: #eceef1;
+  --sidebar-accent: #f1f3f5;
+  --sidebar-accent-foreground: #1a1f26;
+  --sidebar-border: #e1e5ea;
+  --sidebar-ring: #5f6e0f;
+}
+
+/* =========================================================================
+   TEMA ESCURO — o padrão do produto. Grafite, não preto puro: #000 é o
+   default de todo produto dark, não diz nada sobre o produto e cansa mais a
+   leitura no celular à noite.
+   ========================================================================= */
+.dark {
+  --background: #0f1216;          /* grafite */
+  --foreground: #eceef1;          /* papel (16.15 sobre o fundo) */
+  --card: #171c23;                /* carta */
+  --card-foreground: #eceef1;
+  --popover: #171c23;
+  --popover-foreground: #eceef1;
+
+  /* Aqui o marca-texto É a ação primária: 14.60 sobre o grafite */
+  --primary: #d4f03c;
+  --primary-foreground: #1f2812;  /* nunca preto puro sobre o acento */
+
+  --secondary: #1f242c;
+  --secondary-foreground: #eceef1;
+  --muted: #1f242c;
+  --muted-foreground: #7c8794;    /* lápis, clareado de #77828F: 4.38 -> 4.69 sobre carta */
+  --accent: #1f242c;
+  --accent-foreground: #eceef1;
+  --destructive: #f2708c;
+
+  --border: #2a313a;              /* hairline decorativo */
+  --contorno: #626f7f;            /* contorno de CONTROLE, de #3A424D (1.85) pra 3.67 */
+  --input: #2a313a;
+  --ring: #d4f03c;
+
+  --marca-texto: #d4f03c;
+  --sobre-marca-texto: #1f2812;
+
+  --area-linguagens: #6ea8fe;
+  --area-humanas: #f0a93c;
+  --area-natureza: #4fd1a5;
+  --area-matematica: #e86a8c;
+
+  --chart-1: var(--area-linguagens);
+  --chart-2: var(--area-humanas);
+  --chart-3: var(--area-natureza);
+  --chart-4: var(--area-matematica);
+  --chart-5: #d4f03c;
+
+  --sidebar: #171c23;
+  --sidebar-foreground: #eceef1;
+  --sidebar-primary: #d4f03c;
+  --sidebar-primary-foreground: #1f2812;
+  --sidebar-accent: #1f242c;
+  --sidebar-accent-foreground: #eceef1;
+  --sidebar-border: #2a313a;
+  --sidebar-ring: #d4f03c;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
+
+  /* Números em largura fixa. Sem isso o cronômetro "dança" a cada segundo e
+     a coluna de notas do painel do professor desalinha. */
+  .font-mono,
+  time,
+  [data-numero] {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Alvo de toque de 44px e foco visível são requisitos, não sugestões —
+     o aluno usa no celular, e navegação por teclado precisa ser enxergada. */
+  @media (pointer: coarse) {
+    button,
+    a[role="button"],
+    [role="radio"],
+    input[type="checkbox"],
+    input[type="radio"] {
+      min-block-size: 44px;
+      min-inline-size: 44px;
+    }
+  }
+
+  /* Quem pediu menos movimento recebe menos movimento. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}

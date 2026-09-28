@@ -20,17 +20,24 @@ Público: aluno de 16–18 anos no celular (uso principal) e professor/dono de c
 
 ### Base — tema escuro (padrão)
 
-| Papel | Hex | Uso |
-|---|---|---|
-| grafite | `#0F1216` | fundo da página |
-| carta | `#171C23` | superfície de card, alternativa não selecionada |
-| borda | `#2A313A` | hairline padrão, estado pendente |
-| borda forte | `#3A424D` | contorno de bolha vazia, hover |
-| papel | `#ECEEF1` | texto primário |
-| texto secundário | `#B8C0CA` | texto de alternativa, apoio |
-| lápis | `#77828F` | metadados, legendas, placeholder |
-| marca-texto | `#D4F03C` | acento: seleção, ação primária, questão atual |
-| sobre-acento | `#1F2812` | texto e ícone sobre o marca-texto |
+| Papel | Hex | Uso | Contraste |
+|---|---|---|---|
+| grafite | `#0F1216` | fundo da página | — |
+| carta | `#171C23` | superfície de card, alternativa não selecionada | — |
+| borda | `#2A313A` | hairline decorativo | 1.43 (decoração, não precisa passar) |
+| **contorno** | `#626F7F` | **contorno de controle** (bolha vazia, checkbox), hover | 3.67 ✓ |
+| papel | `#ECEEF1` | texto primário | 16.15 ✓ |
+| texto secundário | `#B8C0CA` | texto de alternativa, apoio | 9.32 ✓ |
+| lápis | `#7C8794` | metadados, legendas, placeholder | 4.69 ✓ |
+| marca-texto | `#D4F03C` | acento: seleção, ação primária, questão atual | 14.60 ✓ |
+| sobre-acento | `#1F2812` | texto e ícone sobre o marca-texto | 11.91 ✓ |
+
+**Duas correções aplicadas em 27/08/2026** depois de medir a paleta contra o WCAG:
+
+- `borda forte #3A424D` (1.85) **falhava** o SC 1.4.11 como contorno de controle: a bolha vazia é elemento interativo e precisa de 3:1, senão o aluno com baixa visão não enxerga onde tocar. Virou `contorno #626F7F` (3.67). O papel decorativo (hairline de card) continua com `borda #2A313A`, que não precisa passar no critério.
+- `lápis #77828F` sobre carta dava 4.38, abaixo dos 4.5 para texto pequeno. Clareado para `#7C8794` (4.69).
+
+São **dois tokens distintos** porque têm exigências distintas: `--border` (hairline) e `--contorno` (controle).
 
 ### Áreas do ENEM
 
@@ -50,6 +57,30 @@ Expostas como tokens (`--area-linguagens` etc.), nunca hardcoded em componente.
 Obrigatório, não opcional. O professor projeta o painel no datashow da sala e imprime relatório — dark em projetor fica ilegível.
 
 O tema claro é derivado dos **mesmos papéis semânticos**, não é uma segunda paleta inventada. Definir os dois desde o início: retrofitar tema depois significa reescrever componente por componente.
+
+| Papel | Hex | Contraste |
+|---|---|---|
+| fundo da página | `#FBFCFD` | — |
+| card | `#FFFFFF` | — |
+| texto primário | `#0F1216` | 19.4 ✓ |
+| lápis (apoio) | `#5A6675` | 5.85 ✓ |
+| borda (hairline) | `#E1E5EA` | — |
+| contorno de controle | `#7C8794` | 3.56 ✓ |
+| **ação primária** | `#5F6E0F` | 5.49 ✓ (texto `#ECEEF1` em cima: 4.85 ✓) |
+| marca-texto (destaque) | `#D4F03C` | com texto `#1F2812`: 11.91 ✓ |
+
+**A ação primária muda de tom entre os temas, e isso é deliberado.** O `#D4F03C` sobre fundo claro dá contraste **1.25** — um botão que desaparece no papel. A primária do tema claro é a mesma matiz limão, fechada até passar 3:1, com texto claro por cima.
+
+O **marca-texto puro continua idêntico nos dois temas**, no papel natural dele: fundo de destaque com texto escuro em cima — que é literalmente como marca-texto funciona sobre papel.
+
+**Áreas no tema claro.** As cores do tema escuro ficam em ~2:1 sobre fundo claro; as versões fechadas são:
+
+| Área | Escuro | Claro |
+|---|---|---|
+| Linguagens | `#6EA8FE` | `#1F5FD0` (5.67) |
+| Humanas | `#F0A93C` | `#8A5A00` (5.77) |
+| Natureza | `#4FD1A5` | `#0C7A5A` (5.18) |
+| Matemática | `#E86A8C` | `#B01F45` (6.54) |
 
 ---
 

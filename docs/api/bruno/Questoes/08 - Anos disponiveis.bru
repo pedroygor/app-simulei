@@ -1,0 +1,32 @@
+meta {
+  name: 08 - Anos disponiveis
+  type: http
+  seq: 8
+}
+
+get {
+  url: {{baseUrl}}/questoes/anos
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{accessToken}}
+}
+
+assert {
+  res.status: eq 200
+  res.body: isArray
+}
+
+docs {
+  Anos que têm ao menos uma questão utilizável, do mais recente pro mais
+  antigo. É o que alimenta o filtro de ano da tela.
+
+  O intervalo vem dos DADOS, não de uma constante: reflete o que foi
+  importado da enem.dev. Com só 2023 importado, devolve [2023]; com a
+  importação completa, [2023, 2022, ..., 2009].
+
+  Não conflita com GET /questoes/{id}: segmento literal ganha de variável
+  no Spring MVC (há teste garantindo).
+}

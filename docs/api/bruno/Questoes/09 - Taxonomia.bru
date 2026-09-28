@@ -1,0 +1,33 @@
+meta {
+  name: 09 - Taxonomia
+  type: http
+  seq: 9
+}
+
+get {
+  url: {{baseUrl}}/taxonomia
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{accessToken}}
+}
+
+assert {
+  res.status: eq 200
+  res.body: isArray
+  res.body.length: eq 4
+}
+
+docs {
+  Árvore área → matéria → assunto (docs/taxonomia.md: 4 áreas, 14 matérias,
+  118 assuntos), com quantas questões válidas cada assunto tem.
+
+  É o que a tela de montar prova usa pra mostrar "Probabilidade (87)" antes
+  de o professor escolher a quantidade. Enquanto a classificação não rodar,
+  todos os assuntos aparecem com 0 — e aparecem: o LEFT JOIN da consulta
+  mantém na árvore os assuntos sem questão.
+
+  Uma query só, na ordem da taxonomia (não alfabética).
+}
