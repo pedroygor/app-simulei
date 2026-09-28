@@ -3,7 +3,10 @@ package br.com.simulados.api.questao.infrastructure;
 import br.com.simulados.api.TestcontainersConfiguration;
 import br.com.simulados.api.questao.domain.Alternativa;
 import br.com.simulados.api.questao.domain.Area;
+import br.com.simulados.api.questao.domain.Assunto;
+import br.com.simulados.api.questao.domain.ConfiancaDaClassificacao;
 import br.com.simulados.api.questao.domain.Idioma;
+import br.com.simulados.api.questao.domain.OrigemDaClassificacao;
 import br.com.simulados.api.questao.domain.Questao;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
@@ -81,6 +84,72 @@ class QuestaoRepositoryTest {
         questaoRepository.saveAndFlush(questao);
 
         assertThat(questao.getId()).isNotNull();
+    }
+
+    // --- Taxonomia (V4 + V5) ---
+
+    @Test
+    void taxonomiaSemeadaPorInteiro() {
+        // A V5 já se autoconfere, mas este teste pega o caso de alguém editar
+        // a V5 e a autoconferência junto, errando as duas do mesmo jeito
+        var materias = entityManager.createQuery("select count(m) from Materia m", Long.class).getSingleResult();
+        var assuntos = entityManager.createQuery("select count(a) from Assunto a", Long.class).getSingleResult();
+
+        assertThat(materias).isEqualTo(14);
+        assertThat(assuntos).isEqualTo(118);
+    }
+
+    @Test
+    void assuntoHerdaAAreaDaMateria() {
+        var probabilidade = assunto("probabilidade");
+
+        assertThat(probabilidade.getArea()).isEqualTo(Area.MATEMATICA);
+        assertThat(probabilidade.getMateria().getSlug()).isEqualTo("matematica");
+    }
+
+    @Test
+    void aceitaAssuntoDaMesmaAreaDaQuestao() {
+        var questao = questaoValida(2023, 80, null);
+        classificar(questao, assunto("interpretacao-de-texto"));
+
+        questaoRepository.saveAndFlush(questao);
+
+        assertThat(questao.getId()).isNotNull();
+    }
+
+    @Test
+    void recusaAssuntoDeOutraArea() {
+        // A questão é de LINGUAGENS; genética é de CIÊNCIAS DA NATUREZA. Quem
+        // recusa é a FK composta (assunto_id, area) da V4 — o banco, não o
+        // Java. Nem um bug no importador consegue gravar isso
+        var questao = questaoValida(2023, 81, null);
+        classificar(questao, assunto("genetica"));
+
+        assertThatThrownBy(() -> questaoRepository.saveAndFlush(questao))
+                .isInstanceOf(DataIntegrityViolationException.class);
+    }
+
+    @Test
+    void recusaAssuntoSemOrigemDaClassificacao() {
+        // Assunto sem dizer quem classificou é dado órfão: sem a origem, a
+        // carga da IA não saberia se pode sobrescrever
+        var questao = questaoValida(2023, 82, null);
+        questao.setAssunto(assunto("interpretacao-de-texto"));
+
+        assertThatThrownBy(() -> questaoRepository.saveAndFlush(questao))
+                .isInstanceOf(DataIntegrityViolationException.class);
+    }
+
+    private Assunto assunto(String slug) {
+        return entityManager.createQuery("select a from Assunto a where a.slug = :slug", Assunto.class)
+                .setParameter("slug", slug)
+                .getSingleResult();
+    }
+
+    private void classificar(Questao questao, Assunto assunto) {
+        questao.setAssunto(assunto);
+        questao.setClassificacaoOrigem(OrigemDaClassificacao.IA);
+        questao.setClassificacaoConfianca(ConfiancaDaClassificacao.ALTA);
     }
 
     private Questao questaoValida(int ano, int numero, Idioma idioma) {

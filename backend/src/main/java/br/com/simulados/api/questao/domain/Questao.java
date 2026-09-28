@@ -5,9 +5,12 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
@@ -43,9 +46,20 @@ public class Questao {
     @Column(nullable = false)
     private Area area;
 
-    private String materia;
+    // Um assunto principal (a matéria vem dele — ver Assunto). Nullable:
+    // questão ainda não classificada. LAZY pela regra da seção 8.4; a busca e
+    // o detalhe trazem assunto e matéria no mesmo SELECT via JOIN FETCH
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "assunto_id")
+    private Assunto assunto;
 
-    private String assunto;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "classificacao_origem")
+    private OrigemDaClassificacao classificacaoOrigem;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "classificacao_confianca")
+    private ConfiancaDaClassificacao classificacaoConfianca;
 
     // Nullable: 5% das questões da enem.dev não têm texto-base — a pergunta
     // inteira fica no `comando`. CHECK no banco garante que um dos dois exista.

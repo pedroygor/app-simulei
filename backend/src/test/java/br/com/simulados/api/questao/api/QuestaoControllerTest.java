@@ -3,7 +3,10 @@ package br.com.simulados.api.questao.api;
 import br.com.simulados.api.TestcontainersConfiguration;
 import br.com.simulados.api.questao.domain.Alternativa;
 import br.com.simulados.api.questao.domain.Area;
+import br.com.simulados.api.questao.domain.Assunto;
+import br.com.simulados.api.questao.domain.ConfiancaDaClassificacao;
 import br.com.simulados.api.questao.domain.Idioma;
+import br.com.simulados.api.questao.domain.OrigemDaClassificacao;
 import br.com.simulados.api.questao.domain.Questao;
 import br.com.simulados.api.questao.infrastructure.QuestaoRepository;
 import jakarta.persistence.EntityManager;
@@ -49,10 +52,19 @@ class QuestaoControllerTest {
     @BeforeEach
     void semearQuestoes() {
         questaoRepository.deleteAll();
+        // Uma questão classificada: sem ela, o caminho que busca assunto e
+        // matéria (e os testes que contam query nele) nunca seria exercitado
+        var classificada = questao(2023, 90, Area.MATEMATICA, null, false);
+        classificada.setAssunto(entityManager
+                .createQuery("select a from Assunto a where a.slug = 'probabilidade'", Assunto.class)
+                .getSingleResult());
+        classificada.setClassificacaoOrigem(OrigemDaClassificacao.IA);
+        classificada.setClassificacaoConfianca(ConfiancaDaClassificacao.ALTA);
+
         questaoRepository.saveAll(java.util.List.of(
                 questao(2023, 1, Area.LINGUAGENS, Idioma.ESPANHOL, false),
                 questao(2023, 2, Area.LINGUAGENS, Idioma.INGLES, false),
-                questao(2023, 90, Area.MATEMATICA, null, false),
+                classificada,
                 questao(2022, 91, Area.MATEMATICA, null, false),
                 questao(2021, 92, Area.CIENCIAS_HUMANAS, null, false),
                 // Anulada: não pode aparecer em lugar nenhum
@@ -205,6 +217,57 @@ class QuestaoControllerTest {
                 .andExpect(jsonPath("$.status").value(400))
                 .andExpect(jsonPath("$.mensagem").value(
                         org.hamcrest.Matchers.containsString("ordenação")));
+    }
+
+    @Test
+    @WithMockUser
+    void listagemTrazMateriaEAssuntoDaTaxonomia() throws Exception {
+        mockMvc.perform(get("/questoes").param("area", "MATEMATICA").param("anoInicial", "2023"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].materia").value("Matemática"))
+                .andExpect(jsonPath("$.content[0].assunto").value("Probabilidade"));
+    }
+
+    @Test
+    @WithMockUser
+    void questaoSemClassificacaoContinuaNaListagem() throws Exception {
+        // LEFT JOIN, não INNER: sem isso as 5 questões não classificadas da
+        // semente sumiriam da busca
+        mockMvc.perform(get("/questoes"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.page.totalElements").value(5));
+    }
+
+    @Test
+    @WithMockUser
+    void filtraPorSlugDaMateria() throws Exception {
+        mockMvc.perform(get("/questoes").param("materia", "matematica"))
+                .andExpect(status().isOk())
+                // Das 2 de Matemática não anuladas, só 1 foi classificada
+                .andExpect(jsonPath("$.page.totalElements").value(1))
+                .andExpect(jsonPath("$.content[0].numero").value(90));
+    }
+
+    @Test
+    @WithMockUser
+    void detalheDeQuestaoClassificadaCustaUmaQuery() throws Exception {
+        var id = questaoRepository.findAll().stream()
+                .filter(q -> q.getNumero() == 90).findFirst().orElseThrow().getId();
+        entityManager.flush();
+        entityManager.clear();
+        var statistics = entityManager.unwrap(Session.class).getSessionFactory().getStatistics();
+        statistics.clear();
+
+        mockMvc.perform(get("/questoes/{id}", id))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.materia").value("Matemática"))
+                .andExpect(jsonPath("$.assunto").value("Probabilidade"));
+
+        // Assunto e matéria são LAZY. Sem o JOIN FETCH dos dois, o mapper
+        // dispararia mais 2 SELECTs ao montar a resposta
+        assertThat(statistics.getPrepareStatementCount())
+                .as("detalhe classificado deve custar 1 query: questão, alternativas, assunto e matéria juntos")
+                .isEqualTo(1);
     }
 
     @Test

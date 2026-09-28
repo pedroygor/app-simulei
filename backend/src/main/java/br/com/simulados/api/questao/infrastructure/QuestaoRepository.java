@@ -49,33 +49,42 @@ public interface QuestaoRepository extends JpaRepository<Questao, Long> {
      * trafega. Coalesce porque 5% das questões não têm enunciado — aí a prévia
      * sai do comando.
      *
-     * Sobre `lower(q.materia) = :materia`: a matéria já chega em minúsculas de
-     * quem chama. Envolver o PARÂMETRO num lower() quebra no Postgres quando
-     * ele é null — sem contexto de tipo, o driver manda o null como bytea e o
-     * banco responde "function lower(bytea) does not exist".
+     * Matéria e assunto vêm da taxonomia por LEFT JOIN, no mesmo SELECT —
+     * nada de buscar o assunto de cada questão depois (N+1). É LEFT e não
+     * INNER porque questão ainda não classificada precisa continuar aparecendo.
+     *
+     * `:materia` é o SLUG da matéria, que já é minúsculo por construção (V5).
+     * Nunca envolver o PARÂMETRO num lower(): quando ele é null, o driver o
+     * manda como bytea e o Postgres responde "function lower(bytea) does not
+     * exist" (bug achado no passo 4 da Etapa 2).
      */
     @Query(value = """
             SELECT new br.com.simulados.api.questao.domain.ResumoDeQuestao(
-                       q.id, q.ano, q.numero, q.area, q.idioma, q.materia, q.assunto,
+                       q.id, q.ano, q.numero, q.area, q.idioma, m.nome, a.nome,
                        substring(coalesce(q.enunciado, q.comando), 1, 300))
             FROM Questao q
+            LEFT JOIN q.assunto a
+            LEFT JOIN a.materia m
             WHERE q.anulada = false
               AND (:area IS NULL OR q.area = :area)
               AND (:idioma IS NULL OR q.idioma = :idioma)
               AND (:anoInicial IS NULL OR q.ano >= :anoInicial)
               AND (:anoFinal IS NULL OR q.ano <= :anoFinal)
-              AND (:materia IS NULL OR lower(q.materia) = :materia)
+              AND (:materia IS NULL OR m.slug = :materia)
             """,
             // countQuery explícita: sem ela o Spring tentaria derivar o count a
-            // partir do SELECT com construtor e falharia
+            // partir do SELECT com construtor e falharia. Os mesmos joins, senão
+            // o total não bate com a página quando há filtro por matéria
             countQuery = """
             SELECT count(q) FROM Questao q
+            LEFT JOIN q.assunto a
+            LEFT JOIN a.materia m
             WHERE q.anulada = false
               AND (:area IS NULL OR q.area = :area)
               AND (:idioma IS NULL OR q.idioma = :idioma)
               AND (:anoInicial IS NULL OR q.ano >= :anoInicial)
               AND (:anoFinal IS NULL OR q.ano <= :anoFinal)
-              AND (:materia IS NULL OR lower(q.materia) = :materia)
+              AND (:materia IS NULL OR m.slug = :materia)
             """)
     Page<ResumoDeQuestao> buscar(@Param("area") Area area,
                                  @Param("idioma") Idioma idioma,
@@ -90,10 +99,17 @@ public interface QuestaoRepository extends JpaRepository<Questao, Long> {
      * Sem o JOIN FETCH seriam duas: uma pra questão e outra disparada quando o
      * mapper tocasse na lista lazy. Com uma questão só a diferença é pequena,
      * mas o hábito é o que evita o N+1 quando isso virar laço.
+     *
+     * Assunto e matéria entram no mesmo fetch pelo mesmo motivo: são LAZY, e o
+     * mapper toca nos dois pra montar a resposta. Dá pra buscar vários
+     * relacionamentos "pra um" junto com UMA coleção; duas coleções (bags) é
+     * que o Hibernate recusa (MultipleBagFetchException).
      */
     @Query("""
             SELECT q FROM Questao q
             LEFT JOIN FETCH q.alternativas
+            LEFT JOIN FETCH q.assunto a
+            LEFT JOIN FETCH a.materia
             WHERE q.id = :id AND q.anulada = false
             """)
     Optional<Questao> buscarComAlternativas(@Param("id") Long id);
