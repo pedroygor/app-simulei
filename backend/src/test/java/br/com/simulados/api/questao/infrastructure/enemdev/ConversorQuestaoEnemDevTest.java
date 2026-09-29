@@ -39,15 +39,41 @@ class ConversorQuestaoEnemDevTest {
     }
 
     @Test
-    void mapeiaAsQuatroAreasDaFonte() {
-        assertThat(conversor.converter(questaoDaFonte(2023, 10, "linguagens", null), SEM_REESCRITA).getArea())
-                .isEqualTo(Area.LINGUAGENS);
-        assertThat(conversor.converter(questaoDaFonte(2023, 11, "ciencias-humanas", null), SEM_REESCRITA).getArea())
-                .isEqualTo(Area.CIENCIAS_HUMANAS);
-        assertThat(conversor.converter(questaoDaFonte(2023, 12, "ciencias-natureza", null), SEM_REESCRITA).getArea())
-                .isEqualTo(Area.CIENCIAS_NATUREZA);
-        assertThat(conversor.converter(questaoDaFonte(2023, 13, "matematica", null), SEM_REESCRITA).getArea())
-                .isEqualTo(Area.MATEMATICA);
+    void areaVemDaPosicaoNoCadernoENaoDaFonte() {
+        // Caso real: 2022 q108 (ácido tartárico) chega da fonte como Humanas,
+        // mas a posição 108 de 2022 é do caderno de Natureza
+        var questao = conversor.converter(questaoDaFonte(2022, 108, "ciencias-humanas", null), SEM_REESCRITA);
+
+        assertThat(questao.getArea()).isEqualTo(Area.CIENCIAS_NATUREZA);
+    }
+
+    @Test
+    void areaDesconhecidaNaFonteNaoImpedeAImportacao() {
+        // Antes era rejeitada; agora o nome da fonte nem decide a área
+        var questao = conversor.converter(questaoDaFonte(2023, 170, "disciplina-nova", null), SEM_REESCRITA);
+
+        assertThat(questao.getArea()).isEqualTo(Area.MATEMATICA);
+    }
+
+    @Test
+    void rejeitaPosicaoForaDaProva() {
+        assertThatThrownBy(() -> conversor.converter(questaoDaFonte(2023, 181, "matematica", null), SEM_REESCRITA))
+                .isInstanceOf(QuestaoInvalidaException.class)
+                .hasMessageContaining("fora da prova");
+    }
+
+    @Test
+    void traduzAAreaDeclaradaPelaFonteSoParaComparacao() {
+        assertThat(conversor.areaDeclaradaPelaFonte(questaoDaFonte(2023, 1, "linguagens", null)))
+                .contains(Area.LINGUAGENS);
+        assertThat(conversor.areaDeclaradaPelaFonte(questaoDaFonte(2023, 1, "ciencias-humanas", null)))
+                .contains(Area.CIENCIAS_HUMANAS);
+        assertThat(conversor.areaDeclaradaPelaFonte(questaoDaFonte(2023, 1, "ciencias-natureza", null)))
+                .contains(Area.CIENCIAS_NATUREZA);
+        assertThat(conversor.areaDeclaradaPelaFonte(questaoDaFonte(2023, 1, "matematica", null)))
+                .contains(Area.MATEMATICA);
+        assertThat(conversor.areaDeclaradaPelaFonte(questaoDaFonte(2023, 1, "disciplina-nova", null))).isEmpty();
+        assertThat(conversor.areaDeclaradaPelaFonte(questaoDaFonte(2023, 1, null, null))).isEmpty();
     }
 
     @Test
@@ -141,16 +167,6 @@ class ConversorQuestaoEnemDevTest {
         assertThatThrownBy(() -> conversor.converter(origem, SEM_REESCRITA))
                 .isInstanceOf(QuestaoInvalidaException.class)
                 .hasMessageContaining("sem enunciado e sem comando");
-    }
-
-    @Test
-    void rejeitaAreaDesconhecida() {
-        var origem = new QuestaoEnemDev(1, 2023, "disciplina-nova", null, "enunciado", "comando", "A",
-                List.of(), alternativasValidas());
-
-        assertThatThrownBy(() -> conversor.converter(origem, SEM_REESCRITA))
-                .isInstanceOf(QuestaoInvalidaException.class)
-                .hasMessageContaining("área desconhecida");
     }
 
     @Test
