@@ -1,0 +1,101 @@
+ano,numero,idioma,assunto,confianca,justificativa
+2009,49,,idade-media,media,Apropriações posteriores da memória medieval; poderia ser patrimonio-e-memoria
+2019,88,,populacao-e-migracoes,alta,Bônus demográfico e estrutura etária
+2009,62,,brasil-republica,alta,Propaganda do Estado Novo (Era Vargas)
+2013,24,,filosofia-contemporanea,media,Panóptico e poder disciplinar (Foucault)
+2014,4,,filosofia-medieval-e-moderna,alta,Dúvida metódica de Descartes
+2010,17,,espaco-agrario,media,Conflito entre agronegócio e terras indígenas no Cerrado
+2022,64,,geologia-e-relevo,alta,Forças tectônicas e intemperismo formando solos vulcânicos
+2010,41,,desigualdade-e-estratificacao,media,Violência homofóbica e raízes históricas da intolerância
+2022,65,,desigualdade-e-estratificacao,media,Ciclo da violência doméstica levando ao feminicídio
+2019,74,,filosofia-contemporanea,alta,Subjetivação em Foucault
+2021,64,,filosofia-contemporanea,media,Conceito de minoria em Deleuze e Guattari
+2009,67,,revolucoes-dos-seculos-18-e-19,alta,Revolução Industrial e mudança no trabalho dos tecelões
+2009,60,,brasil-republica,media,Voto feminino na Constituição de 1934 comparada à de 1891
+2017,50,,povos-indigenas,media,Direito indígena à terra e sobrevivência cultural
+2023,62,,seculo-20-mundial,alta,Rivalidade entre as Coreias com origem na Guerra Fria
+2012,8,,seculo-20-mundial,media,Independência da Índia e Gandhi; descolonização do século 20
+2018,70,,filosofia-contemporanea,media,Sociedade do espetáculo de Debord
+2018,78,,brasil-republica,alta,Código Eleitoral de 1932 e voto feminino na Era Vargas
+2019,47,,cartografia,alta,Sensoriamento remoto e albedo
+2018,74,,brasil-republica,alta,Culto à personalidade de Vargas no Estado Novo
+2021,61,,urbanizacao,alta,Revitalização do Porto Maravilha e competitividade global das cidades
+2017,72,,questoes-ambientais,alta,Desertificação por ação humana
+2013,1,,urbanizacao,media,Mapas de população e conflitos indígenas; resposta é a urbanização histórica do litoral
+2023,71,,espaco-agrario,alta,Grilagem de terras devolutas e desmatamento na Amazônia
+2015,20,,brasil-republica,alta,Centralização autoritária do Estado Novo
+2022,108,,solucoes,media,Concentração por titulação ácido-base; poderia ser estequiometria
+2020,132,,quimica-ambiental,alta,Poluição atmosférica por metais pesados dos fogos
+2016,84,,termologia,alta,Condutividade térmica de alumínio e plástico
+2018,118,,termologia,alta,Dilatação térmica pela distância interatômica
+2015,64,,energia-trabalho-potencia,alta,Teorema da energia cinética
+2022,122,,fisiologia-humana,media,Coagulação sanguínea e trombose; contexto de proteína recombinante
+2016,55,,ondulatoria,alta,Intensidade sonora por faixa de frequência
+2020,93,,eletrodinamica,alta,Ligação do amperímetro em série e corrente de fuga
+2018,106,,evolucao,alta,Especiação por isolamento reprodutivo
+2012,65,,genetica,media,Expressão gênica diferencial; poderia ser citologia
+2021,128,,eletrodinamica,alta,Energia consumida e tempo de recarga com P = U·i
+2016,86,,ondulatoria,media,Ondas estacionárias no micro-ondas; nós consecutivos derretem a manteiga (depende da figura)
+2020,129,,saude-e-doencas,media,Escolha de quimioterápico pela toxicidade seletiva; leitura de gráfico
+2021,116,,quimica-organica,media,Identificar a função orgânica ácida que reage com NaOH; poderia ser funcoes-inorganicas
+2011,79,,metabolismo-energetico,media,Metano pela degradação anaeróbia bacteriana
+2012,60,,cinematica,alta,Gráfico posição × tempo de um movimento
+2016,83,,genetica,media,Crossing-over e recombinação genética na meiose; poderia ser citologia
+2009,1,,impactos-ambientais,media,Efeito estufa e desmatamento; poderia ser quimica-ambiental
+2013,83,,eletrodinamica,alta,Leitura do voltímetro num circuito com resistor sensor
+2019,107,,zoologia,media,Resposta da artêmia à luz (fototropismo/fototaxia)
+2021,132,,genetica,alta,Herança autossômica recessiva com pais portadores
+2016,89,,ligacoes-e-propriedades,media,Aquecimento por micro-ondas depende da polaridade; hexano apolar
+2022,109,,radioatividade,alta,Meia-vida do iodo-131
+2023,102,,reacoes-organicas-e-polimeros,alta,Oxidação de álcool secundário a cetona
+2011,87,,zoologia,alta,Categoria taxonômica comum (reino Animal)
+2022,5,INGLES,interpretacao-ingles,alta,Interpretação de poema em inglês
+2020,28,,musica-teatro-danca,media,Sampling de Bach no funk; poderia ser arte-cultura-e-sociedade
+2013,111,,corpo-e-expressao,media,Quadrilha como dança folclórica; poderia ser musica-teatro-danca
+2014,109,,realismo-naturalismo-parnasianismo,alta,Ironia machadiana em Memórias póstumas
+2019,39,,linguagem-literaria,media,Interpretação de poema de Hilda Hilst; poderia ser literatura-contemporanea
+2022,19,,esporte-e-sociedade,alta,Violência no futebol como reflexo social
+2016,124,,variacao-linguistica,media,Palavras de registro formal em conversa informal gerando humor
+2023,2,INGLES,interpretacao-ingles,alta,Interpretação de poema de John Donne
+2012,131,,artes-visuais,alta,Escultura barroca de Aleijadinho
+2011,117,,realismo-naturalismo-parnasianismo,alta,Determinismo naturalista em O Cortiço
+2022,17,,linguagem-literaria,media,Verbete poético sustentado por metáfora
+2012,115,,esporte-e-sociedade,alta,Futebol e alienação na canção de Simonal
+2022,13,,generos-digitais,media,Acesso desigual à internet; poderia ser interpretacao-de-texto
+2021,34,,generos-textuais,media,Campanha que usa recursos verbais e não verbais para persuadir
+2020,2,INGLES,interpretacao-ingles,alta,Pôster de campanha em inglês
+2011,129,,gramatica-aplicada,alta,Pronome reto no lugar de oblíquo e função sintática
+2021,42,,corpo-e-expressao,media,Corpo feminino como objeto de intervenções sociais
+2014,135,,figuras-de-linguagem,baixa,"Propaganda que associa arma e megafone; recurso visual metafórico, assunto incerto"
+2018,3,ESPANHOL,interpretacao-espanhol,alta,Interpretação de texto em espanhol
+2022,20,,praticas-corporais-e-saude,alta,"Sedentarismo, renda e escolaridade na prática de exercício"
+2010,121,,argumentacao,media,Identificar o argumento que foge da discussão sobre o acordo ortográfico
+2010,97,,funcoes-da-linguagem,alta,Função referencial
+2022,16,,generos-textuais,alta,Resenha crítica e sua função social
+2011,99,,modernismo,alta,Morte e vida severina de João Cabral
+2022,24,,variacao-linguistica,alta,Adequação da linguagem à situação de comunicação
+2020,173,,trigonometria,alta,Tangente de 30° no projeto do pergolado
+2022,137,,probabilidade,alta,Probabilidade condicional numa série de partidas
+2009,139,,probabilidade,media,Probabilidade a partir dos dados do gráfico
+2012,152,,geometria-plana,alta,Quadrado inscrito na circunferência (diagonal e raio)
+2012,146,,probabilidade,alta,Probabilidade com transferência de bola entre urnas
+2020,171,,geometria-plana,alta,Ladrilhamento com octógonos regulares
+2016,146,,equacoes-e-inequacoes,baixa,Preço do picolé para atingir uma meta; a fonte não traz o enunciado
+2017,163,,operacoes-e-conjuntos-numericos,media,Menor custo entre combinações de trajetos
+2023,138,,probabilidade,alta,Eventos independentes e ajuste da urna
+2019,147,,geometria-plana,alta,Área de círculo mais retângulo
+2013,171,,funcao-do-1-grau,baixa,Relação linear entre X e Y; a fonte não traz o enunciado
+2018,175,,sistemas-lineares,alta,Sistema de equações com número e valor de parcelas
+2023,136,,geometria-espacial,alta,Volume de tronco de cone com perfuração cilíndrica
+2010,173,,analise-combinatoria,alta,Permutações de trajetos descontando os simétricos
+2015,174,,funcao-do-2-grau,media,Máximo de função quadrática da temperatura; a função não veio no enunciado da fonte
+2012,164,,razao-e-proporcao,alta,Regra de três da dosagem pela massa
+2012,140,,porcentagem-e-juros,alta,Comparação de opções de pagamento com juros compostos
+2022,157,,funcao-do-1-grau,alta,Função afim definida por partes
+2022,170,,razao-e-proporcao,media,Razão aluguel/valor do imóvel a partir de gráficos
+2021,143,,porcentagem-e-juros,media,Volume = porcentagem de ocupação × capacidade
+2020,140,,geometria-plana,media,Área da sala em peças e escolha das caixas
+2016,178,,visao-espacial,alta,Projeção ortogonal de um caminho no globo
+2016,165,,operacoes-e-conjuntos-numericos,baixa,Número de andares; a fonte não traz o enunciado
+2018,143,,razao-e-proporcao,alta,Proporção de prata e cobre nas ligas
+2023,146,,progressoes,baixa,Números em PA nos vértices de um triângulo mágico; é mais raciocínio lógico
