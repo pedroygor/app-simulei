@@ -139,4 +139,19 @@ public interface QuestaoRepository extends JpaRepository<Questao, Long> {
      */
     @Query("SELECT DISTINCT q.ano FROM Questao q WHERE q.anulada = false ORDER BY q.ano DESC")
     List<Integer> buscarAnosDisponiveis();
+
+    /**
+     * Todas as questões, pra carga da classificação casar cada linha do CSV
+     * em memória — UMA query no lugar de uma busca por linha (2.741).
+     *
+     * Exceção consciente à regra "nunca findAll sem limite" (seção 8.4): é um
+     * job de linha de comando sobre um acervo limitado por construção (~185
+     * questões por prova), não uma listagem de usuário. Carrega entidade, e não
+     * projeção, porque a carga ALTERA as questões pelo dirty checking.
+     *
+     * Sem JOIN FETCH do assunto de propósito: a carga só compara o id do
+     * assunto atual, e ler o id de um proxy lazy não dispara SELECT.
+     */
+    @Query("SELECT q FROM Questao q")
+    List<Questao> buscarTodasParaClassificacao();
 }

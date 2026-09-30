@@ -1,5 +1,6 @@
 package br.com.simulados.api.questao.application;
 
+import br.com.simulados.api.questao.domain.Area;
 import br.com.simulados.api.questao.domain.ChaveNaturalQuestao;
 import br.com.simulados.api.questao.domain.Idioma;
 import br.com.simulados.api.questao.domain.Questao;
@@ -111,6 +112,27 @@ class ImportadorDeQuestoesTest {
         importador.importarAnos(List.of(2023, 2022));
 
         verify(client, times(1)).listarProvas();
+    }
+
+    @Test
+    void usaAPosicaoEContaQuandoAFonteDiscordaDaArea() {
+        // 2023 q108 é do caderno de Natureza; a fonte manda uma como Humanas
+        // (erro real, igual ao de 2022 q108) e a outra certa
+        var errada = new QuestaoEnemDev(108, 2023, "ciencias-humanas", null,
+                "Texto-base", "Assinale a correta.", "A", List.of(), alternativas());
+        var certa = new QuestaoEnemDev(109, 2023, "ciencias-natureza", null,
+                "Texto-base", "Assinale a correta.", "A", List.of(), alternativas());
+        responderComPagina("espanhol", errada, certa);
+        responderComPagina("ingles");
+
+        var resultado = importador.importarAno(2023);
+
+        assertThat(resultado.importadas()).isEqualTo(2);
+        assertThat(resultado.areasCorrigidas()).isEqualTo(1);
+        var salvas = ArgumentCaptor.forClass(Questao.class);
+        verify(questaoRepository, times(2)).save(salvas.capture());
+        assertThat(salvas.getAllValues()).extracting(Questao::getArea)
+                .containsOnly(Area.CIENCIAS_NATUREZA);
     }
 
     @Test
