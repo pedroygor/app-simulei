@@ -32,6 +32,17 @@ spring:
     # a sessão do Hibernate aberta durante toda a request e mascara lazy loading
     # fora da transação — o que esconde exatamente os N+1 que queremos ver.
     open-in-view: false
+    properties:
+      hibernate:
+        # UPDATEs do mesmo tipo vão ao banco em lotes de 50 num só round-trip,
+        # em vez de um por linha. Quem mais ganha é a carga da classificação
+        # (até 2.741 UPDATEs). order_updates agrupa por entidade pra o lote não
+        # ser quebrado a cada troca de tipo. INSERT com IDENTITY não entra em
+        # lote (o Hibernate precisa do id gerado na hora), então a importação
+        # de questões não muda.
+        jdbc:
+          batch_size: 50
+        order_updates: true
   flyway:
     enabled: true
   data:
@@ -73,6 +84,11 @@ storage:
     # Teto por arquivo. A maior imagem do ENEM 2023 tem ~540KB; 5MB é folga
     # generosa e ainda protege contra resposta gigante da fonte.
     tamanho-maximo: 5MB
+
+classificacao:
+  # Saída da classificação por assunto (ADR de 29/09/2026), versionada no
+  # repositório. Relativo a backend/, como o storage; --arquivo sobrescreve.
+  arquivo: ${CLASSIFICACAO_ARQUIVO:../dados/classificacao/assuntos.csv}
 
 ---
 # Documento ativado só quando o perfil dev está ativo

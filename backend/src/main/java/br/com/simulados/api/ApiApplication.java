@@ -4,8 +4,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import java.util.List;
-
 @SpringBootApplication
 public class ApiApplication {
 
@@ -15,7 +13,7 @@ public class ApiApplication {
 		// tentar subir o Tomcat colidiria com a aplicação já rodando na 8080.
 		// A decisão tem que ser aqui: quando o ApplicationRunner executa, o
 		// servidor já subiu.
-		if (List.of(args).contains("--" + ImportacaoArgs.FLAG)) {
+		if (ImportacaoArgs.ehJob(args)) {
 			app.setWebApplicationType(WebApplicationType.NONE);
 		}
 		app.run(args);
