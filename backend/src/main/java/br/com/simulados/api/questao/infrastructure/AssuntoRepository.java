@@ -22,8 +22,10 @@ public interface AssuntoRepository extends JpaRepository<Assunto, Integer> {
      * `anulada` é nulo) — os assuntos com zero questões sumiriam da lista. No
      * ON, ela só decide quais questões entram na contagem.
      *
-     * Ordem por id: é a ordem em que a V5 inseriu, a mesma do
-     * docs/taxonomia.md (área → matéria → assunto na sequência de estudo).
+     * Ordem pelas colunas `ordem` (V7): a sequência de estudo do
+     * docs/taxonomia.md. Nunca por id — o id é identity e reflete a ordem em
+     * que o plano do INSERT da V5 produziu as linhas, que saiu invertida.
+     * Áreas aparecem na ordem da primeira matéria de cada uma.
      */
     @Query("""
             SELECT new br.com.simulados.api.questao.domain.LinhaDaTaxonomia(
@@ -31,8 +33,8 @@ public interface AssuntoRepository extends JpaRepository<Assunto, Integer> {
             FROM Assunto a
             JOIN a.materia m
             LEFT JOIN Questao q ON q.assunto = a AND q.anulada = false
-            GROUP BY m.id, m.area, m.slug, m.nome, a.id, a.slug, a.nome
-            ORDER BY m.id, a.id
+            GROUP BY m.id, m.area, m.slug, m.nome, m.ordem, a.id, a.slug, a.nome, a.ordem
+            ORDER BY m.ordem, a.ordem
             """)
     List<LinhaDaTaxonomia> listarComContagem();
 }

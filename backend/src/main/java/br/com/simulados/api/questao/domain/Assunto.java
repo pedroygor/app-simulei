@@ -49,4 +49,9 @@ public class Assunto {
 
     @Column(name = "grupo_matriz", nullable = false)
     private String grupoMatriz;
+
+    // Posição DENTRO da matéria (1..n), na sequência de estudo do docs/taxonomia.md.
+    // Existe porque o id NÃO é a ordem: ver V7
+    @Column(nullable = false)
+    private Integer ordem;
 }
