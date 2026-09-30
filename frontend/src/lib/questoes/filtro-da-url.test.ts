@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { lerFiltroDaUrl, montarOpcoesDeAno, montarUrlDeQuestoes } from "./filtro-da-url";
+import {
+  comOpcaoSelecionada,
+  lerFiltroDaUrl,
+  montarOpcoesDeAno,
+  montarUrlDeQuestoes,
+  mudarFiltro,
+  temFiltroAtivo,
+} from "./filtro-da-url";
 
 describe("lerFiltroDaUrl — a URL é entrada de usuário", () => {
   it("lê os filtros válidos", () => {
@@ -50,6 +57,21 @@ describe("lerFiltroDaUrl — a URL é entrada de usuário", () => {
   it("ignora matéria em branco", () => {
     expect(lerFiltroDaUrl({ materia: "   " }).materia).toBeUndefined();
   });
+
+  it("lê matéria e assunto como slug", () => {
+    expect(lerFiltroDaUrl({ materia: "fisica", assunto: "eletrodinamica" })).toMatchObject({
+      materia: "fisica",
+      assunto: "eletrodinamica",
+    });
+  });
+
+  it("descarta slug fora do formato do backend", () => {
+    // Iriam pro Spring e voltariam 400 (@Pattern do BuscarQuestoesFiltro)
+    expect(lerFiltroDaUrl({ materia: "Física" }).materia).toBeUndefined();
+    expect(lerFiltroDaUrl({ assunto: "funcao do 1 grau" }).assunto).toBeUndefined();
+    expect(lerFiltroDaUrl({ assunto: "-probabilidade" }).assunto).toBeUndefined();
+    expect(lerFiltroDaUrl({ assunto: "a".repeat(61) }).assunto).toBeUndefined();
+  });
 });
 
 describe("montarUrlDeQuestoes — precisa ser o inverso da leitura", () => {
@@ -70,7 +92,8 @@ describe("montarUrlDeQuestoes — precisa ser o inverso da leitura", () => {
       idioma: "ESPANHOL" as const,
       anoInicial: 2012,
       anoFinal: 2019,
-      materia: "química",
+      materia: "quimica",
+      assunto: "estequiometria",
       pagina: 4,
     };
 
@@ -78,6 +101,83 @@ describe("montarUrlDeQuestoes — precisa ser o inverso da leitura", () => {
     const devolta = lerFiltroDaUrl(Object.fromEntries(url.searchParams));
 
     expect(devolta).toEqual(original);
+  });
+});
+
+describe("mudarFiltro — a hierarquia área → matéria → assunto fica coerente", () => {
+  const completo = {
+    area: "CIENCIAS_NATUREZA" as const,
+    materia: "fisica",
+    assunto: "eletrodinamica",
+    anoInicial: 2020,
+    pagina: 3,
+  };
+
+  it("trocar a área limpa matéria e assunto", () => {
+    // Sem isto: ?area=MATEMATICA&materia=fisica, lista sempre vazia
+    expect(mudarFiltro(completo, { area: "MATEMATICA" })).toMatchObject({
+      area: "MATEMATICA",
+      materia: undefined,
+      assunto: undefined,
+    });
+  });
+
+  it("trocar a matéria limpa só o assunto", () => {
+    expect(mudarFiltro(completo, { materia: "quimica" })).toMatchObject({
+      area: "CIENCIAS_NATUREZA",
+      materia: "quimica",
+      assunto: undefined,
+    });
+  });
+
+  it("escolher a matéria junto com a área dela não apaga a matéria", () => {
+    // O filtro manda { area, materia } ao escolher uma matéria
+    const semArea = { pagina: 0 };
+    expect(mudarFiltro(semArea, { area: "MATEMATICA", materia: "matematica" })).toMatchObject({
+      area: "MATEMATICA",
+      materia: "matematica",
+    });
+  });
+
+  it("mudança que não mexe na hierarquia preserva matéria e assunto", () => {
+    expect(mudarFiltro(completo, { anoInicial: 2015, anoFinal: 2015 })).toMatchObject({
+      materia: "fisica",
+      assunto: "eletrodinamica",
+    });
+  });
+
+  it("repetir a mesma área não limpa nada", () => {
+    expect(mudarFiltro(completo, { area: "CIENCIAS_NATUREZA" }).assunto).toBe("eletrodinamica");
+  });
+
+  it("toda mudança volta pra primeira página", () => {
+    expect(mudarFiltro(completo, { assunto: "optica" }).pagina).toBe(0);
+  });
+});
+
+describe("temFiltroAtivo", () => {
+  it("considera matéria e assunto", () => {
+    // Bug anterior: com só a matéria filtrada, o "Limpar filtros" sumia
+    expect(temFiltroAtivo({ materia: "fisica" })).toBe(true);
+    expect(temFiltroAtivo({ assunto: "optica" })).toBe(true);
+  });
+
+  it("página sozinha não é filtro", () => {
+    expect(temFiltroAtivo({ pagina: 4 })).toBe(false);
+  });
+});
+
+describe("comOpcaoSelecionada", () => {
+  const opcoes = [{ valor: "fisica", rotulo: "Física" }];
+
+  it("não altera a lista quando o selecionado está nela", () => {
+    expect(comOpcaoSelecionada(opcoes, "fisica")).toEqual(opcoes);
+    expect(comOpcaoSelecionada(opcoes, undefined)).toEqual(opcoes);
+  });
+
+  it("inclui o selecionado ausente, rotulado pelo slug", () => {
+    // Taxonomia ainda carregando, ou slug de link antigo
+    expect(comOpcaoSelecionada([], "fisica")).toEqual([{ valor: "fisica", rotulo: "fisica" }]);
   });
 });
 

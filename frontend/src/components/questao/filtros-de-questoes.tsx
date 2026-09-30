@@ -19,11 +19,16 @@ import {
   type FiltroDeQuestoes,
   type Idioma,
 } from "@/lib/api/questoes";
+import { areaDaMateria, assuntosDaMateria, buscarTaxonomia, materiasDaArea } from "@/lib/api/taxonomia";
 import {
+  comOpcaoSelecionada,
   montarOpcoesDeAno,
   montarUrlDeQuestoes,
+  mudarFiltro,
   NOME_DA_AREA,
   NOME_DO_IDIOMA,
+  temFiltroAtivo,
+  type OpcaoDeFiltro,
 } from "@/lib/questoes/filtro-da-url";
 
 /**
@@ -33,32 +38,48 @@ import {
  */
 const TODOS = "__todos__";
 
+// Anos e taxonomia só mudam com importação ou migration — não há por que
+// perguntar de novo a cada troca de filtro ou volta pra tela
+const UMA_HORA = 60 * 60 * 1000;
+
 export function FiltrosDeQuestoes({ filtro }: { filtro: FiltroDeQuestoes }) {
   const router = useRouter();
 
   const { data: anosDisponiveis } = useQuery({
     queryKey: ["questoes", "anos"],
     queryFn: buscarAnosDisponiveis,
-    // Os anos só mudam quando alguém roda a importação — não há por que
-    // perguntar de novo a cada troca de filtro ou volta pra tela
-    staleTime: 60 * 60 * 1000,
+    staleTime: UMA_HORA,
   });
-  const anos = montarOpcoesDeAno(anosDisponiveis, filtro.anoInicial);
+  const { data: taxonomia } = useQuery({
+    queryKey: ["taxonomia"],
+    queryFn: buscarTaxonomia,
+    staleTime: UMA_HORA,
+  });
 
-  /**
-   * Toda mudança de filtro volta pra página 1. Sem isto, quem está na página 7
-   * de Matemática e troca pra Linguagens cai numa página 7 que provavelmente
-   * não existe — e vê lista vazia achando que não há questões.
-   */
+  const anos = montarOpcoesDeAno(anosDisponiveis, filtro.anoInicial);
+  const materias = comOpcaoSelecionada(
+    materiasDaArea(taxonomia, filtro.area).map((m) => ({ valor: m.slug, rotulo: m.nome })),
+    filtro.materia,
+  );
+  const assuntos = comOpcaoSelecionada(
+    assuntosDaMateria(taxonomia, filtro.materia).map((a) => ({ valor: a.slug, rotulo: a.nome })),
+    filtro.assunto,
+  );
+
   function aplicar(mudanca: Partial<FiltroDeQuestoes>) {
-    router.push(montarUrlDeQuestoes({ ...filtro, ...mudanca, pagina: 0 }));
+    router.push(montarUrlDeQuestoes(mudarFiltro(filtro, mudanca)));
   }
 
-  const temFiltro =
-    filtro.area || filtro.idioma || filtro.anoInicial !== undefined || filtro.anoFinal !== undefined;
+  // Escolher a matéria já define a área (Física → Natureza). Sem isto, com
+  // "Todas as áreas", o filtro de área mentiria sobre o que está na tela
+  function aplicarMateria(materia: string | undefined) {
+    const area = materia ? areaDaMateria(taxonomia, materia) : filtro.area;
+    aplicar({ area, materia });
+  }
 
   return (
-    // Mobile-first: uma coluna no celular, três a partir de sm
+    // Mobile-first: uma coluna no celular; a partir de sm, a hierarquia
+    // área → matéria → assunto numa linha e idioma/ano na seguinte
     <div className="grid gap-3 sm:grid-cols-3">
       <CampoDeSelecao
         id="filtro-area"
@@ -67,6 +88,26 @@ export function FiltrosDeQuestoes({ filtro }: { filtro: FiltroDeQuestoes }) {
         aoMudar={(area) => aplicar({ area: area as Area | undefined })}
         opcoes={AREAS.map((a) => ({ valor: a, rotulo: NOME_DA_AREA[a] }))}
         rotuloDeTodos="Todas as áreas"
+      />
+
+      <CampoDeSelecao
+        id="filtro-materia"
+        rotulo="Matéria"
+        valor={filtro.materia}
+        aoMudar={aplicarMateria}
+        opcoes={materias}
+        rotuloDeTodos="Todas as matérias"
+      />
+
+      <CampoDeSelecao
+        id="filtro-assunto"
+        rotulo="Assunto"
+        valor={filtro.assunto}
+        aoMudar={(assunto) => aplicar({ assunto })}
+        opcoes={assuntos}
+        // Sem matéria não há lista de assuntos; desabilitado e dizendo por quê
+        desabilitado={!filtro.materia}
+        rotuloDeTodos={filtro.materia ? "Todos os assuntos" : "Escolha a matéria"}
       />
 
       <CampoDeSelecao
@@ -96,7 +137,7 @@ export function FiltrosDeQuestoes({ filtro }: { filtro: FiltroDeQuestoes }) {
         rotuloDeTodos="Todos os anos"
       />
 
-      {temFiltro && (
+      {temFiltroAtivo(filtro) && (
         <div className="sm:col-span-3">
           <Button variant="ghost" size="sm" onClick={() => router.push("/questoes")}>
             Limpar filtros
@@ -107,8 +148,6 @@ export function FiltrosDeQuestoes({ filtro }: { filtro: FiltroDeQuestoes }) {
   );
 }
 
-type OpcaoDeFiltro = { valor: string; rotulo: string };
-
 function CampoDeSelecao({
   id,
   rotulo,
@@ -116,6 +155,7 @@ function CampoDeSelecao({
   aoMudar,
   opcoes,
   rotuloDeTodos,
+  desabilitado = false,
 }: {
   id: string;
   rotulo: string;
@@ -123,13 +163,18 @@ function CampoDeSelecao({
   aoMudar: (valor: string | undefined) => void;
   opcoes: OpcaoDeFiltro[];
   rotuloDeTodos: string;
+  desabilitado?: boolean;
 }) {
   return (
-    <div className="grid gap-1.5">
+    // min-w-0: item de grid não encolhe abaixo do conteúdo por padrão. Sem
+    // isto, "Eletrodinâmica: circuitos, potência e consumo elétrico" alargava
+    // a coluna e a página ganhava rolagem lateral a 360px (medido: 404px)
+    <div className="grid min-w-0 gap-1.5">
       <Label htmlFor={id}>{rotulo}</Label>
       <Select
         value={valor ?? TODOS}
         onValueChange={(novo) => aoMudar(novo === TODOS ? undefined : novo)}
+        disabled={desabilitado}
       >
         <SelectTrigger id={id} className="w-full">
           <SelectValue />

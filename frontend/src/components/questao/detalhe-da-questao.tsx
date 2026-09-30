@@ -11,6 +11,7 @@ import { buscarQuestaoPorId, type QuestaoDetalhe } from "@/lib/api/questoes";
 import { NOME_DO_IDIOMA } from "@/lib/questoes/filtro-da-url";
 import { AlternativaBolha } from "./alternativa-bolha";
 import { EtiquetaDeArea } from "./etiqueta-de-area";
+import { EtiquetaDeAssunto } from "./etiqueta-de-assunto";
 import { TextoDaQuestao } from "./texto-da-questao";
 
 /**
@@ -57,6 +58,7 @@ function ConteudoDaQuestao({ questao }: { questao: QuestaoDetalhe }) {
         <div className="text-muted-foreground flex flex-wrap items-center gap-x-3 gap-y-1">
           <EtiquetaDeArea area={questao.area} />
           {questao.idioma && <Badge variant="outline">{NOME_DO_IDIOMA[questao.idioma]}</Badge>}
+          <EtiquetaDeAssunto materia={questao.materia} assunto={questao.assunto} comMateria />
         </div>
       </header>
 

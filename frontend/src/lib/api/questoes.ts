@@ -106,7 +106,9 @@ export type FiltroDeQuestoes = {
   idioma?: Idioma;
   anoInicial?: number;
   anoFinal?: number;
+  /** Slugs da taxonomia (ex.: "matematica", "probabilidade"). */
   materia?: string;
+  assunto?: string;
   /** Zero-based, igual ao Spring Data. */
   pagina?: number;
 };
@@ -131,6 +133,7 @@ export function montarQueryDeBusca(filtro: FiltroDeQuestoes): string {
   if (filtro.anoInicial !== undefined) params.set("anoInicial", String(filtro.anoInicial));
   if (filtro.anoFinal !== undefined) params.set("anoFinal", String(filtro.anoFinal));
   if (filtro.materia?.trim()) params.set("materia", filtro.materia.trim());
+  if (filtro.assunto?.trim()) params.set("assunto", filtro.assunto.trim());
   if (filtro.pagina) params.set("page", String(filtro.pagina));
 
   params.set("size", String(QUESTOES_POR_PAGINA));

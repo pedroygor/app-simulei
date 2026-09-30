@@ -26,6 +26,20 @@ function lerOpcao<T extends string>(
   return permitidos.includes(texto as T) ? (texto as T) : undefined;
 }
 
+/**
+ * Mesma regra do backend (BuscarQuestoesFiltro.SLUG + @Size(max = 60)).
+ * Slug fora do formato é descartado aqui pra não virar 400 na tela; slug no
+ * formato mas inexistente passa, e o backend devolve busca vazia.
+ */
+const SLUG = /^[a-z0-9]+(-[a-z0-9]+)*$/;
+const TAMANHO_MAXIMO_DO_SLUG = 60;
+
+function lerSlug(valor: string | string[] | undefined): string | undefined {
+  const texto = primeiro(valor)?.trim();
+  if (!texto || texto.length > TAMANHO_MAXIMO_DO_SLUG || !SLUG.test(texto)) return undefined;
+  return texto;
+}
+
 function lerAno(valor: string | string[] | undefined): number | undefined {
   const texto = primeiro(valor);
   if (!texto) return undefined;
@@ -48,8 +62,6 @@ function lerAno(valor: string | string[] | undefined): number | undefined {
 export function lerFiltroDaUrl(params: ParametrosDaUrl): FiltroDeQuestoes {
   const anoInicial = lerAno(params.anoInicial);
   const anoFinal = lerAno(params.anoFinal);
-  const materia = primeiro(params.materia)?.trim();
-
   const pagina = Number(primeiro(params.pagina));
 
   return {
@@ -57,7 +69,8 @@ export function lerFiltroDaUrl(params: ParametrosDaUrl): FiltroDeQuestoes {
     idioma: lerOpcao<Idioma>(params.idioma, IDIOMAS),
     anoInicial,
     anoFinal,
-    materia: materia || undefined,
+    materia: lerSlug(params.materia),
+    assunto: lerSlug(params.assunto),
     // Na URL a página é 1-based (?pagina=2 é a segunda, como o usuário lê),
     // mas o Spring Data é 0-based. A conversão mora AQUI, num lugar só.
     pagina: Number.isInteger(pagina) && pagina > 1 ? pagina - 1 : 0,
@@ -77,10 +90,54 @@ export function montarUrlDeQuestoes(filtro: FiltroDeQuestoes): string {
   if (filtro.anoInicial !== undefined) params.set("anoInicial", String(filtro.anoInicial));
   if (filtro.anoFinal !== undefined) params.set("anoFinal", String(filtro.anoFinal));
   if (filtro.materia?.trim()) params.set("materia", filtro.materia.trim());
+  if (filtro.assunto?.trim()) params.set("assunto", filtro.assunto.trim());
   if (filtro.pagina) params.set("pagina", String(filtro.pagina + 1));
 
   const query = params.toString();
   return query ? `/questoes?${query}` : "/questoes";
+}
+
+/**
+ * Aplica uma mudança de filtro mantendo a hierarquia área → matéria → assunto
+ * coerente.
+ *
+ * Trocar a área limpa matéria e assunto; trocar a matéria limpa o assunto. Sem
+ * isto a URL ficaria com `?area=MATEMATICA&assunto=genetica` — combinação que
+ * nunca tem questão — e o usuário veria lista vazia sem entender por quê.
+ *
+ * A exceção é a mudança que JÁ traz o nível de baixo: escolher uma matéria
+ * manda junto a área dela (`{ area, materia }`), e aí a matéria não pode ser
+ * apagada pela troca de área que ela mesma causou.
+ *
+ * Toda mudança volta pra página 1: quem está na página 7 de Matemática e troca
+ * pra Linguagens cairia numa página 7 que provavelmente não existe.
+ */
+export function mudarFiltro(
+  atual: FiltroDeQuestoes,
+  mudanca: Partial<FiltroDeQuestoes>,
+): FiltroDeQuestoes {
+  const novo: FiltroDeQuestoes = { ...atual, ...mudanca, pagina: 0 };
+
+  if ("area" in mudanca && mudanca.area !== atual.area && !("materia" in mudanca)) {
+    novo.materia = undefined;
+    novo.assunto = undefined;
+  }
+  if ("materia" in mudanca && mudanca.materia !== atual.materia && !("assunto" in mudanca)) {
+    novo.assunto = undefined;
+  }
+  return novo;
+}
+
+/** Algum filtro ligado? Decide se o "Limpar filtros" aparece. */
+export function temFiltroAtivo(filtro: FiltroDeQuestoes): boolean {
+  return Boolean(
+    filtro.area ||
+      filtro.idioma ||
+      filtro.materia ||
+      filtro.assunto ||
+      filtro.anoInicial !== undefined ||
+      filtro.anoFinal !== undefined,
+  );
 }
 
 /** Rótulos de exibição. Enum do backend não é texto de interface. */
@@ -109,4 +166,17 @@ export function montarOpcoesDeAno(disponiveis: number[] | undefined, selecionado
   const anos = new Set(disponiveis ?? []);
   if (selecionado !== undefined) anos.add(selecionado);
   return [...anos].sort((a, b) => b - a);
+}
+
+export type OpcaoDeFiltro = { valor: string; rotulo: string };
+
+/**
+ * Mesma ideia de montarOpcoesDeAno, pra matéria e assunto: garante que o valor
+ * selecionado tenha um item na lista, senão o Select do Radix fica em branco
+ * com o filtro ligado. Acontece enquanto a taxonomia não chegou e com slug que
+ * não existe (`?assunto=renomeado` de link antigo). Sem o nome, mostra o slug.
+ */
+export function comOpcaoSelecionada(opcoes: OpcaoDeFiltro[], selecionado: string | undefined): OpcaoDeFiltro[] {
+  if (selecionado === undefined || opcoes.some((o) => o.valor === selecionado)) return opcoes;
+  return [...opcoes, { valor: selecionado, rotulo: selecionado }];
 }
