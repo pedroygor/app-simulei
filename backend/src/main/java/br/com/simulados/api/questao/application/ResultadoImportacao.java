@@ -8,11 +8,14 @@ public record ResultadoImportacao(
         int jaExistiam,
         int ignoradasPorDadoInvalido,
         int imagensGuardadas,
-        int imagensComFalha
+        int imagensComFalha,
+        // Questões em que o "discipline" da fonte discordava da posição no
+        // caderno e a posição venceu (ver CadernoDoEnem)
+        int areasCorrigidas
 ) {
 
     public static ResultadoImportacao vazio() {
-        return new ResultadoImportacao(0, 0, 0, 0, 0);
+        return new ResultadoImportacao(0, 0, 0, 0, 0, 0);
     }
 
     public ResultadoImportacao mais(ResultadoImportacao outro) {
@@ -21,12 +24,13 @@ public record ResultadoImportacao(
                 jaExistiam + outro.jaExistiam,
                 ignoradasPorDadoInvalido + outro.ignoradasPorDadoInvalido,
                 imagensGuardadas + outro.imagensGuardadas,
-                imagensComFalha + outro.imagensComFalha);
+                imagensComFalha + outro.imagensComFalha,
+                areasCorrigidas + outro.areasCorrigidas);
     }
 
     @Override
     public String toString() {
-        return "%d importadas, %d já existiam, %d ignoradas, %d imagens guardadas, %d imagens com falha"
-                .formatted(importadas, jaExistiam, ignoradasPorDadoInvalido, imagensGuardadas, imagensComFalha);
+        return "%d importadas, %d já existiam, %d ignoradas, %d imagens guardadas, %d imagens com falha, %d áreas corrigidas pela posição"
+                .formatted(importadas, jaExistiam, ignoradasPorDadoInvalido, imagensGuardadas, imagensComFalha, areasCorrigidas);
     }
 }

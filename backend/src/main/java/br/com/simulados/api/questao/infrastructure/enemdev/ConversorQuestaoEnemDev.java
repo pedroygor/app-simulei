@@ -3,11 +3,13 @@ package br.com.simulados.api.questao.infrastructure.enemdev;
 import br.com.simulados.api.questao.application.QuestaoInvalidaException;
 import br.com.simulados.api.questao.domain.Alternativa;
 import br.com.simulados.api.questao.domain.Area;
+import br.com.simulados.api.questao.domain.CadernoDoEnem;
 import br.com.simulados.api.questao.domain.Idioma;
 import br.com.simulados.api.questao.domain.Questao;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.UnaryOperator;
 import java.util.regex.Pattern;
 
@@ -36,7 +38,7 @@ public class ConversorQuestaoEnemDev {
         questao.setAno(origem.year());
         questao.setNumero(origem.index());
         questao.setIdioma(idiomaDe(origem.language()));
-        questao.setArea(areaDe(origem));
+        questao.setArea(areaPelaPosicao(origem));
         questao.setEnunciado(reescreverImagensDoMarkdown(origem.context(), reescreverImagem));
         questao.setComando(origem.alternativesIntroduction());
         questao.setGabarito(origem.correctAlternative());
@@ -123,18 +125,31 @@ public class ConversorQuestaoEnemDev {
         };
     }
 
-    private Area areaDe(QuestaoEnemDev origem) {
-        var discipline = origem.discipline();
-        if (discipline == null) {
-            throw new QuestaoInvalidaException(origem.year(), origem.index(), "sem área (discipline null)");
+    // A área vem da POSIÇÃO no caderno, não do "discipline" da fonte, que
+    // erra 5% das questões (ver CadernoDoEnem)
+    private Area areaPelaPosicao(QuestaoEnemDev origem) {
+        try {
+            return CadernoDoEnem.areaDaPosicao(origem.year(), origem.index());
+        } catch (IllegalArgumentException e) {
+            throw new QuestaoInvalidaException(origem.year(), origem.index(), e.getMessage());
         }
-        return switch (discipline) {
-            case "linguagens" -> Area.LINGUAGENS;
-            case "ciencias-humanas" -> Area.CIENCIAS_HUMANAS;
-            case "ciencias-natureza" -> Area.CIENCIAS_NATUREZA;
-            case "matematica" -> Area.MATEMATICA;
-            default -> throw new QuestaoInvalidaException(origem.year(), origem.index(),
-                    "área desconhecida na fonte: " + discipline);
+    }
+
+    /**
+     * O que a fonte DIZ que é a área. Não decide nada: serve pro importador
+     * medir quanto a fonte discorda da posição. Vazio quando a fonte não
+     * informa ou manda um nome que não conhecemos.
+     */
+    public Optional<Area> areaDeclaradaPelaFonte(QuestaoEnemDev origem) {
+        if (origem.discipline() == null) {
+            return Optional.empty();
+        }
+        return switch (origem.discipline()) {
+            case "linguagens" -> Optional.of(Area.LINGUAGENS);
+            case "ciencias-humanas" -> Optional.of(Area.CIENCIAS_HUMANAS);
+            case "ciencias-natureza" -> Optional.of(Area.CIENCIAS_NATUREZA);
+            case "matematica" -> Optional.of(Area.MATEMATICA);
+            default -> Optional.empty();
         };
     }
 

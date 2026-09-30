@@ -1,5 +1,6 @@
 package br.com.simulados.api.questao.application;
 
+import br.com.simulados.api.questao.domain.CadernoDoEnem;
 import br.com.simulados.api.questao.domain.ChaveNaturalQuestao;
 import br.com.simulados.api.questao.domain.Idioma;
 import br.com.simulados.api.questao.domain.Questao;
@@ -35,6 +36,11 @@ public class ImportadorDeQuestoes {
 
     // Teto da API: limit > 50 devolve 400
     private static final int TAMANHO_DA_PAGINA = 50;
+
+    // Normal é a fonte errar a área de 0 a ~35 questões por ano. Mais que um
+    // caderno inteiro de divergência não é erro de etiqueta: é sinal de que a
+    // ORDEM dos cadernos mudou e a tabela do CadernoDoEnem precisa de revisão
+    private static final int DIVERGENCIAS_QUE_SUGEREM_ORDEM_NOVA = CadernoDoEnem.QUESTOES_POR_AREA;
 
     private final EnemDevClient client;
     private final ConversorQuestaoEnemDev conversor;
@@ -80,6 +86,11 @@ public class ImportadorDeQuestoes {
         for (var origem : buscarQuestoesDeTodasAsVariantes(ano, idiomas)) {
             resultado = resultado.mais(processar(origem, jaImportadas, vistasNestaRodada));
         }
+        if (resultado.areasCorrigidas() > DIVERGENCIAS_QUE_SUGEREM_ORDEM_NOVA) {
+            log.error("A fonte discordou da posição no caderno em {} questões de {}. Isso é mais que um"
+                    + " caderno inteiro: a ordem das áreas pode ter mudado neste ano — revise CadernoDoEnem"
+                    + " antes de confiar nas áreas importadas", resultado.areasCorrigidas(), ano);
+        }
         return resultado;
     }
 
@@ -122,7 +133,7 @@ public class ImportadorDeQuestoes {
             return ResultadoImportacao.vazio();
         }
         if (jaImportadas.contains(chave)) {
-            return new ResultadoImportacao(0, 1, 0, 0, 0);
+            return new ResultadoImportacao(0, 1, 0, 0, 0, 0);
         }
 
         var contadorDeImagens = new ContadorDeImagens();
@@ -130,14 +141,29 @@ public class ImportadorDeQuestoes {
             // Imagens são baixadas AQUI, fora de qualquer transação: são
             // centenas de downloads e não podem segurar conexão do pool
             var questao = conversor.converter(origem, contadorDeImagens::guardar);
+            var areaCorrigida = areaDaFonteDiverge(origem, questao);
             questaoRepository.save(questao);
-            return new ResultadoImportacao(1, 0, 0, contadorDeImagens.guardadas, contadorDeImagens.falhas);
+            return new ResultadoImportacao(1, 0, 0, contadorDeImagens.guardadas, contadorDeImagens.falhas,
+                    areaCorrigida ? 1 : 0);
         } catch (QuestaoInvalidaException e) {
             // Qualidade de dado da fonte: registra e segue. Uma questão
             // defeituosa não pode abortar a importação do ano inteiro.
             log.warn("{}", e.getMessage());
-            return new ResultadoImportacao(0, 0, 1, contadorDeImagens.guardadas, contadorDeImagens.falhas);
+            return new ResultadoImportacao(0, 0, 1, contadorDeImagens.guardadas, contadorDeImagens.falhas, 0);
         }
+    }
+
+    // Aviso, não erro: a questão entra com a área da posição. O log existe pra
+    // continuarmos medindo a fonte — se ela corrigir o dado, isto zera
+    private boolean areaDaFonteDiverge(QuestaoEnemDev origem, Questao questao) {
+        var declarada = conversor.areaDeclaradaPelaFonte(origem);
+        if (declarada.isPresent() && declarada.get() == questao.getArea()) {
+            return false;
+        }
+        log.warn("{}/{}: a fonte diz {}, a posição no caderno diz {} — usando a posição",
+                origem.year(), origem.index(), declarada.map(Enum::name).orElse(origem.discipline()),
+                questao.getArea());
+        return true;
     }
 
     /**
