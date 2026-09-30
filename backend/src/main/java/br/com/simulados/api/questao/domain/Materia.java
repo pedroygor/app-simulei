@@ -37,4 +37,8 @@ public class Materia {
 
     @Column(nullable = false)
     private String nome;
+
+    // Posição na taxonomia (1..14). Existe porque o id NÃO é a ordem: ver V7
+    @Column(nullable = false)
+    private Integer ordem;
 }

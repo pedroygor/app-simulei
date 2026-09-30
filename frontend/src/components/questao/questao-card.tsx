@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import type { QuestaoResumo } from "@/lib/api/questoes";
 import { NOME_DO_IDIOMA } from "@/lib/questoes/filtro-da-url";
 import { EtiquetaDeArea } from "./etiqueta-de-area";
+import { EtiquetaDeAssunto } from "./etiqueta-de-assunto";
 
 /**
  * `href` vem de fora porque o cartão não sabe de que listagem faz parte — quem
@@ -34,9 +35,7 @@ export function QuestaoCard({ questao, href }: { questao: QuestaoResumo; href: s
           {questao.idioma && (
             <Badge variant="outline">{NOME_DO_IDIOMA[questao.idioma]}</Badge>
           )}
-          {/* O assunto e não a matéria: "Probabilidade" diz mais que
-              "Matemática", e a área já aparece na etiqueta ao lado */}
-          {questao.assunto && <span className="text-xs">{questao.assunto.nome}</span>}
+          <EtiquetaDeAssunto materia={questao.materia} assunto={questao.assunto} />
         </div>
 
         {questao.previa && (

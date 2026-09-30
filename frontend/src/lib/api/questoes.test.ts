@@ -16,6 +16,7 @@ describe("montarQueryDeBusca", () => {
     expect(params).not.toHaveProperty("area");
     expect(params).not.toHaveProperty("idioma");
     expect(params).not.toHaveProperty("materia");
+    expect(params).not.toHaveProperty("assunto");
     expect(params).not.toHaveProperty("anoInicial");
   });
 
@@ -26,8 +27,13 @@ describe("montarQueryDeBusca", () => {
         idioma: "INGLES",
         anoInicial: 2015,
         anoFinal: 2023,
+        materia: "matematica",
+        assunto: "probabilidade",
       }),
     );
+
+    expect(params.materia).toBe("matematica");
+    expect(params.assunto).toBe("probabilidade");
 
     expect(params.area).toBe("MATEMATICA");
     expect(params.idioma).toBe("INGLES");

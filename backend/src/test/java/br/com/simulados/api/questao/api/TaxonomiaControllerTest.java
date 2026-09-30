@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -74,6 +75,40 @@ class TaxonomiaControllerTest {
                 .andExpect(jsonPath("$[3].area").value("CIENCIAS_HUMANAS"))
                 .andExpect(jsonPath("$[*].materias[*]", hasSize(14)))
                 .andExpect(jsonPath("$[*].materias[*].assuntos[*]", hasSize(118)));
+    }
+
+    @Test
+    @WithMockUser
+    void assuntosSaemNaSequenciaDeEstudoDoDocsDaTaxonomia() throws Exception {
+        // Regressão do bug de 29/09/2026: a V5 insere via INSERT ... SELECT ... JOIN,
+        // que não garante ordem de linha, e o banco gerou os ids INVERTIDOS —
+        // Cinemática saía por último na Física. O ORDER BY a.id herdava o erro.
+        // Física é o caso do bug; as pontas de Língua Portuguesa cobrem outra matéria
+        mockMvc.perform(get("/taxonomia"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[2].materias[0].slug").value("fisica"))
+                .andExpect(jsonPath("$[2].materias[0].assuntos[*].slug").value(contains(
+                        "cinematica", "dinamica", "energia-trabalho-potencia", "hidrostatica",
+                        "gravitacao", "termologia", "termodinamica", "optica", "ondulatoria",
+                        "eletrostatica", "eletrodinamica", "eletromagnetismo", "fisica-moderna")))
+                .andExpect(jsonPath("$[0].materias[0].assuntos[0].slug").value("interpretacao-de-texto"))
+                .andExpect(jsonPath("$[0].materias[0].assuntos[9].slug").value("generos-digitais"));
+    }
+
+    @Test
+    void ordemDosAssuntosEhContiguaEComecaEmUmEmCadaMateria() {
+        // Guarda geral, pras 14 matérias: assunto novo numa migration futura sem
+        // ordem, ou com ordem repetida ou com buraco, quebra aqui. Dá a garantia
+        // que o teste da Física, sozinho, não dá
+        @SuppressWarnings("unchecked")
+        List<Object[]> fora = entityManager.createNativeQuery("""
+                SELECT m.slug, count(*), min(a.ordem), max(a.ordem)
+                FROM assuntos a JOIN materias m ON m.id = a.materia_id
+                GROUP BY m.slug
+                HAVING min(a.ordem) <> 1 OR max(a.ordem) <> count(*)
+                """).getResultList();
+
+        assertThat(fora).as("matérias com ordem de assuntos fora de 1..n").isEmpty();
     }
 
     @Test
