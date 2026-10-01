@@ -141,17 +141,21 @@ public interface QuestaoRepository extends JpaRepository<Questao, Long> {
     List<Integer> buscarAnosDisponiveis();
 
     /**
-     * Todas as questões, pra carga da classificação casar cada linha do CSV
-     * em memória — UMA query no lugar de uma busca por linha (2.741).
+     * Todas as questões, pras cargas de arquivo (classificação por assunto e
+     * conferência com o INEP) casarem cada linha do CSV em memória — UMA query
+     * no lugar de uma busca por linha (2.741).
      *
      * Exceção consciente à regra "nunca findAll sem limite" (seção 8.4): é um
      * job de linha de comando sobre um acervo limitado por construção (~185
      * questões por prova), não uma listagem de usuário. Carrega entidade, e não
-     * projeção, porque a carga ALTERA as questões pelo dirty checking.
+     * projeção, porque as cargas ALTERAM as questões pelo dirty checking.
      *
-     * Sem JOIN FETCH do assunto de propósito: a carga só compara o id do
+     * Sem JOIN FETCH do assunto de propósito: a classificação só compara o id do
      * assunto atual, e ler o id de um proxy lazy não dispara SELECT.
+     *
+     * Inclui as anuladas: a conferência com o INEP precisa enxergá-las pra ser
+     * idempotente (uma questão já anulada é "inalterada", não "sem questão").
      */
     @Query("SELECT q FROM Questao q")
-    List<Questao> buscarTodasParaClassificacao();
+    List<Questao> buscarTodasParaCarga();
 }

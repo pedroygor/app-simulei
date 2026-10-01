@@ -32,125 +32,23 @@ Só biblioteca padrão.
 """
 
 import argparse
-import io
 import re
 import ssl
 import sys
-import time
-import urllib.error
-import urllib.request
 import zipfile
 from pathlib import Path
 
+from zip_remoto import TAMANHO_MAXIMO, URL, ArquivoRemoto, abrir_zip, contexto_tls
+
 RAIZ = Path(__file__).resolve().parents[2]
 DESTINO = RAIZ / "dados" / "inep"
-INTERMEDIARIO = Path(__file__).resolve().parent / "rnp-icpedu-gr46-ov-tls-ca-2025.pem"
 
-URL = "https://download.inep.gov.br/microdados/microdados_enem_{ano}.zip"
 ANOS_PADRAO = range(2009, 2024)
-
-# Bloco lido por requisição. O zipfile lê de 4 KB em 4 KB; sem isto seriam
-# centenas de requisições por arquivo
-BLOCO = 1024 * 1024
-TENTATIVAS = 4
-# ITENS_PROVA real tem < 1 MB. O teto protege contra zip malformado ou hostil
-# (arquivo que "descomprime" pra gigabytes)
-TAMANHO_MAXIMO = 20 * 1024 * 1024
-
-
-def contexto_tls() -> ssl.SSLContext:
-    """Verificação COMPLETA, com o intermediário faltante do INEP acrescentado."""
-    contexto = ssl.create_default_context()
-    contexto.load_verify_locations(cafile=str(INTERMEDIARIO))
-    return contexto
-
-
-class ArquivoRemoto(io.RawIOBase):
-    """
-    Arquivo somente-leitura sobre HTTP com `Range`, o suficiente pro zipfile.
-
-    Guarda o último bloco lido: o zipfile faz muitas leituras pequenas e
-    vizinhas (cabeçalho, nome, dados), que caem quase todas no mesmo bloco.
-    """
-
-    def __init__(self, url: str, contexto: ssl.SSLContext):
-        self.url = url
-        self.contexto = contexto
-        self.posicao = 0
-        self.bloco_inicio = 0
-        self.bloco = b""
-        self.requisicoes = 0
-        self.bytes_baixados = 0
-        self.tamanho = self._descobrir_tamanho()
-
-    def _abrir(self, requisicao):
-        # Servidor de governo cai e oscila (anotado no CLAUDE.md): tenta de novo
-        # com espera crescente. Erro 4xx é resposta definitiva, não se repete
-        for tentativa in range(1, TENTATIVAS + 1):
-            try:
-                return urllib.request.urlopen(requisicao, context=self.contexto, timeout=60)
-            except urllib.error.HTTPError as e:
-                if e.code < 500 or tentativa == TENTATIVAS:
-                    raise
-            except (urllib.error.URLError, TimeoutError):
-                if tentativa == TENTATIVAS:
-                    raise
-            time.sleep(2**tentativa)
-
-    def _descobrir_tamanho(self) -> int:
-        with self._abrir(urllib.request.Request(self.url, method="HEAD")) as r:
-            if r.headers.get("Accept-Ranges") != "bytes":
-                raise RuntimeError("o servidor não aceita Range: baixar o zip inteiro seria o único jeito")
-            return int(r.headers["Content-Length"])
-
-    def readable(self):
-        return True
-
-    def seekable(self):
-        return True
-
-    def tell(self):
-        return self.posicao
-
-    def seek(self, deslocamento, referencia=io.SEEK_SET):
-        if referencia == io.SEEK_SET:
-            self.posicao = deslocamento
-        elif referencia == io.SEEK_CUR:
-            self.posicao += deslocamento
-        else:
-            self.posicao = self.tamanho + deslocamento
-        return self.posicao
-
-    def _carregar(self, inicio: int) -> None:
-        fim = min(inicio + BLOCO, self.tamanho) - 1
-        req = urllib.request.Request(self.url, headers={"Range": f"bytes={inicio}-{fim}"})
-        with self._abrir(req) as r:
-            if r.status != 206:
-                # 200 = ignorou o Range e mandaria o zip inteiro. Melhor parar
-                raise RuntimeError(f"esperava 206 Partial Content, veio {r.status}")
-            dados = r.read()
-        self.requisicoes += 1
-        self.bytes_baixados += len(dados)
-        self.bloco_inicio, self.bloco = inicio, dados
-
-    def readinto(self, destino):
-        if self.posicao >= self.tamanho:
-            return 0
-        fim_bloco = self.bloco_inicio + len(self.bloco)
-        if not (self.bloco_inicio <= self.posicao < fim_bloco):
-            # Leitura perto do fim do arquivo (o índice do zip): recua o bloco
-            # pra que ele termine no fim, em vez de pedir um bloco quase vazio
-            self._carregar(min(self.posicao, max(0, self.tamanho - BLOCO)))
-        deslocamento = self.posicao - self.bloco_inicio
-        pedaco = self.bloco[deslocamento : deslocamento + len(destino)]
-        destino[: len(pedaco)] = pedaco
-        self.posicao += len(pedaco)
-        return len(pedaco)
 
 
 def listar(ano: int, contexto: ssl.SSLContext) -> list[zipfile.ZipInfo]:
-    remoto = ArquivoRemoto(URL.format(ano=ano), contexto)
-    with zipfile.ZipFile(io.BufferedReader(remoto)) as z:
+    z, _ = abrir_zip(ano, contexto)
+    with z:
         return z.infolist()
 
 
@@ -159,8 +57,8 @@ def eh_itens_prova(nome: str) -> bool:
 
 
 def baixar(ano: int, contexto: ssl.SSLContext) -> Path | None:
-    remoto = ArquivoRemoto(URL.format(ano=ano), contexto)
-    with zipfile.ZipFile(io.BufferedReader(remoto)) as z:
+    z, remoto = abrir_zip(ano, contexto)
+    with z:
         candidatos = [i for i in z.infolist() if eh_itens_prova(i.filename)]
         if not candidatos:
             print(f"  {ano}: NÃO há ITENS_PROVA neste zip — use --listar pra ver o conteúdo")

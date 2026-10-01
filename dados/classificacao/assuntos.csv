@@ -2113,7 +2113,7 @@ ano,numero,idioma,assunto,confianca,justificativa
 2023,150,,funcao-do-1-grau,media,Expressão algébrica da concentração de álcool; alternativa: porcentagem-e-juros
 2023,151,,leitura-de-graficos-e-tabelas,alta,Comparação de criptomoedas em gráfico
 2023,152,,exponencial-e-logaritmo,alta,Nível sonoro em decibéis por logaritmo
-2023,153,,operacoes-e-conjuntos-numericos,media,Tempo de espera nas filas dos caixas
+2023,153,,razao-e-proporcao,media,"Tempo de espera proporcional ao tamanho da fila vezes o tempo de atendimento; INEP H17 [conferida com o INEP, H17: reclassificada]"
 2023,154,,geometria-plana,alta,Setor circular escondido pelo telhado
 2023,155,,geometria-plana,alta,Área da calçada ao redor da piscina
 2023,156,,leitura-de-graficos-e-tabelas,alta,Tempo sem sinal de internet pelo gráfico
@@ -2123,7 +2123,7 @@ ano,numero,idioma,assunto,confianca,justificativa
 2023,160,,analise-combinatoria,media,Quantidade de senhas e probabilidade de acerto; alternativa: probabilidade
 2023,161,,porcentagem-e-juros,alta,Taxa de juros compostos no financiamento
 2023,162,,funcao-do-1-grau,alta,Preço do concreto com parte fixa e variável
-2023,163,,graficos-de-funcoes,media,Trajetória pelo gráfico da distância à base; alternativas em imagem
+2023,163,,visao-espacial,media,"O gráfico é só o dado; a pergunta é a VISTA SUPERIOR da trajetória; INEP H6 (movimentação no espaço e representação plana) [conferida com o INEP, H6: reclassificada]"
 2023,164,,leitura-de-graficos-e-tabelas,alta,Categoria mais exposta à gripe pelo gráfico
 2023,165,,geometria-plana,media,Área de revestimento da escada
 2023,166,,operacoes-e-conjuntos-numericos,media,Gasto calórico por dia combinando quadros; alternativa: leitura-de-graficos-e-tabelas
@@ -2136,7 +2136,7 @@ ano,numero,idioma,assunto,confianca,justificativa
 2023,173,,escalas-e-unidades,alta,Unidade da economia de corrida
 2023,175,,sistemas-lineares,alta,Preço dos tíquetes por sistema de equações
 2023,176,,progressoes,alta,Números pentagonais e padrão da sequência
-2023,177,,trigonometria,media,Altura na roda-gigante como função periódica; alternativas em gráfico
+2023,177,,graficos-de-funcoes,media,"Escolher o gráfico da altura em função do tempo (comportamento periódico); INEP H15 (dependência entre grandezas) [conferida com o INEP, H15: reclassificada]"
 2023,178,,graficos-de-funcoes,alta,Volume acumulado pela torneira em função do tempo
 2023,179,,operacoes-e-conjuntos-numericos,alta,Sistema de numeração com base diferente
 2023,180,,estatistica,alta,Maior média de chuva em dois meses consecutivos
@@ -2154,7 +2154,7 @@ ano,numero,idioma,assunto,confianca,justificativa
 2022,149,,estatistica,alta,Mediana em distribuição de frequências
 2022,150,,funcao-do-2-grau,alta,Altura máxima da parábola do saque
 2022,151,,porcentagem-e-juros,media,Duração da atividade pela água ingerida com 40% a mais
-2022,152,,operacoes-e-conjuntos-numericos,media,Número de fileiras pelas distâncias mínima e máxima
+2022,152,,razao-e-proporcao,media,"Número de fileiras proporcional à distância permitida (0,6 L a 2,9 L) com fileiras de 1 m; INEP H18 [conferida com o INEP, H18: reclassificada]"
 2022,153,,geometria-espacial,alta,Raio do cone com volume 19% menor
 2022,154,,porcentagem-e-juros,alta,Valor anterior após queda de 75%
 2022,155,,analise-combinatoria,alta,Maneiras de escolher dois apartamentos
@@ -2203,7 +2203,7 @@ ano,numero,idioma,assunto,confianca,justificativa
 2021,157,,operacoes-e-conjuntos-numericos,media,Matriz de fluxos e soma das colunas
 2021,158,,porcentagem-e-juros,alta,Variações percentuais combinadas no consumo
 2021,159,,razao-e-proporcao,alta,Grandezas inversamente proporcionais na troca de pneus
-2021,160,,operacoes-e-conjuntos-numericos,media,Menor custo de suplementos para suprir minerais
+2021,160,,razao-e-proporcao,media,"Número de sachês proporcional à falta de cada mineral e custo total por suplemento; INEP H17 (variação de grandezas) [conferida com o INEP, H17: reclassificada]"
 2021,161,,funcao-do-2-grau,alta,Arrecadação em função do desconto
 2021,162,,graficos-de-funcoes,media,Gráfico do imposto por faixas de preço; alternativas em imagem
 2021,163,,escalas-e-unidades,alta,Unidade do módulo volumétrico por análise dimensional
@@ -2309,7 +2309,7 @@ ano,numero,idioma,assunto,confianca,justificativa
 2018,136,,operacoes-e-conjuntos-numericos,media,Soma das linhas da matriz de TEDs
 2018,137,,porcentagem-e-juros,alta,Valor presente com juros compostos
 2018,138,,geometria-analitica,alta,Equações de reta e circunferência que passam pelos pontos
-2018,139,,geometria-plana,media,Menor percurso por arcos e raios na malha polar
+2018,139,,geometria-plana,media,"Menor caminho por arcos e raios (comprimento de arco); H26 do INEP é rótulo genérico desta questão [conferida com o INEP, H26: mantida]"
 2018,140,,geometria-espacial,alta,Número de potes cilíndricos por caixa
 2018,141,,progressoes,alta,Número de postes em PA e custo máximo
 2018,142,,razao-e-proporcao,media,Força gravitacional proporcional à massa e inversa ao quadrado do raio
@@ -2318,7 +2318,7 @@ ano,numero,idioma,assunto,confianca,justificativa
 2018,146,,razao-e-proporcao,alta,Distâncias pela velocidade média e tempo
 2018,147,,porcentagem-e-juros,alta,Reduções percentuais sucessivas do LDL
 2018,148,,funcao-do-1-grau,media,Pessoas alcançadas em função do orçamento; alternativas em imagem
-2018,149,,porcentagem-e-juros,media,Inclinação percentual da rampa e ajuste do nível
+2018,149,,razao-e-proporcao,media,"Inclinação é razão entre vertical e horizontal; o percentual é só a unidade; INEP H14 (grandezas e medidas) [conferida com o INEP, H14: reclassificada]"
 2018,150,,probabilidade,alta,Maior probabilidade de retirar duas pretas
 2018,151,,geometria-plana,media,Área pintada e tamanho da fonte com furos
 2018,152,,geometria-analitica,media,Inequações que descrevem região triangular; alternativas em imagem
@@ -2358,7 +2358,7 @@ ano,numero,idioma,assunto,confianca,justificativa
 2017,142,,geometria-espacial,alta,Volume livre de caixas com cubo dentro
 2017,143,,analise-combinatoria,alta,Combinação com repetição e pelo menos um de cada cor
 2017,144,,geometria-espacial,media,Volume da piscina e dosagem proporcional
-2017,145,,operacoes-e-conjuntos-numericos,media,Calcular erro pela fórmula com raiz e comparar
+2017,145,,operacoes-e-conjuntos-numericos,media,"Substituição numérica na fórmula do erro com a raiz de N dada e comparação de decimais; o rótulo H17 do INEP descreve o argumento e não o cálculo [conferida com o INEP, H17: mantida]"
 2017,146,,razao-e-proporcao,media,Velocidade constante e tempos de partida dos bondinhos
 2017,147,,leitura-de-graficos-e-tabelas,media,Profundidade lida no gráfico com redução de 10%
 2017,148,,visao-espacial,alta,Identificar o sólido pela estrutura de arestas
@@ -2382,7 +2382,7 @@ ano,numero,idioma,assunto,confianca,justificativa
 2017,167,,geometria-espacial,media,Corte de calota esférica; enunciado só em imagem
 2017,168,,geometria-plana,media,Altura em figura plana; enunciado só em imagem
 2017,169,,leitura-de-graficos-e-tabelas,media,Maior taxa de aumento lida nos gráficos; enunciado só em imagem
-2017,170,,leitura-de-graficos-e-tabelas,media,Leitura da escala do termômetro de máxima e mínima
+2017,170,,escalas-e-unidades,media,"Ler um instrumento graduado (termômetro de duas escalas) é medição e escala, não gráfico ou tabela; INEP H1 [conferida com o INEP, H1: reclassificada]"
 2017,171,,geometria-plana,media,Comprimento de circunferências e velocidades das torres
 2017,172,,funcao-do-1-grau,media,Igualar volumes de dois reservatórios ao longo do tempo; enunciado só em imagem
 2017,173,,razao-e-proporcao,media,Frações do tanque e conversão por densidade
@@ -2390,14 +2390,14 @@ ano,numero,idioma,assunto,confianca,justificativa
 2017,175,,probabilidade,media,Probabilidade de exatamente um sinal verde; sem texto-base na fonte
 2017,176,,razao-e-proporcao,media,Área de painéis proporcional à energia economizada
 2017,177,,analise-combinatoria,alta,Princípio multiplicativo para número de senhas
-2017,178,,analise-combinatoria,media,Número de partidas entre 8 jogadores; enunciado só em imagem
+2017,178,,analise-combinatoria,media,"Partidas entre n jogadores = C(n;2); a tabela deixa ver o padrão como sequência mas o conhecimento pedido é combinatório [conferida com o INEP, H24: mantida]"
 2017,179,,probabilidade,media,Probabilidade condicional de atraso com chuva; sem texto-base na fonte
 2017,180,,razao-e-proporcao,baixa,Tempo de escoamento da piscina; sem texto-base na fonte
 2016,136,,geometria-espacial,media,Volume do silo (cilindro e cone) e número de viagens
 2016,137,,escalas-e-unidades,media,Redimensionar desenho em escala; sem texto-base na fonte
 2016,138,,escalas-e-unidades,alta,Conversão de pés e polegadas para metros
 2016,139,,funcao-do-1-grau,media,Vazão como taxa de variação no gráfico volume × tempo
-2016,140,,equacoes-e-inequacoes,baixa,Comparação de pesos por pesagens; enunciado só em imagem
+2016,140,,estatistica,baixa,"A imagem é uma tabela de média mediana e desvio padrão; INEP H29 (estatística); a regra do sorteio falta na fonte, por isso baixa [conferida com o INEP, H29: reclassificada]"
 2016,141,,porcentagem-e-juros,media,Altura do pneu como porcentagem da largura
 2016,142,,geometria-analitica,media,Ponto equidistante de três locais no quadriculado
 2016,143,,equacoes-e-inequacoes,media,Dimensões do terreno retangular pela condição dada; enunciado só em imagem
@@ -2405,7 +2405,7 @@ ano,numero,idioma,assunto,confianca,justificativa
 2016,145,,porcentagem-e-juros,alta,Cota percentual de empregados pela lei
 2016,147,,analise-combinatoria,media,Escolha de tenistas para a partida; sem texto-base na fonte
 2016,148,,operacoes-e-conjuntos-numericos,alta,Sistema de numeração posicional no ábaco
-2016,149,,geometria-analitica,alta,Coeficiente angular da reta da trajetória
+2016,149,,graficos-de-funcoes,media,"Lê duas curvas no gráfico (parábola e reta) e ajusta o coeficiente angular; INEP H26 aponta leitura de gráfico [conferida com o INEP, H26: reclassificada]"
 2016,150,,razao-e-proporcao,baixa,Custo proporcional à área e à distância; sem texto-base na fonte
 2016,151,,porcentagem-e-juros,media,Aumento percentual da altura lida na curva
 2016,152,,probabilidade,alta,Probabilidade por caminhos em ramificações
@@ -2415,7 +2415,7 @@ ano,numero,idioma,assunto,confianca,justificativa
 2016,156,,razao-e-proporcao,baixa,Número de policiais proporcional ao público; sem texto-base na fonte
 2016,157,,estatistica,media,Lucro mínimo para a média do semestre atingir a meta
 2016,158,,funcao-do-1-grau,media,Queda linear do nível do reservatório no gráfico
-2016,159,,razao-e-proporcao,baixa,Quantidade de vacinas a adquirir; sem texto-base na fonte
+2016,159,,razao-e-proporcao,baixa,"Sem texto-base na fonte; INEP H30 sugere estatística ou probabilidade mas não dá pra confirmar; mantida com baixa [conferida com o INEP, H30: mantida]"
 2016,160,,exponencial-e-logaritmo,media,Resfriamento exponencial resolvido com logaritmos; sem texto-base na fonte
 2016,161,,geometria-espacial,media,Volume derramado dos compartimentos do petroleiro
 2016,162,,leitura-de-graficos-e-tabelas,media,Escolher o mês pelas condições lidas no gráfico
@@ -2445,11 +2445,11 @@ ano,numero,idioma,assunto,confianca,justificativa
 2015,143,,estatistica,alta,Mediana dos tempos do quadro
 2015,144,,geometria-plana,alta,Variação da área do garrafão (trapézio para retângulo)
 2015,146,,geometria-espacial,media,Aumento do raio da cisterna para o volume desejado; sem texto-base na fonte
-2015,147,,analise-combinatoria,media,Contar configurações de notas que dão o título
+2015,147,,analise-combinatoria,media,"Conta configurações de notas (princípio multiplicativo); a leitura do quadro é apoio, e H24 do INEP descreve só essa parte [conferida com o INEP, H24: mantida]"
 2015,148,,geometria-espacial,media,Empilhar contêineres (volume e dimensões) na área delimitada
 2015,149,,geometria-espacial,media,Contar as faces do troféu poliédrico; sem texto-base na fonte
 2015,150,,funcao-do-2-grau,alta,Arrecadação p·q como quadrática e intervalo de preço
-2015,151,,porcentagem-e-juros,baixa,Proposta de vacinação com menor público; dados só em imagem
+2015,151,,porcentagem-e-juros,baixa,"Dados só em imagem ausente na fonte; INEP H30 sugere estatística ou probabilidade mas não dá pra confirmar; mantida com baixa [conferida com o INEP, H30: mantida]"
 2015,152,,progressoes,media,Produção crescendo em progressão geométrica
 2015,153,,geometria-plana,baixa,Escolha do polígono pelas condições dadas; enunciado só em imagem
 2015,154,,funcao-do-2-grau,media,Altura do vidro pela parábola simétrica ao eixo x
@@ -2461,7 +2461,7 @@ ano,numero,idioma,assunto,confianca,justificativa
 2015,160,,escalas-e-unidades,alta,Medidas reais da pegada pela escala
 2015,161,,geometria-plana,media,Taxa de cobertura da malha como razão de áreas
 2015,162,,analise-combinatoria,baixa,Número de peças a produzir; sem texto-base na fonte
-2015,163,,operacoes-e-conjuntos-numericos,media,Unidades de insulina por refil com descarte
+2015,163,,escalas-e-unidades,media,"Converter mL em unidades de 0,01 mL (definição do enunciado) e dividir o refil; o centro é a conversão de unidades [conferida com o INEP, H17: reclassificada]"
 2015,164,,analise-combinatoria,alta,Formas de acomodar a família nos assentos
 2015,165,,geometria-plana,media,Área do setor circular menor que a do retângulo
 2015,166,,geometria-espacial,baixa,Escolha da garrafa; sem texto-base na fonte
@@ -2492,7 +2492,7 @@ ano,numero,idioma,assunto,confianca,justificativa
 2014,147,,geometria-plana,media,Desigualdade triangular com os segmentos disponíveis
 2014,148,,geometria-analitica,media,Trajetória circular do balanço como gráfico de função
 2014,149,,razao-e-proporcao,media,Tempo para todos passarem pelas catracas; sem texto-base na fonte
-2014,150,,equacoes-e-inequacoes,media,Maior x que respeita o limite de dimensões da Anac
+2014,150,,visao-espacial,media,"Lê as dimensões da caixa na PLANIFICAÇÃO antes de montar a inequação; INEP H9 (conhecimento geométrico de forma) [conferida com o INEP, H9: reclassificada]"
 2014,151,,geometria-espacial,media,Mesmo volume com base ampliada em 25%
 2014,152,,porcentagem-e-juros,media,Novo percentual de esgoto tratado; sem texto-base na fonte
 2014,153,,porcentagem-e-juros,media,Aumento de receita para manter o lucro
@@ -2500,7 +2500,7 @@ ano,numero,idioma,assunto,confianca,justificativa
 2014,155,,estatistica,media,Média ponderada para vencer a competição
 2014,156,,escalas-e-unidades,media,Volume real do armário pela escala; sem texto-base na fonte
 2014,157,,estatistica,media,Moda da numeração e média da cor codificada em 0 e 1
-2014,158,,porcentagem-e-juros,media,Sensibilidade do teste como percentual do quadro
+2014,158,,probabilidade,media,"Sensibilidade de um teste diagnóstico é probabilidade condicional empírica (95 de 100 doentes); INEP H28 (estatística e probabilidade) [conferida com o INEP, H28: reclassificada]"
 2014,159,,geometria-plana,baixa,Número máximo de mudas no espaço; sem texto-base na fonte
 2014,160,,visao-espacial,alta,Projeção ortogonal do caminho no piso
 2014,161,,leitura-de-graficos-e-tabelas,baixa,Escolha do reagente pelos experimentos; dados só em imagem
@@ -2516,13 +2516,13 @@ ano,numero,idioma,assunto,confianca,justificativa
 2014,171,,razao-e-proporcao,baixa,Cargas nos pontos de sustentação; sem texto-base na fonte
 2014,172,,operacoes-e-conjuntos-numericos,alta,Sistema posicional dos quipus convertido para base decimal
 2014,173,,escalas-e-unidades,baixa,Área do terreno em m² (ordem de grandeza); sem texto-base na fonte
-2014,174,,operacoes-e-conjuntos-numericos,baixa,Escolher recipiente que divide o volume exato; dados sem texto-base
+2014,174,,razao-e-proporcao,baixa,"Variação de grandezas (capacidade dos recipientes x número de galões); INEP H18; dados faltam na fonte, por isso baixa [conferida com o INEP, H18: reclassificada]"
 2014,175,,porcentagem-e-juros,baixa,Intervalo de variação percentual de P; sem texto-base na fonte
 2014,176,,leitura-de-graficos-e-tabelas,media,Dia de máximo de bactérias lido no gráfico
 2014,177,,razao-e-proporcao,media,Tempo para encher o restante do depósito à vazão constante
 2014,178,,razao-e-proporcao,baixa,Ajuste no número de células; sem texto-base na fonte
 2014,179,,equacoes-e-inequacoes,baixa,Quantia levada para as compras; sem texto-base na fonte
-2014,180,,escalas-e-unidades,baixa,Horário do voo com fuso horário; sem texto-base na fonte
+2014,180,,escalas-e-unidades,baixa,"Fuso horário; sem texto-base na fonte, o rótulo H23 do INEP não dá pra confirmar; mantida com confiança baixa [conferida com o INEP, H23: mantida]"
 2013,136,,trigonometria,alta,Tangente de 15° para achar a dimensão da base
 2013,137,,estatistica,alta,Nova média após descartar maior e menor nota
 2013,138,,razao-e-proporcao,baixa,Coeficiente de melhora; sem texto-base e alternativas sem imagem na fonte
@@ -2534,7 +2534,7 @@ ano,numero,idioma,assunto,confianca,justificativa
 2013,144,,leitura-de-graficos-e-tabelas,media,Diferença entre percentuais do gráfico
 2013,145,,razao-e-proporcao,media,Razão de cadeiras reservadas no setor
 2013,146,,probabilidade,alta,Probabilidade conjunta de dois sorteios independentes
-2013,147,,geometria-plana,media,Perímetro do terreno e número de rolos de tela
+2013,147,,geometria-plana,media,"Perímetro de três lados do terreno (190 + 2 x 81) e divisão pelo rolo; H4 do INEP (razoabilidade) é genérica [conferida com o INEP, H4: mantida]"
 2013,148,,razao-e-proporcao,alta,Carga proporcional entre telhas e tijolos
 2013,149,,progressoes,media,Soma da produção em PA no período
 2013,150,,probabilidade,alta,Probabilidade condicional com conjuntos
@@ -2554,7 +2554,7 @@ ano,numero,idioma,assunto,confianca,justificativa
 2013,164,,visao-espacial,media,Transformação da figura (reflexão/rotação)
 2013,165,,analise-combinatoria,media,Contagem de joias com pedras em posições; regras em imagem
 2013,166,,exponencial-e-logaritmo,alta,Meia-vida do césio resolvida com logaritmo
-2013,167,,porcentagem-e-juros,media,Redução percentual da área com lados reduzidos em 20%
+2013,167,,geometria-plana,media,"Variação da ÁREA de um retângulo com lados reduzidos em 20% (fator 0,8 ao quadrado); INEP H13 aponta grandezas e medidas [conferida com o INEP, H13: reclassificada]"
 2013,168,,leitura-de-graficos-e-tabelas,media,Classificar o desempenho conjunto pelos dados do quadro
 2013,169,,probabilidade,media,Comparar chances pelo número de combinações por cartela
 2013,170,,escalas-e-unidades,alta,Conversão de mL para onça fluida
@@ -2595,7 +2595,7 @@ ano,numero,idioma,assunto,confianca,justificativa
 2012,165,,visao-espacial,alta,Desenho do deslocamento na pirâmide vista de cima
 2012,166,,equacoes-e-inequacoes,media,Igualar oferta e demanda para o preço de equilíbrio
 2012,167,,razao-e-proporcao,media,Tíquetes por período e custo total proporcional
-2012,168,,operacoes-e-conjuntos-numericos,media,Potência de expoente fracionário: 8^(2/3)
+2012,168,,operacoes-e-conjuntos-numericos,media,"Só potência de expoente fracionário (8 elevado a 2/3); o modelo já vem dado; o rótulo H21 do INEP descreve a fórmula e não o conhecimento pedido [conferida com o INEP, H21: mantida]"
 2012,169,,sistemas-lineares,baixa,Multiplicação de matrizes para obter médias; taxonomia não tem assunto de matrizes
 2012,170,,funcao-do-2-grau,media,Energia proporcional ao quadrado da corrente (parábola)
 2012,171,,escalas-e-unidades,alta,"Converter graus, minutos e segundos para decimal"
@@ -2621,7 +2621,7 @@ ano,numero,idioma,assunto,confianca,justificativa
 2011,146,,escalas-e-unidades,alta,Escala do mapa a partir de 8 cm e 2 000 km
 2011,147,,visao-espacial,alta,Identificar a superfície de revolução
 2011,148,,escalas-e-unidades,alta,Converter metros em pés e subtrair altitudes
-2011,149,,operacoes-e-conjuntos-numericos,media,Calcular o IAC pela fórmula com raízes e comparar com a faixa
+2011,149,,equacoes-e-inequacoes,media,"Isolar a altura pelo IMC e aplicar na fórmula do IAC com potência 1,5; INEP H23 aponta conhecimento algébrico [conferida com o INEP, H23: reclassificada]"
 2011,150,,geometria-analitica,alta,Distância de ponto a pontos da reta y = x + 4
 2011,151,,geometria-plana,media,Simetria de rotação do polígono regular
 2011,152,,funcao-do-1-grau,alta,Preço proporcional à massa: gráfico linear pela origem
@@ -2675,7 +2675,7 @@ ano,numero,idioma,assunto,confianca,justificativa
 2010,156,,geometria-analitica,media,Deslocamentos por coordenadas no mapa com curvas de nível
 2010,157,,geometria-espacial,alta,Volume da coroa cilíndrica de concreto
 2010,158,,geometria-espacial,media,Cubagem das toras e massa pela densidade
-2010,159,,operacoes-e-conjuntos-numericos,media,Fórmulas de IMC e RIP com raiz cúbica
+2010,159,,equacoes-e-inequacoes,media,"Isolar a altura na fórmula do IMC e aplicar no RIP com raiz cúbica; INEP H23 aponta conhecimento algébrico [conferida com o INEP, H23: reclassificada]"
 2010,160,,trigonometria,media,Altura do balão por triângulos com ângulos de visada
 2010,161,,geometria-plana,alta,Áreas com pontos médios do triângulo retângulo
 2010,162,,geometria-plana,media,Lado do retângulo com 4% da área da página
@@ -2685,13 +2685,13 @@ ano,numero,idioma,assunto,confianca,justificativa
 2010,166,,funcao-do-1-grau,media,Variação linear do número de favelas
 2010,167,,estatistica,alta,Mediana dos gols dos artilheiros
 2010,168,,geometria-espacial,alta,Igualar volumes de hemisfério e cone
-2010,169,,progressoes,media,"Três saltos com diferenças fixas somando 17,4 m"
+2010,169,,equacoes-e-inequacoes,media,"As diferenças entre os saltos não são constantes (1,2 e 1,5): não é PA; é equação linear com a soma 17,4 [conferida com o INEP, H13: reclassificada]"
 2010,170,,estatistica,alta,Desvio padrão como critério de regularidade
 2010,171,,porcentagem-e-juros,alta,Porcentagem de porcentagem nos tratamentos
 2010,172,,porcentagem-e-juros,alta,Aumento percentual necessário da produção brasileira
 2010,174,,probabilidade,alta,Probabilidade condicional pelos dados do quadro
 2010,175,,estatistica,alta,"Média, mediana e moda da distribuição de gols"
-2010,176,,operacoes-e-conjuntos-numericos,media,Encadear multiplicações: 58 × 23 Terras
+2010,176,,razao-e-proporcao,media,"Cadeia de proporções (58 Terras por Netuno; 23 Netunos por Júpiter); INEP H16 (proporcionalidade direta) [conferida com o INEP, H16: reclassificada]"
 2010,177,,razao-e-proporcao,media,Contaminação proporcional com potências de 10
 2010,178,,geometria-espacial,alta,Diferença de volumes dos cubos
 2010,179,,progressoes,media,Propriedade da soma das linhas da sequência

@@ -90,6 +90,11 @@ classificacao:
   # repositório. Relativo a backend/, como o storage; --arquivo sobrescreve.
   arquivo: ${CLASSIFICACAO_ARQUIVO:../dados/classificacao/assuntos.csv}
 
+conferencia-inep:
+  # Correções de gabarito e anulações do INEP (2b.7, docs/conferencia-inep.md).
+  # Mesmo esquema: relativo a backend/, --arquivo sobrescreve
+  arquivo: ${CONFERENCIA_INEP_ARQUIVO:../dados/conferencia-inep/correcoes.csv}
+
 ---
 # Documento ativado só quando o perfil dev está ativo
 spring:

@@ -52,7 +52,7 @@ public class ImportadorDeClassificacao {
         // buscar slug a slug
         var assuntosPorSlug = assuntoRepository.findAll().stream()
                 .collect(Collectors.toMap(Assunto::getSlug, Function.identity()));
-        var questoesPorChave = questaoRepository.buscarTodasParaClassificacao().stream()
+        var questoesPorChave = questaoRepository.buscarTodasParaCarga().stream()
                 .collect(Collectors.toMap(Chave::de, Function.identity()));
 
         var validacao = validar(linhas, assuntosPorSlug, questoesPorChave);
