@@ -321,6 +321,13 @@ amostrar à mão antes de mostrar diagnóstico a um cliente.
 
 ## Próximos passos
 
-1. Passo B concluído nas quatro áreas. Resta decidir o merge da branch e a Etapa 3.
-2. **2009 só tem habilidade pra Matemática.** Nas outras áreas, 134 questões desse ano
-   ficam sem conferência; é limite do dado, não do método.
+1. Passo B concluído nas quatro áreas. A habilidade oficial passou a ser gravada e
+   mostrada no detalhe da questão (2b.8: V8, `--importar-habilidades`).
+2. **2009 só tem habilidade pra Matemática.** Nas outras áreas as questões desse ano
+   ficam sem conferência e sem habilidade na tela; é limite do dado, não do método.
+3. **Palpite de especialista não substitui a habilidade oficial.** Nas 120 questões de
+   confiança baixa, atribuí a habilidade às cegas e comparei com as 108 que têm a
+   oficial: **36% de acerto exato, 62% na competência**. As habilidades do INEP se
+   sobrepõem muito (várias descrevem a mesma tarefa com outro verbo). Por isso as 12
+   sem oficial (2009) ficam como `ESTIMADA` em
+   `dados/classificacao/habilidades_baixa_confianca.csv` e não vão pro banco.

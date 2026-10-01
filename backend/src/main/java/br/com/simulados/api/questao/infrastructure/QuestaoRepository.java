@@ -40,10 +40,10 @@ public interface QuestaoRepository extends JpaRepository<Questao, Long> {
      * query só, sem Criteria API nem concatenação de string. Parâmetro nulo
      * simplesmente não filtra.
      *
-     * `q.anulada = false` não é filtro do usuário: questão anulada nunca entra
-     * em simulado, então nem aparece na busca (regra da seção 4 do CLAUDE.md).
-     * O índice parcial `(area, ano) WHERE NOT anulada` da V2 cobre exatamente
-     * este caminho.
+     * `q.disponivel = true` não é filtro do usuário: questão anulada ou incompleta
+     * nunca entra em simulado, então nem aparece na busca. `disponivel` é coluna
+     * gerada pelo banco (V9: NOT anulada AND NOT incompleta) — a regra mora num
+     * lugar só. O índice parcial `(area, ano) WHERE disponivel` cobre este caminho.
      *
      * A prévia é cortada no BANCO (substring), não em Java: o texto grande nem
      * trafega. Coalesce porque 5% das questões não têm enunciado — aí a prévia
@@ -66,7 +66,7 @@ public interface QuestaoRepository extends JpaRepository<Questao, Long> {
             FROM Questao q
             LEFT JOIN q.assunto a
             LEFT JOIN a.materia m
-            WHERE q.anulada = false
+            WHERE q.disponivel = true
               AND (:area IS NULL OR q.area = :area)
               AND (:idioma IS NULL OR q.idioma = :idioma)
               AND (:anoInicial IS NULL OR q.ano >= :anoInicial)
@@ -81,7 +81,7 @@ public interface QuestaoRepository extends JpaRepository<Questao, Long> {
             SELECT count(q) FROM Questao q
             LEFT JOIN q.assunto a
             LEFT JOIN a.materia m
-            WHERE q.anulada = false
+            WHERE q.disponivel = true
               AND (:area IS NULL OR q.area = :area)
               AND (:idioma IS NULL OR q.idioma = :idioma)
               AND (:anoInicial IS NULL OR q.ano >= :anoInicial)
@@ -108,13 +108,18 @@ public interface QuestaoRepository extends JpaRepository<Questao, Long> {
      * mapper toca nos dois pra montar a resposta. Dá pra buscar vários
      * relacionamentos "pra um" junto com UMA coleção; duas coleções (bags) é
      * que o Hibernate recusa (MultipleBagFetchException).
+     *
+     * A habilidade oficial e a competência dela também são "pra um" e LAZY: mesmo
+     * fetch, mesma query. LEFT porque 5% das questões não têm habilidade publicada.
      */
     @Query("""
             SELECT q FROM Questao q
             LEFT JOIN FETCH q.alternativas
             LEFT JOIN FETCH q.assunto a
             LEFT JOIN FETCH a.materia
-            WHERE q.id = :id AND q.anulada = false
+            LEFT JOIN FETCH q.habilidadeOficial h
+            LEFT JOIN FETCH h.competencia
+            WHERE q.id = :id AND q.disponivel = true
             """)
     Optional<Questao> buscarComAlternativas(@Param("id") Long id);
 
@@ -134,10 +139,10 @@ public interface QuestaoRepository extends JpaRepository<Questao, Long> {
      * (seção 8.4): o resultado é limitado POR CONSTRUÇÃO, uma linha por prova
      * do ENEM (~15 hoje, uma a mais por ano).
      *
-     * `anulada = false` pelo mesmo motivo da busca: um ano cujas questões
-     * fossem todas anuladas levaria o usuário a uma lista vazia.
+     * `disponivel` pelo mesmo motivo da busca: um ano cujas questões fossem
+     * todas anuladas ou incompletas levaria o usuário a uma lista vazia.
      */
-    @Query("SELECT DISTINCT q.ano FROM Questao q WHERE q.anulada = false ORDER BY q.ano DESC")
+    @Query("SELECT DISTINCT q.ano FROM Questao q WHERE q.disponivel = true ORDER BY q.ano DESC")
     List<Integer> buscarAnosDisponiveis();
 
     /**

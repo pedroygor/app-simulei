@@ -95,6 +95,16 @@ conferencia-inep:
   # Mesmo esquema: relativo a backend/, --arquivo sobrescreve
   arquivo: ${CONFERENCIA_INEP_ARQUIVO:../dados/conferencia-inep/correcoes.csv}
 
+habilidades-inep:
+  # Habilidade oficial e dificuldade TRI de cada questão, geradas dos microdados por
+  # ferramentas/inep/gerar_habilidades.py. Mesmo esquema: relativo a backend/
+  arquivo: ${HABILIDADES_INEP_ARQUIVO:../dados/conferencia-inep/habilidades.csv}
+
+incompletas:
+  # Questões sem o texto-base ou a imagem de que dependem (nunca mostradas nem
+  # sorteadas, V9). Lista completa, revisada à mão. Relativo a backend/
+  arquivo: ${INCOMPLETAS_ARQUIVO:../dados/qualidade/questoes_incompletas.csv}
+
 ---
 # Documento ativado só quando o perfil dev está ativo
 spring:

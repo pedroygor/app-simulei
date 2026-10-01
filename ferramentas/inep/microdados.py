@@ -56,6 +56,9 @@ class ItemDoInep:
     co_prova: str
     cor: str
     habilidade: str  # "" quando o INEP não publicou
+    # Parâmetro B da TRI (dificuldade calibrada); "" quando o item foi abandonado
+    # pela TRI ou o INEP não publicou. Default pra não quebrar quem monta à mão
+    dificuldade: str = ""
 
 
 def ler_itens(ano: int) -> list[dict]:
@@ -138,10 +141,14 @@ def casar(gabaritos_do_banco: dict[tuple[int, int, str], str], anos=range(2009, 
         # Mesmo item = mesma habilidade em todos os cadernos (medido: 0 conflitos
         # em 15 anos), então vale a de qualquer caderno que a tenha
         habilidade_do_item = {}
+        dificuldade_do_item = {}
         for l in linhas:
             h = (l["CO_HABILIDADE"] or "").strip()
             if h:
                 habilidade_do_item[l["CO_ITEM"]] = h
+            b = (l.get("NU_PARAM_B") or "").strip()
+            if b:
+                dificuldade_do_item[l["CO_ITEM"]] = b
 
         for area in AREAS:
             prova, numeradas = _escolher_caderno(ano, area, cadernos, gabaritos_do_banco)
@@ -153,5 +160,6 @@ def casar(gabaritos_do_banco: dict[tuple[int, int, str], str], anos=range(2009, 
                     motivo_do_abandono=(l["TX_MOTIVO_ABAN"] or "").strip(),
                     co_prova=prova, cor=l["TX_COR"],
                     habilidade=habilidade_do_item.get(l["CO_ITEM"], ""),
+                    dificuldade=dificuldade_do_item.get(l["CO_ITEM"], ""),
                 ))
     return resultado

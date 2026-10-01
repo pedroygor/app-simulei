@@ -10,10 +10,12 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinColumns;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -72,12 +74,41 @@ public class Questao {
 
     private String gabarito;
 
+    // Parâmetro B da TRI (microdados do INEP), carregado por --importar-habilidades.
+    // Ainda não aparece na tela: a escala crua (~-3 a +4) não diz nada ao aluno
     private Double dificuldade;
 
+    // Código da habilidade oficial (1–30), escrito pela carga --importar-habilidades.
+    // É a coluna que a carga altera; a leitura com o texto vem de habilidadeOficial
     private Short habilidade;
+
+    // A mesma coluna `habilidade`, junto com `area`, vista como relacionamento: a
+    // FK composta da V8 aponta pra habilidade da PRÓPRIA área. Só leitura
+    // (insertable/updatable = false) porque as duas colunas já são escritas pelos
+    // campos acima — o JPA recusa duas fontes de escrita pra mesma coluna.
+    // LAZY; o detalhe traz no mesmo SELECT via JOIN FETCH
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumns({
+            @JoinColumn(name = "area", referencedColumnName = "area", insertable = false, updatable = false),
+            @JoinColumn(name = "habilidade", referencedColumnName = "codigo", insertable = false, updatable = false)
+    })
+    private Habilidade habilidadeOficial;
 
     @Column(nullable = false)
     private boolean anulada = false;
+
+    // A fonte não trouxe o texto-base ou a imagem de que a pergunta depende (V9).
+    // Escrita pela carga --marcar-incompletas
+    @Column(nullable = false)
+    private boolean incompleta = false;
+
+    // NOT anulada AND NOT incompleta, calculada pelo PRÓPRIO banco (coluna gerada
+    // da V9). Só leitura: o Postgres recusa escrita numa coluna gerada, então o
+    // Hibernate não pode incluí-la em INSERT nem UPDATE. As consultas filtram por
+    // ela; este campo existe pra quem precisar ler a regra numa entidade carregada
+    @Column(insertable = false, updatable = false)
+    @Setter(AccessLevel.NONE)
+    private boolean disponivel;
 
     @Column(nullable = false)
     private String fonte;

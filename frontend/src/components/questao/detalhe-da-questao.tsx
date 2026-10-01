@@ -12,6 +12,7 @@ import { NOME_DO_IDIOMA } from "@/lib/questoes/filtro-da-url";
 import { AlternativaBolha } from "./alternativa-bolha";
 import { EtiquetaDeArea } from "./etiqueta-de-area";
 import { EtiquetaDeAssunto } from "./etiqueta-de-assunto";
+import { HabilidadeDaMatriz } from "./habilidade-da-matriz";
 import { TextoDaQuestao } from "./texto-da-questao";
 
 /**
@@ -29,12 +30,12 @@ export function DetalheDaQuestao({ id, voltarPara }: { id: number; voltarPara: s
   if (isPending) return <EsqueletoDoDetalhe />;
 
   if (error) {
-    // 404 cobre inexistente E anulada: pro produto, anulada não existe
+    // 404 cobre inexistente, anulada e incompleta (V9): pro produto, elas não existem
     const naoExiste = error instanceof ErroDaApi && error.status === 404;
     return (
       <div className="space-y-3 py-8 text-center text-sm">
         <p role="alert" className={naoExiste ? "text-muted-foreground" : "text-destructive"}>
-          {naoExiste ? "Esta questão não existe ou foi anulada." : error.message}
+          {naoExiste ? "Esta questão não existe ou não está disponível." : error.message}
         </p>
         <Link href={voltarPara} className="underline">
           Voltar para as questões
@@ -97,6 +98,10 @@ function ConteudoDaQuestao({ questao }: { questao: QuestaoDetalhe }) {
           </p>
         </div>
       )}
+
+      {/* Depois das alternativas e do gabarito, não no cabeçalho: lida antes de
+          responder, a habilidade ("calcular probabilidade") daria dica */}
+      <HabilidadeDaMatriz habilidade={questao.habilidade} />
     </article>
   );
 }

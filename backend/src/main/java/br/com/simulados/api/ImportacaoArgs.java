@@ -16,6 +16,12 @@ public final class ImportacaoArgs {
     // opção --arquivo da classificação: o significado é o mesmo (qual CSV ler)
     public static final String FLAG_CONFERENCIA = "aplicar-conferencia-inep";
 
+    // Grava a habilidade oficial e a dificuldade TRI do INEP (habilidades.csv)
+    public static final String FLAG_HABILIDADES = "importar-habilidades";
+
+    // Marca as questões sem texto-base/imagem (dados/qualidade/questoes_incompletas.csv)
+    public static final String FLAG_INCOMPLETAS = "marcar-incompletas";
+
     private ImportacaoArgs() {
     }
 
@@ -24,6 +30,8 @@ public final class ImportacaoArgs {
         var lista = List.of(args);
         return lista.contains("--" + FLAG)
                 || lista.contains("--" + FLAG_CLASSIFICACAO)
-                || lista.contains("--" + FLAG_CONFERENCIA);
+                || lista.contains("--" + FLAG_CONFERENCIA)
+                || lista.contains("--" + FLAG_HABILIDADES)
+                || lista.contains("--" + FLAG_INCOMPLETAS);
     }
 }
