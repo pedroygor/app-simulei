@@ -64,29 +64,41 @@ class DadosVersionadosTest(unittest.TestCase):
     """Os CSVs são a tabela de verdade: um erro de digitação aqui não quebra nada
     visível, só deixa de conferir. Por isso são testados."""
 
-    def test_faixas_de_matematica_cobrem_h1_a_h30_sem_buraco_nem_sobreposicao(self):
-        faixas = sorted(c.ler_faixas()["MT"])
-        self.assertEqual(faixas[0][0], 1)
-        self.assertEqual(faixas[-1][1], 30)
-        for (_, fim_anterior, _), (inicio, _, _) in zip(faixas, faixas[1:]):
-            self.assertEqual(inicio, fim_anterior + 1)
+    def test_faixas_de_cada_area_cobrem_h1_a_h30_sem_buraco_nem_sobreposicao(self):
+        for area, lista in c.ler_faixas().items():
+            faixas = sorted(lista)
+            self.assertEqual(faixas[0][0], 1, area)
+            self.assertEqual(faixas[-1][1], 30, area)
+            for (_, fim_anterior, _), (inicio, _, _) in zip(faixas, faixas[1:]):
+                self.assertEqual(inicio, fim_anterior + 1, area)
 
-    def test_todo_assunto_de_matematica_da_taxonomia_esta_na_tabela(self):
+    # Matérias da taxonomia (V5) que compõem cada área do INEP. Assunto novo numa migration
+    # futura sem linha na tabela deixaria de ser conferido; este teste quebra antes
+    MATERIAS_DA_AREA = {
+        "MT": {"matematica"},
+        "LC": {"lingua-portuguesa", "literatura", "ingles", "espanhol", "artes", "educacao-fisica"},
+        "CN": {"fisica", "quimica", "biologia"},
+        "CH": {"historia", "geografia", "filosofia", "sociologia"},
+    }
+
+    def test_todo_assunto_da_taxonomia_das_areas_conferidas_esta_na_tabela(self):
         import re
         import microdados
         v5 = next((microdados.RAIZ / "backend/src/main/resources/db/migration").glob("V5__*.sql")).read_text()
-        slugs = set(re.findall(r"\('matematica', '([a-z0-9-]+)'", v5))
-        na_tabela = {assunto for (area, assunto) in c.ler_compatibilidade() if area == "MT"}
-        self.assertEqual(len(slugs), 20)
-        self.assertEqual(slugs - na_tabela, set(), "assunto da taxonomia sem linha em compatibilidade.csv")
-        self.assertEqual(na_tabela - slugs, set(), "linha em compatibilidade.csv de assunto que não existe")
+        tabela = c.ler_compatibilidade()
+        for area, materias in self.MATERIAS_DA_AREA.items():
+            slugs = {a for m, a in re.findall(r"\('([a-z0-9-]+)', '([a-z0-9-]+)',", v5) if m in materias}
+            na_tabela = {assunto for (a, assunto) in tabela if a == area}
+            self.assertGreater(len(slugs), 0, area)
+            self.assertEqual(slugs - na_tabela, set(), f"{area}: assunto da taxonomia sem linha em compatibilidade.csv")
+            self.assertEqual(na_tabela - slugs, set(), f"{area}: linha de assunto que não existe na taxonomia")
 
     def test_papeis_validos_e_competencias_existentes(self):
-        faixas = {comp for _, _, comp in c.ler_faixas()["MT"]}
+        faixas = {area: {comp for _, _, comp in lista} for area, lista in c.ler_faixas().items()}
         with (c.PASTA / "compatibilidade.csv").open(newline="", encoding="utf-8") as arquivo:
             for linha in csv.DictReader(arquivo):
                 self.assertIn(linha["papel"], {"NUCLEO", "TOLERADA"}, linha)
-                self.assertIn(int(linha["competencia"]), faixas, linha)
+                self.assertIn(int(linha["competencia"]), faixas[linha["area"]], linha)
 
     def test_revisoes_apontam_pra_assuntos_e_decisoes_validos(self):
         tabela = c.ler_compatibilidade()

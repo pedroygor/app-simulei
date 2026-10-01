@@ -29,7 +29,7 @@ ano,numero,idioma,assunto,confianca,justificativa
 2016,84,,termologia,alta,Condutividade térmica de alumínio e plástico
 2018,118,,termologia,alta,Dilatação térmica pela distância interatômica
 2015,64,,energia-trabalho-potencia,alta,Teorema da energia cinética
-2022,122,,fisiologia-humana,media,Coagulação sanguínea e trombose; contexto de proteína recombinante
+2022,122,,fisiologia-humana,media,"Efeito sobre coagulação e trombo: fisiologia do sangue; a proteína recombinante é o contexto [conferida com o INEP, H11: mantida]"
 2016,55,,ondulatoria,alta,Intensidade sonora por faixa de frequência
 2020,93,,eletrodinamica,alta,Ligação do amperímetro em série e corrente de fuga
 2018,106,,evolucao,alta,Especiação por isolamento reprodutivo
@@ -99,7 +99,7 @@ ano,numero,idioma,assunto,confianca,justificativa
 2016,165,,operacoes-e-conjuntos-numericos,baixa,Número de andares; a fonte não traz o enunciado
 2018,143,,razao-e-proporcao,alta,Proporção de prata e cobre nas ligas
 2023,146,,progressoes,baixa,Números em PA nos vértices de um triângulo mágico; é mais raciocínio lógico
-2023,46,,cultura-e-identidade,baixa,Sertão como lugar vivido e afetivo; conceito geográfico de lugar sem slug próprio
+2023,46,,cultura-e-identidade,baixa,"Sertão como lugar de vivências socioafetivas (memória e identidade); o conceito geográfico de lugar não tem assunto próprio e nenhum conhecimento cartográfico é pedido; H6 descreve a imagem [conferida com o INEP, H6: mantida]"
 2023,47,,brasil-imperio,media,Mudança de costumes femininos pelo letramento no século XIX
 2023,48,,espaco-agrario,alta,Territorialização do agronegócio e subordinação do campesinato
 2023,49,,globalizacao-e-geopolitica,alta,Política demográfica chinesa em Xinjiang para garantir integridade territorial
@@ -135,7 +135,7 @@ ano,numero,idioma,assunto,confianca,justificativa
 2023,81,,filosofia-contemporanea,media,Economia das ilegalidades em Foucault; poderia ser teoria-sociologica
 2023,82,,populacao-e-migracoes,media,Cartas de imigrantes e circularidade cultural
 2023,83,,questoes-ambientais,media,Degradação do solo pela ocupação desordenada; poderia ser geologia-e-relevo
-2023,84,,trabalho-e-sociedade,media,Racionalização do trabalho doméstico nos anos 1930
+2023,84,,trabalho-e-sociedade,media,"Racionalização do trabalho doméstico e seus efeitos sobre as mulheres: trabalho e sociedade; H3 descreve a tarefa [conferida com o INEP, H3: mantida]"
 2023,85,,globalizacao-e-geopolitica,alta,Interesses opostos no acordo União Europeia-Mercosul
 2023,86,,cultura-e-identidade,baixa,Educação feminina rompendo papéis de gênero no século XIX
 2023,87,,brasil-republica,media,Antissemitismo e imigração judaica no governo Vargas
@@ -257,7 +257,7 @@ ano,numero,idioma,assunto,confianca,justificativa
 2020,72,,filosofia-medieval-e-moderna,media,Montaigne e o ensaio
 2020,73,,cidadania-e-movimentos-sociais,media,Educação inclusiva e pluralidade dos sujeitos
 2020,74,,filosofia-contemporanea,alta,Corpo e percepção em Merleau-Ponty
-2020,75,,cartografia,media,Cartografia moderna como forma de dominação da América
+2020,75,,idade-moderna,media,"A cartografia é o objeto mas o conhecimento é a invenção da América pelos europeus e a dominação sobre os saberes ameríndios na época moderna; INEP H11 [conferida com o INEP, H11: reclassificada]"
 2020,76,,revolucoes-dos-seculos-18-e-19,baixa,Leis de sucessão e valores burgueses na América de Tocqueville
 2020,77,,filosofia-antiga,alta,Ética e política em Aristóteles
 2020,78,,trabalho-e-sociedade,alta,Toyotismo e produção sob demanda
@@ -274,7 +274,7 @@ ano,numero,idioma,assunto,confianca,justificativa
 2020,89,,filosofia-medieval-e-moderna,alta,Empirismo de Hume
 2020,90,,questoes-ambientais,media,Tragédia de Mariana e hipóteses sobre a febre amarela
 2019,46,,geologia-e-relevo,media,Antropoceno e processos exógenos
-2019,48,,filosofia-medieval-e-moderna,media,Natureza como recurso no racionalismo cartesiano
+2019,48,,filosofia-medieval-e-moderna,media,"Pede a corrente filosófica (racionalismo cartesiano) por trás da visão da natureza como recurso; H29 descreve o tema do texto [conferida com o INEP, H29: mantida]"
 2019,49,,questoes-ambientais,media,"Agrotóxicos, morte de abelhas e controle biológico"
 2019,50,,filosofia-contemporanea,alta,Hospitalidade e alteridade em Derrida
 2019,51,,filosofia-politica,baixa,Direito como regulação do convívio social
@@ -300,7 +300,7 @@ ano,numero,idioma,assunto,confianca,justificativa
 2019,71,,trabalho-e-sociedade,alta,Crise capitalista e qualificação profissional
 2019,72,,brasil-imperio,alta,Voto indireto e censitário na Constituição de 1824
 2019,73,,idade-moderna,media,Igreja pós-Trento apropriando festas do fogo
-2019,75,,filosofia-medieval-e-moderna,media,Natureza objetificada desde Bacon; poderia ser questoes-ambientais
+2019,75,,filosofia-medieval-e-moderna,media,"Natureza objetificada desde Bacon e o método experimental: concepção moderna de ciência; hesitei com questoes-ambientais pelo texto II [conferida com o INEP, H27: mantida]"
 2019,76,,seculo-20-mundial,media,Campos de concentração em Arendt; poderia ser filosofia-contemporanea
 2019,77,,urbanizacao,media,Arte de rua e apropriação do espaço público
 2019,78,,filosofia-medieval-e-moderna,alta,Lei moral e fenômeno em Kant
@@ -340,7 +340,7 @@ ano,numero,idioma,assunto,confianca,justificativa
 2018,69,,ditadura-e-redemocratizacao,alta,Henfil e os limites da distensão
 2018,71,,brasil-republica,alta,Revolta da Chibata
 2018,72,,povos-indigenas,media,Domesticação de plantas por povos pré-colombianos na Amazônia
-2018,73,,geologia-e-relevo,media,Relevo e estratégia militar
+2018,73,,geologia-e-relevo,media,"Relação entre topografia (relevo) e domínio do território em dois textos; o relevo é o conhecimento central; H14 descreve a tarefa de comparar textos [conferida com o INEP, H14: mantida]"
 2018,75,,populacao-e-migracoes,alta,Transição demográfica europeia
 2018,76,,brasil-republica,alta,Criminalização do curandeirismo em 1890
 2018,77,,geologia-e-relevo,media,Laterização sob clima tropical; poderia ser clima
@@ -420,7 +420,7 @@ ano,numero,idioma,assunto,confianca,justificativa
 2016,19,,populacao-e-migracoes,media,Remessas de imigrantes facilitadas pelas comunicações
 2016,20,,filosofia-medieval-e-moderna,alta,Autonomia do sujeito pensante em Descartes
 2016,21,,antiguidade,alta,Imperialismo romano em Políbio
-2016,22,,cultura-e-identidade,baixa,Memória de mudança política e de costumes; depende da figura
+2016,22,,seculo-20-mundial,media,"A imagem é a HQ Persépolis e trata da Revolução Islâmica de 1979 e do véu obrigatório: o conhecimento é o contexto político do Irã no século XX; INEP H10 [conferida com o INEP, H10: reclassificada]"
 2016,23,,filosofia-antiga,alta,Heráclito e Parmênides: debate ontológico
 2016,24,,estado-e-democracia,media,Democracia deliberativa e democracia ativista
 2016,25,,etica-e-moral,alta,Princípio responsabilidade de Hans Jonas
@@ -458,7 +458,7 @@ ano,numero,idioma,assunto,confianca,justificativa
 2015,12,,urbanizacao,media,Desaceleração metropolitana pela realocação industrial
 2015,13,,filosofia-antiga,alta,Justiça como convenção em Trasímaco
 2015,14,,estado-e-democracia,baixa,Personalismo e interesses privados na vida pública brasileira (Sérgio Buarque)
-2015,15,,cartografia,media,Cartografia social e identidades coletivas
+2015,15,,cultura-e-identidade,media,"A cartografia é só a ferramenta: nenhum conhecimento cartográfico é pedido e a resposta é a valorização de identidades coletivas de povos tradicionais; INEP H25 [conferida com o INEP, H25: reclassificada]"
 2015,16,,filosofia-medieval-e-moderna,alta,Empirismo de Hume
 2015,17,,filosofia-medieval-e-moderna,alta,Monarquia e bem comum em Tomás de Aquino
 2015,18,,brasil-republica,alta,Criação da Justiça Eleitoral em 1932
@@ -670,7 +670,7 @@ ano,numero,idioma,assunto,confianca,justificativa
 2010,4,,questoes-ambientais,alta,Lixões e saúde pública
 2010,5,,questoes-ambientais,media,Erosão em encosta e aração morro abaixo; alternativa: geologia-e-relevo
 2010,6,,questoes-ambientais,media,Assoreamento de rios e enchentes urbanas
-2010,7,,cartografia,alta,Coordenadas geográficas
+2010,7,,cartografia,alta,"Pede o conceito de coordenada geográfica (latitude e longitude): cartografia pura; H16 descreve o contexto de navegação [conferida com o INEP, H16: mantida]"
 2010,8,,geologia-e-relevo,alta,Rochas sedimentares e fósseis
 2010,9,,globalizacao-e-geopolitica,alta,G-20 e BRIC
 2010,10,,revolucoes-dos-seculos-18-e-19,alta,Revolução Industrial e cidades operárias
@@ -785,7 +785,7 @@ ano,numero,idioma,assunto,confianca,justificativa
 2023,126,,ligacoes-e-propriedades,media,Cloridrato de fármaco e caráter iônico; alternativa: funcoes-inorganicas
 2023,127,,metabolismo-energetico,alta,Cianeto bloqueando a cadeia respiratória
 2023,128,,ondulatoria,alta,Interferência entre ondas de mesma frequência
-2023,129,,ligacoes-e-propriedades,media,Composto apolar acumula no leite gorduroso; imagens quebradas na fonte
+2023,129,,ligacoes-e-propriedades,media,"Composto apolar se concentra onde há gordura: polaridade e solubilidade; H10 descreve a tarefa [conferida com o INEP, H10: mantida]"
 2023,130,,termologia,media,Baixa condutividade térmica e menos resíduo não biodegradável
 2023,131,,solucoes,media,Densidade do refrigerante com açúcar dissolvido
 2023,133,,quimica-ambiental,media,Detergente biodegradável com cadeia normal; alternativa: quimica-organica
@@ -847,7 +847,7 @@ ano,numero,idioma,assunto,confianca,justificativa
 2021,102,,eletrodinamica,media,Pilhas em série no circuito equivalente; alternativas em imagem
 2021,103,,funcoes-inorganicas,media,Titulação ácido-base do AAS; alternativa: solucoes
 2021,104,,ecologia,alta,Magnificação trófica de rejeitos da barragem
-2021,106,,quimica-organica,alta,Isomeria geométrica da bilirrubina na fototerapia
+2021,106,,quimica-organica,alta,"O que se pede é o tipo de isomeria (geométrica); H22 descreve o contexto da fototerapia [conferida com o INEP, H22: mantida]"
 2021,107,,energia-trabalho-potencia,alta,Potência como taxa de variação da energia cinética
 2021,108,,gravitacao,media,Distância ao Sol e densidade de Saturno; leitura de tabela
 2021,109,,eletrodinamica,alta,Segunda lei de Ohm e geometria dos fios
@@ -890,7 +890,7 @@ ano,numero,idioma,assunto,confianca,justificativa
 2020,105,,termodinamica,media,Refrigerador e trabalho do compressor
 2020,106,,hidrostatica,media,Pressão hidrostática e tempo de descompressão; leitura de gráfico
 2020,107,,hidrostatica,media,Pressão da torre e do modelo em escala
-2020,108,,funcoes-inorganicas,baixa,Revestimento entérico resistente ao pH ácido; alternativa: fisiologia-humana
+2020,108,,fisiologia-humana,media,"Revestimento que resiste ao suco gástrico: o conhecimento pedido é o pH ácido do estômago e a digestão; INEP H30 (saúde); era a alternativa do próprio classificador [conferida com o INEP, H30: reclassificada]"
 2020,109,,termologia,media,Panela de pressão e ebulição; economia de gás
 2020,110,,cinetica-quimica,alta,Nanocatalisadores e superfície de contato
 2020,111,,ondulatoria,alta,Interferência destrutiva no cancelamento de ruído
@@ -904,7 +904,7 @@ ano,numero,idioma,assunto,confianca,justificativa
 2020,119,,impactos-ambientais,media,"Esgoto, oxigênio dissolvido e DBO; leitura de gráfico"
 2020,120,,estequiometria,alta,Emissão de CO2 e massa de etanol economizada
 2020,121,,metabolismo-energetico,alta,Experimento de Engelmann e espectro da fotossíntese
-2020,122,,hidrostatica,media,Flutuação de ovos de parasitos pela densidade; alternativa: saude-e-doencas
+2020,122,,hidrostatica,media,"Comparar a densidade dos ovos com a da solução para ver quem flutua: densidade e flutuação; o parasito é só o contexto [conferida com o INEP, H15: mantida]"
 2020,123,,separacao-de-misturas,alta,Decantação de líquidos imiscíveis
 2020,124,,quimica-ambiental,media,Petróleo hidrofóbico e pouco denso no mar; alternativa: impactos-ambientais
 2020,125,,genetica,alta,Equilíbrio de Hardy-Weinberg no sistema ABO
@@ -924,7 +924,7 @@ ano,numero,idioma,assunto,confianca,justificativa
 2019,96,,ecologia,alta,Estratégias r e K na recolonização
 2019,97,,ecologia,alta,Competição intraespecífica entre cutias
 2019,99,,ecologia,media,Resíduo de café e reciclagem de carbono e nitrogênio
-2019,101,,fisiologia-humana,alta,EPO e transporte de oxigênio
+2019,101,,fisiologia-humana,alta,"EPO e transporte de oxigênio para produção de ATP: fisiologia; a biotecnologia é só o contexto do doping [conferida com o INEP, H11: mantida]"
 2019,102,,termologia,alta,Condutividade térmica de recipientes isolantes
 2019,103,,eletroquimica,alta,Oxirredução no biochip de glicose
 2019,104,,impactos-ambientais,media,Fármacos residuais e tratamento de efluentes; alternativa: quimica-ambiental
@@ -934,7 +934,7 @@ ano,numero,idioma,assunto,confianca,justificativa
 2019,109,,cinematica,media,Velocidade angular do foguete relativa à Terra; alternativa: gravitacao
 2019,110,,genetica,alta,Ligação gênica e segunda lei de Mendel
 2019,111,,dinamica,alta,Impulso e força média no capacete
-2019,112,,ligacoes-e-propriedades,alta,Forças intermoleculares e ebulição das frações do petróleo
+2019,112,,ligacoes-e-propriedades,alta,"Ponto de ebulição das frações do petróleo pede forças intermoleculares; o rótulo H23 descreve o contexto energético [conferida com o INEP, H23: mantida]"
 2019,113,,eletromagnetismo,alta,Movimento de íon em campo magnético
 2019,114,,saude-e-doencas,alta,Antirretrovirais contra retrovírus
 2019,115,,impactos-ambientais,alta,Concreto reciclado e redução da extração de brita
@@ -1029,7 +1029,7 @@ ano,numero,idioma,assunto,confianca,justificativa
 2017,117,,genetica,alta,Inativação do X em gêmeas com DMD
 2017,118,,impactos-ambientais,alta,Concregrama contra a impermeabilização do solo
 2017,119,,equilibrio-quimico-e-ph,alta,pKa e extração do lapachol em meio básico
-2017,120,,solucoes,alta,Osmose reversa e pressão mecânica
+2017,120,,solucoes,alta,"Osmose reversa pede comparar pressão osmótica e mecânica: propriedade coligativa de soluções; H20 descreve a tarefa [conferida com o INEP, H20: mantida]"
 2017,121,,eletroquimica,media,Pilhas em série para acender o LED; alternativas em imagem
 2017,122,,estequiometria,alta,Massa de ácido salicílico com rendimento de 50%
 2017,123,,botanica,alta,Bromélias epífitas acumulando água da chuva
@@ -1117,7 +1117,7 @@ ano,numero,idioma,assunto,confianca,justificativa
 2015,77,,reacoes-organicas-e-polimeros,media,Eletrólise de Kolbe e nomenclatura do alcano; enunciado só em imagem
 2015,78,,saude-e-doencas,media,Primeiros socorros em queimadura
 2015,79,,termologia,alta,Alto calor específico do fluido arrefecedor
-2015,80,,ligacoes-e-propriedades,alta,Baixa polaridade e acúmulo lipídico de organoclorados
+2015,80,,ligacoes-e-propriedades,alta,"Acúmulo em tecido lipídico pede polaridade das moléculas; H10 descreve a tarefa (destino de poluentes) [conferida com o INEP, H10: mantida]"
 2015,81,,eletroquimica,media,Deposição de cobre sobre ferro; enunciado só em imagem
 2015,82,,dinamica,baixa,Massa da barra em equilíbrio; enunciado só em imagem
 2015,83,,zoologia,alta,Pele permeável dos anfíbios
@@ -1231,7 +1231,7 @@ ano,numero,idioma,assunto,confianca,justificativa
 2012,58,,reacoes-organicas-e-polimeros,alta,Esterificação formando benzoato de etila
 2012,59,,estequiometria,alta,Massa de butano pela emissão de CO2
 2012,61,,energia-trabalho-potencia,media,Eficiência luminosa por potência das lâmpadas
-2012,62,,evolucao,media,Híbridos substituindo geneticamente a espécie natural; alternativa: ecologia
+2012,62,,impactos-ambientais,media,"Híbridos de piscicultura que escapam e substituem a espécie natural: impacto de atividade econômica em ambiente natural; INEP H12 [conferida com o INEP, H12: reclassificada]"
 2012,63,,metabolismo-energetico,alta,Fermentação e CO2 no crescimento do pão
 2012,64,,optica,alta,Refração na pesca com lança
 2012,66,,reacoes-organicas-e-polimeros,media,Substituição eletrofílica no benzeno; alternativas em imagem
@@ -1254,7 +1254,7 @@ ano,numero,idioma,assunto,confianca,justificativa
 2012,83,,termodinamica,alta,Segunda lei e rendimento das máquinas térmicas
 2012,84,,radioatividade,alta,Material irradiado não se torna radioativo
 2012,85,,botanica,alta,Grão de pólen e polinização cruzada
-2012,86,,solucoes,alta,Pressão osmótica e solução hipertônica
+2012,86,,citologia,media,"O que se pede é o que a osmose faz com a célula humana em meio hipertônico (água sai); o conhecimento é transporte pela membrana; INEP H15 [conferida com o INEP, H15: reclassificada]"
 2012,87,,saude-e-doencas,alta,Desmatamento e aumento da doença de Chagas
 2012,88,,ondulatoria,alta,Baixa frequência da luz incandescente e bronzeamento
 2012,89,,citologia,alta,Natureza anfifílica dos fosfolipídios
@@ -1408,7 +1408,7 @@ ano,numero,idioma,assunto,confianca,justificativa
 2023,11,,argumentacao,alta,Procedimentos argumentativos na campanha Maio Amarelo
 2023,12,,modernismo,media,Ficção urbana dos anos 1950 e foco narrativo
 2023,13,,modernismo,alta,Poema de Mário de Andrade e memória amorosa
-2023,14,,modernismo,alta,Conto de Guimarães Rosa e o contador de histórias
+2023,14,,modernismo,alta,"Trecho de Guimarães Rosa; o conhecimento é interpretar o conto (convenção: autor modernista); H29 refere-se ao rádio como tema do trecho [conferida com o INEP, H29: mantida]"
 2023,15,,arte-cultura-e-sociedade,media,Perda de registros linguísticos indígenas no Museu Nacional
 2023,16,,variacao-linguistica,alta,Variação regional na Libras
 2023,17,,gramatica-aplicada,media,Uso não padrão dos colchetes e identidade da revista
@@ -1455,7 +1455,7 @@ ano,numero,idioma,assunto,confianca,justificativa
 2022,10,,generos-digitais,alta,"Internet, divulgação artística e direito autoral"
 2022,11,,generos-digitais,media,Novas técnicas e apropriação de nova linguagem
 2022,12,,variacao-linguistica,alta,Norma-padrão inadequada ao contexto de comunicação
-2022,14,,variacao-linguistica,media,Léxico e incorporação de preconceitos; alternativa: intertextualidade
+2022,14,,intertextualidade,media,"O Texto II exemplifica o Texto I: a tarefa é relacionar os dois textos; o léxico é o tema; INEP H22 [conferida com o INEP, H22: reclassificada]"
 2022,15,,generos-digitais,media,Post que se apropria de outro gênero; imagem
 2022,18,,gramatica-aplicada,media,Justaposição de sequências verbais e nominais
 2022,21,,romantismo,alta,Conto de Maria Firmina dos Reis e a hipocrisia escravocrata
@@ -1528,7 +1528,7 @@ ano,numero,idioma,assunto,confianca,justificativa
 2021,40,,literatura-contemporanea,media,Mulher em hospital psiquiátrico e imersão lírica
 2021,41,,linguagem-literaria,media,Soneto de Sosígenes Costa e sinestesia
 2021,43,,literatura-contemporanea,media,Quadrinhos de Cumbe e resistência dos escravizados
-2021,44,,realismo-naturalismo-parnasianismo,media,O alienista e a matraca como informação não fidedigna
+2021,44,,realismo-naturalismo-parnasianismo,media,"Ironia machadiana sobre a matraca como meio de divulgação; o conhecimento é interpretar a ironia do narrador; H29 descreve o tema do meio de comunicação [conferida com o INEP, H29: mantida]"
 2021,45,,argumentacao,media,Argumentos sobre a relevância do choro; alternativa: musica-teatro-danca
 2020,1,ESPANHOL,interpretacao-espanhol,alta,Canção Pablo Pueblo e crítica social
 2020,1,INGLES,interpretacao-ingles,media,Pôster de campanha sobre tratamento da mulher; imagem
@@ -1552,7 +1552,7 @@ ano,numero,idioma,assunto,confianca,justificativa
 2020,17,,praticas-corporais-e-saude,alta,Crítica ao discurso individual da aptidão física
 2020,18,,linguagem-literaria,media,Descrição lírica que desvela vazio e angústia
 2020,19,,generos-textuais,media,Petição jurídica em versos e jogo de linguagem
-2020,20,,variacao-linguistica,media,Jargão do empreendedor de palco; alternativa: argumentacao
+2020,20,,variacao-linguistica,media,"Identificar o empreendedor de palco pelo jargão e estrangeirismos (registro); o rótulo H29 do INEP não descreve o conteúdo pedido [conferida com o INEP, H29: mantida]"
 2020,21,,arte-cultura-e-sociedade,alta,Canção que exalta a cultura popular pernambucana
 2020,22,,generos-textuais,media,Anúncio contra violência de gênero no esporte; imagem
 2020,23,,literatura-contemporanea,alta,Repetições e frases curtas expondo futilidade do narrador
@@ -1665,7 +1665,7 @@ ano,numero,idioma,assunto,confianca,justificativa
 2018,34,,artes-visuais,alta,Cerâmica sem função utilitária e urna marajoara
 2018,35,,literatura-contemporanea,alta,Angélica Freitas e hipocrisia do senso comum
 2018,36,,linguagem-literaria,media,Manoel de Barros e a nomeação que empobrece a imagem
-2018,37,,variacao-linguistica,alta,Pajubá como patrimônio linguístico
+2018,37,,variacao-linguistica,alta,"Pajubá como variedade e patrimônio linguístico: variação social; H21 do INEP não descreve o conteúdo da questão [conferida com o INEP, H21: mantida]"
 2018,38,,coesao-e-coerencia,media,Justaposição de frases e progressão em Graciliano
 2018,39,,generos-textuais,media,Rótulos de alimentos sem glúten; imagem
 2018,40,,generos-digitais,alta,Twitter como suporte de concurso literário
@@ -1693,14 +1693,14 @@ ano,numero,idioma,assunto,confianca,justificativa
 2017,12,,variacao-linguistica,alta,Contribuição do tupi para o léxico do português
 2017,13,,modernismo,alta,Murilo Mendes e visão iconoclasta do colonialismo
 2017,14,,argumentacao,alta,Estratégias da propaganda e imposição de ideias
-2017,15,,variacao-linguistica,media,Grafia de Gerimum e relação com o lugar de origem
+2017,15,,variacao-linguistica,media,"Grafia de Gerimum com g como marca de variante regional e identidade com o lugar; H23 descreve a estratégia [conferida com o INEP, H23: mantida]"
 2017,16,,figuras-de-linguagem,media,Polissemia de criação na publicidade
 2017,17,,generos-digitais,alta,Uso orientado da internet por estudantes
 2017,18,,literatura-contemporanea,media,H. Dobal e inventário afetivo das memórias
 2017,19,,esporte-e-sociedade,alta,Ascensão social pelo futebol e abandono escolar
 2017,20,,variacao-linguistica,media,Clarice e a língua portuguesa como herança a renovar
 2017,21,,artes-visuais,alta,Goeldi e o expressionismo
-2017,22,,variacao-linguistica,media,Línguas ticuna e outra e predomínio sobre línguas de contato
+2017,22,,intertextualidade,media,"Pede o ponto em comum entre dois textos sobre línguas diferentes: a tarefa é relacionar textos; a língua é o tema; INEP H22 [conferida com o INEP, H22: reclassificada]"
 2017,23,,funcoes-da-linguagem,alta,Função emotiva em canção de Chico Buarque
 2017,24,,musica-teatro-danca,media,Teatro engajado de 1964 e alinhamento político
 2017,25,,generos-textuais,alta,Resenha de livro sobre festival de 1967
@@ -1791,10 +1791,10 @@ ano,numero,idioma,assunto,confianca,justificativa
 2015,103,,generos-textuais,media,Função de texto sobre lixo nas rodovias
 2015,104,,literatura-contemporanea,media,Poema de inspiração concretista e fragmentação da palavra
 2015,105,,generos-digitais,alta,Sociedade da informação
-2015,106,,variacao-linguistica,media,Adequação do registro ao suporte digital; alternativa: generos-digitais
+2015,106,,generos-digitais,media,"Adequação do registro e das linguagens aos ambientes digitais; INEP H29 (linguagens das tecnologias de comunicação) [conferida com o INEP, H29: reclassificada]"
 2015,107,,realismo-naturalismo-parnasianismo,media,Bilac e o projeto ideológico da Primeira República
 2015,108,,artes-visuais,alta,Magritte e justaposição surrealista
-2015,109,,variacao-linguistica,media,Iorubá em canção de Pixinguinha; alternativa: musica-teatro-danca
+2015,109,,arte-cultura-e-sociedade,media,"O iorubá na canção como marca da cultura africana na música brasileira: diversidade e patrimônio cultural; INEP H14 [conferida com o INEP, H14: reclassificada]"
 2015,110,,artes-visuais,alta,Máscara africana e sintetização das formas
 2015,111,,arte-cultura-e-sociedade,alta,Equivalência entre arte colonizadora e indígena
 2015,112,,artes-visuais,alta,Performance de Marina Abramovic
@@ -1859,8 +1859,8 @@ ano,numero,idioma,assunto,confianca,justificativa
 2014,122,,artes-visuais,alta,Bicho de bolso de Lygia Clark e participação do espectador
 2014,123,,musica-teatro-danca,alta,Cavaquinho e violão no choro e no samba
 2014,124,,simbolismo-e-pre-modernismo,alta,Cruz e Sousa e sofrimento diante da discriminação
-2014,125,,variacao-linguistica,media,Contraste entre tema bíblico e gíria na crônica de Verissimo
-2014,126,,generos-textuais,media,Rubricas em Martins Pena como possibilidade cênica
+2014,125,,variacao-linguistica,media,"Contraste entre tema bíblico e gíria (registro) gera o humor: variação de registro; H23 descreve a estratégia argumentativa [conferida com o INEP, H23: mantida]"
+2014,126,,musica-teatro-danca,media,"Função das rubricas num texto teatral encenado: conhecimento de teatro e encenação; INEP H13 (produção artística) [conferida com o INEP, H13: reclassificada]"
 2014,127,,intertextualidade,alta,Charge dialogando com Guernica
 2014,128,,coesao-e-coerencia,media,Conjunção mas articulando oposição no poema
 2014,129,,variacao-linguistica,alta,Forma do falar popular regional em canção
@@ -1914,7 +1914,7 @@ ano,numero,idioma,assunto,confianca,justificativa
 2013,129,,modernismo,media,Poema de Oswald anotado sobre brasilidade e futebol; imagem
 2013,130,,argumentacao,media,Na verdade introduzindo informações pouco divulgadas
 2013,131,,argumentacao,media,Ironia crítica sobre tecnologia na tirinha; imagem
-2013,132,,variacao-linguistica,alta,Piada com pronúncia lagarto e largato
+2013,132,,variacao-linguistica,alta,"Humor da piada depende de reconhecer que a pergunta era sobre a pronúncia (lagarto e largato); mantida em variação com o humor como apoio [conferida com o INEP, H22: mantida]"
 2013,133,,generos-digitais,media,Imagem da venda e deep web; imagem
 2013,134,,generos-digitais,alta,Cyberbullying e anonimato
 2013,135,,generos-textuais,media,Gráficos sobre casamento e emprego; imagem
@@ -1931,7 +1931,7 @@ ano,numero,idioma,assunto,confianca,justificativa
 2012,97,,generos-digitais,media,Anúncio de revista digital e novo paradigma de consumo; imagem
 2012,98,,romantismo,media,Digitalização do acervo de José de Alencar e memória
 2012,99,,variacao-linguistica,alta,Relato oral e marcas da modalidade falada
-2012,100,,modernismo,media,Drummond e inquietação sobre o verbo ser
+2012,100,,corpo-e-expressao,media,"A pergunta é sobre autoimagem corporal e corporeidade (padrão corporal imposto); o poema é só o suporte; INEP H9 (linguagem corporal) [conferida com o INEP, H9: reclassificada]"
 2012,101,,linguagem-literaria,media,Imagem do títere e crítica ao personagem
 2012,102,,figuras-de-linguagem,media,Metáfora do jornal que embrulha peixe e temporalidade
 2012,103,,figuras-de-linguagem,alta,Polissemia de rede social na charge
@@ -1959,8 +1959,8 @@ ano,numero,idioma,assunto,confianca,justificativa
 2012,126,,literatura-contemporanea,alta,Cacaso e alegorias da opressão nos anos 1970
 2012,127,,funcoes-da-linguagem,alta,Função emotiva na crônica Desabafo
 2012,128,,variacao-linguistica,alta,Norma padrão adequada ao gênero entrevista
-2012,129,,variacao-linguistica,media,Léxico e cultura; diferenças vocabulares entre idiomas
-2012,130,,variacao-linguistica,alta,Substituição de haver por ter e purismo
+2012,129,,interpretacao-de-texto,media,"Texto sobre léxico e cultura entre línguas; a questão pede a tese do texto (compreensão); a língua é o tema; INEP H23 (inferir objetivos do produtor) [conferida com o INEP, H23: reclassificada]"
+2012,130,,variacao-linguistica,alta,"Substituição de haver por ter e crítica ao purismo: variação e mudança com norma; H22 descreve a tarefa [conferida com o INEP, H22: mantida]"
 2012,132,,argumentacao,media,Enunciado que distorce lugar de mulher é na cozinha
 2012,133,,generos-textuais,media,Peça publicitária sobre consumo responsável; imagem
 2012,134,,figuras-de-linguagem,alta,Metaforização do verbo beber no conto de Drummond
@@ -1997,13 +1997,13 @@ ano,numero,idioma,assunto,confianca,justificativa
 2011,122,,argumentacao,media,Recurso gráfico e metalinguagem publicitária do Conar
 2011,123,,generos-textuais,media,Objetivo do anúncio do Conar dirigido a publicitários
 2011,124,,argumentacao,media,Jogo de palavras em campanha de solidariedade; imagem
-2011,125,,variacao-linguistica,media,Museu da Língua e identidade nacional
+2011,125,,interpretacao-de-texto,media,"A língua é o TEMA do texto mas a questão pede só a ideia central; pela regra 1 da taxonomia o assunto é a compreensão; INEP H22 [conferida com o INEP, H22: reclassificada]"
 2011,126,,intertextualidade,media,Cartas de leitores sobre incapacidade política
 2011,127,,argumentacao,media,Saco de açúcar como corpo fora de forma; imagem
 2011,128,,variacao-linguistica,alta,Normas e norma nacional distinta da europeia
 2011,130,,variacao-linguistica,alta,Nomes regionais da mandioca
 2011,131,,variacao-linguistica,alta,Usos consagrados que revelam mudança linguística
-2011,132,,variacao-linguistica,media,Termos de informática traduzidos ao guarani; alternativa: generos-digitais
+2011,132,,generos-digitais,media,"Impacto das tecnologias da informação numa comunidade e adaptação de termos de informática; INEP H28 (função e impacto das tecnologias) [conferida com o INEP, H28: reclassificada]"
 2011,133,,praticas-corporais-e-saude,media,Uso do computador e má postura; imagem
 2011,134,,generos-digitais,media,Charge sobre evolução e dependência tecnológica; imagem
 2011,135,,generos-digitais,alta,Twitter e comunicação concisa
@@ -2082,19 +2082,19 @@ ano,numero,idioma,assunto,confianca,justificativa
 2009,116,,funcoes-da-linguagem,alta,Função poética em Bandeira
 2009,117,,figuras-de-linguagem,media,Repetição de sons e estruturas no poema de Bandeira
 2009,118,,musica-teatro-danca,alta,Teatro do Oprimido de Boal
-2009,119,,variacao-linguistica,alta,Rigidez gramatical x adequação da linguagem
+2009,119,,variacao-linguistica,alta,"Confronta purismo gramatical e adequação ao padrão brasileiro: o conteúdo é norma x uso; o H22 descreve a tarefa de confrontar textos [conferida com o INEP, H22: mantida]"
 2009,120,,modernismo,media,Romance regionalista nordestino e realismo
 2009,121,,argumentacao,media,Discurso indígena dirigido aos não índios
 2009,122,,variacao-linguistica,media,Norma padrão para posições simétricas na interlocução
 2009,123,,linguagem-literaria,media,Brecht e crítica à sociedade capitalista
 2009,124,,figuras-de-linguagem,alta,Oximoro em Hilda Hilst
-2009,125,,variacao-linguistica,media,Crítica ao uso da linguagem escrita em anúncio; imagem
+2009,125,,variacao-linguistica,media,"Posição crítica sobre oral e escrito e norma padrão no anúncio; o conteúdo é modalidade e norma; H4 descreve a tarefa [conferida com o INEP, H4: mantida]"
 2009,126,,generos-digitais,media,Gênero híbrido carta e publicidade sobre dengue; imagem
 2009,127,,argumentacao,media,Conclamar a população contra a dengue; imagem
 2009,128,,linguagem-literaria,media,Hesitação do narrador na partida
-2009,129,,variacao-linguistica,alta,Variação diatópica e sociocultural no Brasil
+2009,129,,variacao-linguistica,alta,"Variação diatópica e sociocultural (Silva Neto x Teyssier): variação pura; H22 descreve a tarefa de confrontar autores [conferida com o INEP, H22: mantida]"
 2009,130,,arte-cultura-e-sociedade,media,Estilo brasileiro e reconhecimento cultural
-2009,131,,variacao-linguistica,media,Contato do português com outras línguas e visão homogênea de João de Barros
+2009,131,,variacao-linguistica,media,"Contato linguístico e concepção de língua homogênea (João de Barros): variação e mudança; H4 descreve a tarefa [conferida com o INEP, H4: mantida]"
 2009,132,,literatura-contemporanea,alta,Um copo de cólera e fluxo verbal agressivo
 2009,133,,literatura-contemporanea,media,Discurso desmistificador na novela de Raduan Nassar
 2009,134,,praticas-corporais-e-saude,media,Corpolatria como culto ao corpo
