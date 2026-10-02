@@ -47,4 +47,27 @@ public interface SimuladoRepository extends JpaRepository<Simulado, UUID> {
             ORDER BY m.ordem, a.ordem
             """)
     List<LinhaDaComposicao> composicao(@Param("id") UUID id);
+
+    /**
+     * Se a alternativa marcada está certa — e, de quebra, se a resposta faz
+     * sentido: só devolve linha quando a questão está NESTE simulado e a
+     * alternativa é DESTA questão. Vazio = resposta inválida. Validação e correção
+     * numa query só, em vez de três buscas.
+     *
+     * CASE e não "a.letra = q.gabarito" direto: o JPQL não aceita comparação como
+     * valor no SELECT. Questão anulada DEPOIS da montagem tem gabarito nulo, e a
+     * comparação com nulo cai no ELSE (false) — o que a anulada vale na nota é
+     * decisão da correção (3c), não daqui.
+     */
+    @Query("""
+            SELECT CASE WHEN a.letra = q.gabarito THEN true ELSE false END
+            FROM Simulado s
+            JOIN s.questoes sq
+            JOIN Questao q ON q.id = sq.questaoId
+            JOIN q.alternativas a
+            WHERE s.id = :simulado AND q.id = :questao AND a.id = :alternativa
+            """)
+    Optional<Boolean> alternativaEstaCorreta(@Param("simulado") UUID simulado,
+                                             @Param("questao") Long questao,
+                                             @Param("alternativa") Long alternativa);
 }
