@@ -11,6 +11,9 @@ import br.com.simulados.api.questao.infrastructure.QuestaoRepository;
 import br.com.simulados.api.usuario.domain.Role;
 import br.com.simulados.api.usuario.domain.Usuario;
 import br.com.simulados.api.usuario.infrastructure.UsuarioRepository;
+import com.jayway.jsonpath.JsonPath;
+import jakarta.persistence.EntityManager;
+import org.hibernate.Session;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +32,9 @@ import java.util.stream.Collectors;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.matchesPattern;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -51,6 +56,9 @@ class SimuladoControllerTest {
 
     @Autowired
     private AssuntoRepository assuntoRepository;
+
+    @Autowired
+    private EntityManager entityManager;
 
     private UUID aluno;
 
@@ -152,6 +160,55 @@ class SimuladoControllerTest {
     }
 
     @Test
+    void donoVeOSimuladoComAComposicaoEmDuasQueries() throws Exception {
+        var id = criarProva();
+        entityManager.flush();
+        entityManager.clear();
+        var statistics = entityManager.unwrap(Session.class).getSessionFactory().getStatistics();
+        statistics.clear();
+
+        mockMvc.perform(comoAluno(get("/simulados/{id}", id)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(id))
+                .andExpect(jsonPath("$.total").value(10))
+                .andExpect(jsonPath("$.composicao[0].area").value("MATEMATICA"))
+                // Na ordem da taxonomia (V7), não na do pedido: estatística vem antes
+                .andExpect(jsonPath("$.composicao[0].assunto.slug").value("estatistica"))
+                .andExpect(jsonPath("$.composicao[0].questoes").value(5))
+                .andExpect(jsonPath("$.composicao[1].assunto.slug").value("probabilidade"))
+                // A prova abre pela tentativa (3b): aqui não vão questões nem gabarito
+                .andExpect(jsonPath("$.questoes").doesNotExist());
+
+        // O simulado com as questões (@EntityGraph, filtrado pelo dono) + a composição
+        assertThat(statistics.getPrepareStatementCount()).isEqualTo(2);
+    }
+
+    @Test
+    void simuladoDeOutroUsuarioEh404IgualAoInexistente() throws Exception {
+        var id = criarProva();
+
+        var outro = new Usuario();
+        outro.setNome("Outra pessoa");
+        outro.setEmail("outra@exemplo.com");
+        outro.setSenhaHash("hash-irrelevante-aqui");
+        outro.setRole(Role.PROFESSOR);
+        var outroId = usuarioRepository.save(outro).getId();
+
+        mockMvc.perform(get("/simulados/{id}", id)
+                        .with(jwt().jwt(j -> j.subject(outroId.toString())).authorities(new SimpleGrantedAuthority("ROLE_PROFESSOR"))))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.mensagem").value("Simulado não encontrado: " + id));
+        mockMvc.perform(comoAluno(get("/simulados/{id}", UUID.randomUUID())))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void idQueNaoEhUuidEh400() throws Exception {
+        mockMvc.perform(comoAluno(get("/simulados/{id}", "123")))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     void semTokenEh401() throws Exception {
         mockMvc.perform(post("/simulados").contentType(MediaType.APPLICATION_JSON).content("""
                         { "titulo": "x", "total": 10, "itens": [ { "tipo": "ASSUNTO", "valor": "probabilidade" } ] }
@@ -160,6 +217,17 @@ class SimuladoControllerTest {
     }
 
     // --- apoio ---
+
+    private String criarProva() throws Exception {
+        var resposta = mockMvc.perform(comoAluno(post("/simulados")).content("""
+                        { "titulo": "Treino", "total": 10,
+                          "itens": [ { "tipo": "ASSUNTO", "valor": "probabilidade" },
+                                     { "tipo": "ASSUNTO", "valor": "estatistica" } ] }
+                        """))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse().getContentAsString();
+        return JsonPath.read(resposta, "$.id");
+    }
 
     // jwt(): token já validado, sem assinar nada — o `sub` é o id do usuário, como
     // o JwtService gera de verdade
