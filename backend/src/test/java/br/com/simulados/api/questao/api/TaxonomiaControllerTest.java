@@ -122,6 +122,37 @@ class TaxonomiaControllerTest {
 
     @Test
     @WithMockUser
+    void contaSoNosAnosPedidos() throws Exception {
+        mockMvc.perform(get("/taxonomia").param("anos", "2023"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(PROBABILIDADE).value(1));
+        mockMvc.perform(get("/taxonomia").param("anos", "2022", "2023"))
+                .andExpect(jsonPath(PROBABILIDADE).value(2));
+        // A anulada de 2021 continua fora, com ou sem filtro de ano
+        mockMvc.perform(get("/taxonomia").param("anos", "2021"))
+                .andExpect(jsonPath(PROBABILIDADE).value(0));
+    }
+
+    @Test
+    @WithMockUser
+    void anoSemQuestaoMantemAArvoreInteiraComZeros() throws Exception {
+        // O filtro de ano está no ON do LEFT JOIN: os 118 assuntos continuam lá
+        mockMvc.perform(get("/taxonomia").param("anos", "2024"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[*].materias[*].assuntos[*]", hasSize(118)))
+                .andExpect(jsonPath(PROBABILIDADE).value(0));
+    }
+
+    @Test
+    @WithMockUser
+    void anoForaDoIntervaloEh400ApontandoOItem() throws Exception {
+        mockMvc.perform(get("/taxonomia").param("anos", "2023", "1990"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.campos[0].campo").value("anos[1]"));
+    }
+
+    @Test
+    @WithMockUser
     void assuntoSemQuestaoApareceComZero() throws Exception {
         // É o teste do LEFT JOIN com a condição no ON: se `anulada = false`
         // fosse pro WHERE, os assuntos sem questão sumiriam da árvore e o
@@ -137,9 +168,9 @@ class TaxonomiaControllerTest {
         var statistics = entityManager.unwrap(Session.class).getSessionFactory().getStatistics();
         statistics.clear();
 
-        mockMvc.perform(get("/taxonomia")).andExpect(status().isOk());
+        mockMvc.perform(get("/taxonomia").param("anos", "2022", "2023")).andExpect(status().isOk());
 
-        // 118 assuntos, 14 matérias, contagem de cada um: tudo num SELECT. Um
+        // Com filtro de anos: 118 assuntos, 14 matérias, contagem de cada um: tudo num SELECT. Um
         // laço contando por assunto seriam 118 queries
         assertThat(statistics.getPrepareStatementCount())
                 .as("taxonomia com contagem deve custar 1 query")

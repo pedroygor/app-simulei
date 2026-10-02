@@ -4,6 +4,7 @@ import br.com.simulados.api.questao.domain.Assunto;
 import br.com.simulados.api.questao.domain.LinhaDaTaxonomia;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
@@ -20,7 +21,9 @@ public interface AssuntoRepository extends JpaRepository<Assunto, Integer> {
      * `q.disponivel = true` (nem anulada nem incompleta, V9) fica no ON, e NÃO
      * no WHERE. No WHERE, a condição seria avaliada depois do join e descartaria
      * as linhas sem questão (onde `disponivel` é nulo) — os assuntos com zero questões sumiriam da lista. No
-     * ON, ela só decide quais questões entram na contagem.
+     * ON, ela só decide quais questões entram na contagem. O filtro de anos fica
+     * no ON pelo mesmo motivo: assunto sem questão naqueles anos tem que aparecer
+     * com 0, não sumir.
      *
      * Ordem pelas colunas `ordem` (V7): a sequência de estudo do
      * docs/taxonomia.md. Nunca por id — o id é identity e reflete a ordem em
@@ -33,10 +36,12 @@ public interface AssuntoRepository extends JpaRepository<Assunto, Integer> {
             FROM Assunto a
             JOIN a.materia m
             LEFT JOIN Questao q ON q.assunto = a AND q.disponivel = true
+                                  AND (:todosOsAnos = true OR q.ano IN :anos)
             GROUP BY m.id, m.area, m.slug, m.nome, m.ordem, a.id, a.slug, a.nome, a.ordem
             ORDER BY m.ordem, a.ordem
             """)
-    List<LinhaDaTaxonomia> listarComContagem();
+    List<LinhaDaTaxonomia> listarComContagem(@Param("todosOsAnos") boolean todosOsAnos,
+                                             @Param("anos") List<Integer> anos);
 
     /**
      * Os 118 assuntos com a matéria de cada um, num SELECT só. A montagem de prova
