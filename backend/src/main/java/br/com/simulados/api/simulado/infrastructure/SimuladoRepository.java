@@ -30,6 +30,18 @@ public interface SimuladoRepository extends JpaRepository<Simulado, UUID> {
     Optional<Simulado> buscarDoUsuario(@Param("id") UUID id, @Param("usuario") UUID usuario);
 
     /**
+     * O simulado com a ordem das questões, SEM filtro de dono: só pra quem já
+     * autorizou por outro caminho — a prova de uma tentativa que é do aluno. Na
+     * Etapa 5 o aluno faz a prova da turma, cujo dono é o professor.
+     */
+    @Query("""
+            SELECT s FROM Simulado s
+            LEFT JOIN FETCH s.questoes
+            WHERE s.id = :id
+            """)
+    Optional<Simulado> buscarComQuestoes(@Param("id") UUID id);
+
+    /**
      * Quantas questões do simulado há em cada assunto, num GROUP BY só. Join pelo
      * id da questão guardado no @ElementCollection (o simulado não mapeia a
      * entidade Questao de propósito — ver QuestaoDoSimulado). Na ordem da taxonomia.

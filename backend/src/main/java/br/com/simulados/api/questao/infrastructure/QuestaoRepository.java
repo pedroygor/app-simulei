@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -122,6 +123,22 @@ public interface QuestaoRepository extends JpaRepository<Questao, Long> {
             WHERE q.id = :id AND q.disponivel = true
             """)
     Optional<Questao> buscarComAlternativas(@Param("id") Long id);
+
+    /**
+     * Várias questões com as alternativas, numa query só — a prova inteira de uma
+     * tentativa (até 180). O Hibernate 6+ já elimina as linhas repetidas que o
+     * JOIN FETCH da coleção produz, sem precisar de DISTINCT.
+     *
+     * SEM o filtro `disponivel`, de propósito: o simulado é uma definição fechada.
+     * Uma questão anulada pelo INEP depois da montagem continua na prova (some do
+     * sorteio, não de uma prova que o aluno já começou); o que ela vale é da 3c.
+     */
+    @Query("""
+            SELECT q FROM Questao q
+            LEFT JOIN FETCH q.alternativas
+            WHERE q.id IN :ids
+            """)
+    List<Questao> buscarVariasComAlternativas(@Param("ids") Collection<Long> ids);
 
     /**
      * Anos que têm ao menos uma questão utilizável, do mais recente pro mais
