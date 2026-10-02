@@ -6,7 +6,7 @@ import type { Area } from "./questoes";
 export type AssuntoDaTaxonomia = {
   slug: string;
   nome: string;
-  /** Questões válidas (não anuladas) no banco inteiro, sem filtro de ano. */
+  /** Questões disponíveis (nem anuladas nem incompletas), nos anos pedidos ou no banco inteiro. */
   questoes: number;
 };
 
@@ -23,8 +23,15 @@ export type AreaDaTaxonomia = {
 
 export type Taxonomia = AreaDaTaxonomia[];
 
-export function buscarTaxonomia(): Promise<Taxonomia> {
-  return requisitar<Taxonomia>("/taxonomia");
+/**
+ * Sem anos, conta o banco inteiro (filtros da listagem). Com anos, conta só as
+ * questões desses anos: é o número que a montagem de prova pode sortear.
+ */
+export function buscarTaxonomia(anos: number[] = []): Promise<Taxonomia> {
+  const parametros = new URLSearchParams();
+  for (const ano of anos) parametros.append("anos", String(ano));
+  const consulta = parametros.toString();
+  return requisitar<Taxonomia>(consulta ? `/taxonomia?${consulta}` : "/taxonomia");
 }
 
 /**
