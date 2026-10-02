@@ -17,9 +17,9 @@ public interface AssuntoRepository extends JpaRepository<Assunto, Integer> {
      * @OneToMany de Assunto pra Questao só pra contar deixaria à mão um
      * `assunto.getQuestoes()` que carrega milhares de questões por engano.
      *
-     * `q.anulada = false` fica no ON, e NÃO no WHERE. No WHERE, a condição
-     * seria avaliada depois do join e descartaria as linhas sem questão (onde
-     * `anulada` é nulo) — os assuntos com zero questões sumiriam da lista. No
+     * `q.disponivel = true` (nem anulada nem incompleta, V9) fica no ON, e NÃO
+     * no WHERE. No WHERE, a condição seria avaliada depois do join e descartaria
+     * as linhas sem questão (onde `disponivel` é nulo) — os assuntos com zero questões sumiriam da lista. No
      * ON, ela só decide quais questões entram na contagem.
      *
      * Ordem pelas colunas `ordem` (V7): a sequência de estudo do
@@ -32,7 +32,7 @@ public interface AssuntoRepository extends JpaRepository<Assunto, Integer> {
                        m.area, m.slug, m.nome, a.slug, a.nome, count(q))
             FROM Assunto a
             JOIN a.materia m
-            LEFT JOIN Questao q ON q.assunto = a AND q.anulada = false
+            LEFT JOIN Questao q ON q.assunto = a AND q.disponivel = true
             GROUP BY m.id, m.area, m.slug, m.nome, m.ordem, a.id, a.slug, a.nome, a.ordem
             ORDER BY m.ordem, a.ordem
             """)

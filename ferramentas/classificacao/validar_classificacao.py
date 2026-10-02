@@ -9,7 +9,7 @@ Confere:
   - cabeçalho esperado
   - slug existe na taxonomia (lida da TABELA, a mesma que a carga vai usar)
   - assunto é da MESMA ÁREA da questão (a regra da FK composta da V4)
-  - questão existe no banco, não está anulada
+  - questão existe no banco (anulada é tolerada: ver abaixo)
   - chave (ano, numero, idioma) sem repetição
   - confiança em alta|media|baixa; justificativa preenchida
 
@@ -40,6 +40,7 @@ def main() -> int:
         " 'area', area, 'anulada', anulada)) FROM questoes;")}
 
     problemas = []
+    anuladas = []
     chaves = Counter()
     with CSV_CLASSIFICACAO.open(newline="", encoding="utf-8") as arquivo:
         leitor = csv.DictReader(arquivo)
@@ -57,7 +58,10 @@ def main() -> int:
             problemas.append(f"linha {n}: questão {chave} não existe no banco")
             continue
         if questao["anulada"]:
-            problemas.append(f"linha {n}: questão {chave} está anulada — não se classifica")
+            # NÃO é erro: a anulação pelo INEP (--aplicar-conferencia-inep) veio DEPOIS
+            # da classificação. A linha é histórico e a carga a aplica sem dano. O
+            # exportador já não oferece anulada pra classificar
+            anuladas.append(chave)
         if slug not in area_do_assunto:
             problemas.append(f"linha {n}: assunto '{slug}' não existe na taxonomia")
         elif area_do_assunto[slug] != questao["area"]:
@@ -77,6 +81,8 @@ def main() -> int:
         print("\n".join(f"  - {p}" for p in problemas))
         return 1
     print("OK: todas as linhas válidas")
+    if anuladas:
+        print(f"(aviso: {len(anuladas)} já anuladas pelo INEP, classificadas antes da anulação — histórico, sem dano)")
     return 0
 
 

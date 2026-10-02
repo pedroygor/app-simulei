@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -80,8 +81,24 @@ public class QuestaoController {
         return buscaDeQuestoes.anosDisponiveis();
     }
 
+    /**
+     * Detalhe da questão. O gabarito só vai pro PROFESSOR: o aluno vê o gabarito
+     * apenas no resultado da prova, depois de finalizar (decidido em 01/10/2026).
+     * Sem isto, durante uma prova ele abriria a questão em outra aba e leria a resposta.
+     *
+     * `Authentication`: o Spring injeta o usuário autenticado no parâmetro, já com
+     * as authorities que o SecurityConfig montou a partir da claim "role" do JWT.
+     * A regra é por omissão: quem não é professor (inclusive um papel novo no
+     * futuro) não recebe o gabarito.
+     */
     @GetMapping("/{id}")
-    public QuestaoDetalheResponse porId(@PathVariable Long id) {
-        return questaoMapper.toDetalhe(buscaDeQuestoes.buscarPorId(id));
+    public QuestaoDetalheResponse porId(@PathVariable Long id, Authentication autenticacao) {
+        var detalhe = questaoMapper.toDetalhe(buscaDeQuestoes.buscarPorId(id));
+        return ehProfessor(autenticacao) ? detalhe : detalhe.semGabarito();
+    }
+
+    private static boolean ehProfessor(Authentication autenticacao) {
+        return autenticacao.getAuthorities().stream()
+                .anyMatch(authority -> "ROLE_PROFESSOR".equals(authority.getAuthority()));
     }
 }

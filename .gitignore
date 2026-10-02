@@ -24,3 +24,6 @@ target/
 ### Lotes de classificação: gerados do banco a qualquer hora (ferramentas/classificacao/exportar_lotes.py) ###
 ferramentas/classificacao/lotes/
 __pycache__/
+
+### Microdados do INEP: dado de terceiro, baixado por ferramentas/inep/baixar_itens_prova.py ###
+dados/inep/
