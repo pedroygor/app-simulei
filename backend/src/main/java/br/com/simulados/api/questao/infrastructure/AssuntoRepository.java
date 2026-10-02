@@ -37,4 +37,13 @@ public interface AssuntoRepository extends JpaRepository<Assunto, Integer> {
             ORDER BY m.ordem, a.ordem
             """)
     List<LinhaDaTaxonomia> listarComContagem();
+
+    /**
+     * Os 118 assuntos com a matéria de cada um, num SELECT só. A montagem de prova
+     * (3a) expande "Matemática" ou "Física" em assuntos, e pra isso lê a matéria de
+     * cada assunto: com o `materia` LAZY e um findAll(), seriam 1 + 118 queries.
+     * Dado de referência e limitado por construção (a taxonomia), sem paginação.
+     */
+    @Query("SELECT a FROM Assunto a JOIN FETCH a.materia m ORDER BY m.ordem, a.ordem")
+    List<Assunto> buscarTodosComMateria();
 }
