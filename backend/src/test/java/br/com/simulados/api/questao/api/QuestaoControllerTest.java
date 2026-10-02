@@ -310,6 +310,67 @@ class QuestaoControllerTest {
     }
 
     @Test
+    @WithMockUser
+    void detalheTrazAHabilidadeOficialComCompetenciaNaMesmaQuery() throws Exception {
+        var questao = questaoRepository.findAll().stream()
+                .filter(q -> q.getNumero() == 90).findFirst().orElseThrow();
+        questao.setHabilidade((short) 28);
+        questao.setDificuldade(1.2);
+        entityManager.flush();
+        entityManager.clear();
+        var statistics = entityManager.unwrap(Session.class).getSessionFactory().getStatistics();
+        statistics.clear();
+
+        mockMvc.perform(get("/questoes/{id}", questao.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.habilidade.codigo").value(28))
+                .andExpect(jsonPath("$.habilidade.descricao").value(
+                        "Resolver situação-problema que envolva conhecimentos de estatística e probabilidade."))
+                .andExpect(jsonPath("$.habilidade.competencia.numero").value(7))
+                // A dificuldade TRI é carregada, mas não sai na API (ver QuestaoDetalheResponse)
+                .andExpect(jsonPath("$.dificuldade").doesNotExist());
+
+        // Habilidade e competência são LAZY: sem o JOIN FETCH seriam mais 2 SELECTs
+        assertThat(statistics.getPrepareStatementCount()).isEqualTo(1);
+    }
+
+    @Test
+    @WithMockUser
+    void detalheSemHabilidadePublicadaDevolveNull() throws Exception {
+        var id = questaoRepository.findAll().stream()
+                .filter(q -> q.getNumero() == 90).findFirst().orElseThrow().getId();
+
+        mockMvc.perform(get("/questoes/{id}", id))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.habilidade").value(org.hamcrest.Matchers.nullValue()));
+    }
+
+    @Test
+    @WithMockUser(roles = "PROFESSOR")
+    void professorRecebeOGabaritoNoDetalhe() throws Exception {
+        var id = questaoRepository.findAll().stream()
+                .filter(q -> q.getNumero() == 90).findFirst().orElseThrow().getId();
+
+        mockMvc.perform(get("/questoes/{id}", id))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.gabarito").isNotEmpty());
+    }
+
+    @Test
+    @WithMockUser(roles = "ALUNO")
+    void alunoNaoRecebeOGabaritoNoDetalhe() throws Exception {
+        // O aluno vê o gabarito só no resultado da prova finalizada: aqui ele
+        // abriria a questão em outra aba durante a prova
+        var id = questaoRepository.findAll().stream()
+                .filter(q -> q.getNumero() == 90).findFirst().orElseThrow().getId();
+
+        mockMvc.perform(get("/questoes/{id}", id))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.gabarito").value(org.hamcrest.Matchers.nullValue()))
+                .andExpect(jsonPath("$.alternativas.length()").value(5));
+    }
+
+    @Test
     void listagemExigeAutenticacao() throws Exception {
         mockMvc.perform(get("/questoes"))
                 .andExpect(status().isUnauthorized());

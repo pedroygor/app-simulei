@@ -2,6 +2,8 @@ package br.com.simulados.api.questao.api;
 
 import br.com.simulados.api.questao.domain.Alternativa;
 import br.com.simulados.api.questao.domain.Assunto;
+import br.com.simulados.api.questao.domain.Competencia;
+import br.com.simulados.api.questao.domain.Habilidade;
 import br.com.simulados.api.questao.domain.Materia;
 import br.com.simulados.api.questao.domain.Questao;
 import br.com.simulados.api.questao.domain.ResumoDeQuestao;
@@ -37,7 +39,16 @@ public interface QuestaoMapper {
     // (ele gera a checagem). A navegação assunto.materia é null-safe também
     @Mapping(target = "materia", source = "assunto.materia")
     @Mapping(target = "assunto", source = "assunto")
+    // `habilidade` na entidade é o código cru (a coluna que a carga escreve); a
+    // resposta quer o relacionamento, com texto e competência
+    @Mapping(target = "habilidade", source = "habilidadeOficial")
     QuestaoDetalheResponse toDetalhe(Questao questao);
+
+    // Gerado: codigo e descricao batem pelo nome, e a competência vira
+    // CompetenciaResponse pelo método abaixo. Null entra, null sai
+    HabilidadeResponse toHabilidade(Habilidade habilidade);
+
+    HabilidadeResponse.CompetenciaResponse toCompetencia(Competencia competencia);
 
     RotuloResponse toRotulo(Materia materia);
 

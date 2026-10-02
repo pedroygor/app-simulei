@@ -1,0 +1,69 @@
+ano,numero,idioma,habilidade,assunto_anterior,assunto_atual,decisao,motivo
+2009,119,,22,variacao-linguistica,variacao-linguistica,MANTIDA,Confronta purismo gramatical e adequação ao padrão brasileiro: o conteúdo é norma x uso; o H22 descreve a tarefa de confrontar textos
+2009,125,,4,variacao-linguistica,variacao-linguistica,MANTIDA,Posição crítica sobre oral e escrito e norma padrão no anúncio; o conteúdo é modalidade e norma; H4 descreve a tarefa
+2009,129,,22,variacao-linguistica,variacao-linguistica,MANTIDA,Variação diatópica e sociocultural (Silva Neto x Teyssier): variação pura; H22 descreve a tarefa de confrontar autores
+2009,131,,4,variacao-linguistica,variacao-linguistica,MANTIDA,Contato linguístico e concepção de língua homogênea (João de Barros): variação e mudança; H4 descreve a tarefa
+2010,7,,16,cartografia,cartografia,MANTIDA,Pede o conceito de coordenada geográfica (latitude e longitude): cartografia pura; H16 descreve o contexto de navegação
+2010,159,,23,operacoes-e-conjuntos-numericos,equacoes-e-inequacoes,RECLASSIFICADA,Isolar a altura na fórmula do IMC e aplicar no RIP com raiz cúbica; INEP H23 aponta conhecimento algébrico
+2010,169,,13,progressoes,equacoes-e-inequacoes,RECLASSIFICADA,"As diferenças entre os saltos não são constantes (1,2 e 1,5): não é PA; é equação linear com a soma 17,4"
+2010,176,,16,operacoes-e-conjuntos-numericos,razao-e-proporcao,RECLASSIFICADA,Cadeia de proporções (58 Terras por Netuno; 23 Netunos por Júpiter); INEP H16 (proporcionalidade direta)
+2011,125,,22,variacao-linguistica,interpretacao-de-texto,RECLASSIFICADA,A língua é o TEMA do texto mas a questão pede só a ideia central; pela regra 1 da taxonomia o assunto é a compreensão; INEP H22
+2011,132,,28,variacao-linguistica,generos-digitais,RECLASSIFICADA,Impacto das tecnologias da informação numa comunidade e adaptação de termos de informática; INEP H28 (função e impacto das tecnologias)
+2011,149,,23,operacoes-e-conjuntos-numericos,equacoes-e-inequacoes,RECLASSIFICADA,"Isolar a altura pelo IMC e aplicar na fórmula do IAC com potência 1,5; INEP H23 aponta conhecimento algébrico"
+2012,62,,12,evolucao,impactos-ambientais,RECLASSIFICADA,Híbridos de piscicultura que escapam e substituem a espécie natural: impacto de atividade econômica em ambiente natural; INEP H12
+2012,86,,15,solucoes,citologia,RECLASSIFICADA,O que se pede é o que a osmose faz com a célula humana em meio hipertônico (água sai); o conhecimento é transporte pela membrana; INEP H15
+2012,100,,9,modernismo,corpo-e-expressao,RECLASSIFICADA,A pergunta é sobre autoimagem corporal e corporeidade (padrão corporal imposto); o poema é só o suporte; INEP H9 (linguagem corporal)
+2012,129,,23,variacao-linguistica,interpretacao-de-texto,RECLASSIFICADA,Texto sobre léxico e cultura entre línguas; a questão pede a tese do texto (compreensão); a língua é o tema; INEP H23 (inferir objetivos do produtor)
+2012,130,,22,variacao-linguistica,variacao-linguistica,MANTIDA,Substituição de haver por ter e crítica ao purismo: variação e mudança com norma; H22 descreve a tarefa
+2012,168,,21,operacoes-e-conjuntos-numericos,operacoes-e-conjuntos-numericos,MANTIDA,Só potência de expoente fracionário (8 elevado a 2/3); o modelo já vem dado; o rótulo H21 do INEP descreve a fórmula e não o conhecimento pedido
+2013,132,,22,variacao-linguistica,variacao-linguistica,MANTIDA,Humor da piada depende de reconhecer que a pergunta era sobre a pronúncia (lagarto e largato); mantida em variação com o humor como apoio
+2013,147,,4,geometria-plana,geometria-plana,MANTIDA,Perímetro de três lados do terreno (190 + 2 x 81) e divisão pelo rolo; H4 do INEP (razoabilidade) é genérica
+2013,167,,13,porcentagem-e-juros,geometria-plana,RECLASSIFICADA,"Variação da ÁREA de um retângulo com lados reduzidos em 20% (fator 0,8 ao quadrado); INEP H13 aponta grandezas e medidas"
+2014,125,,23,variacao-linguistica,variacao-linguistica,MANTIDA,Contraste entre tema bíblico e gíria (registro) gera o humor: variação de registro; H23 descreve a estratégia argumentativa
+2014,126,,13,generos-textuais,musica-teatro-danca,RECLASSIFICADA,Função das rubricas num texto teatral encenado: conhecimento de teatro e encenação; INEP H13 (produção artística)
+2014,150,,9,equacoes-e-inequacoes,visao-espacial,RECLASSIFICADA,Lê as dimensões da caixa na PLANIFICAÇÃO antes de montar a inequação; INEP H9 (conhecimento geométrico de forma)
+2014,158,,28,porcentagem-e-juros,probabilidade,RECLASSIFICADA,Sensibilidade de um teste diagnóstico é probabilidade condicional empírica (95 de 100 doentes); INEP H28 (estatística e probabilidade)
+2014,174,,18,operacoes-e-conjuntos-numericos,razao-e-proporcao,RECLASSIFICADA,"Variação de grandezas (capacidade dos recipientes x número de galões); INEP H18; dados faltam na fonte, por isso baixa"
+2014,180,,23,escalas-e-unidades,escalas-e-unidades,MANTIDA,"Fuso horário; sem texto-base na fonte, o rótulo H23 do INEP não dá pra confirmar; mantida com confiança baixa"
+2015,15,,25,cartografia,cultura-e-identidade,RECLASSIFICADA,A cartografia é só a ferramenta: nenhum conhecimento cartográfico é pedido e a resposta é a valorização de identidades coletivas de povos tradicionais; INEP H25
+2015,80,,10,ligacoes-e-propriedades,ligacoes-e-propriedades,MANTIDA,Acúmulo em tecido lipídico pede polaridade das moléculas; H10 descreve a tarefa (destino de poluentes)
+2015,106,,29,variacao-linguistica,generos-digitais,RECLASSIFICADA,Adequação do registro e das linguagens aos ambientes digitais; INEP H29 (linguagens das tecnologias de comunicação)
+2015,109,,14,variacao-linguistica,arte-cultura-e-sociedade,RECLASSIFICADA,O iorubá na canção como marca da cultura africana na música brasileira: diversidade e patrimônio cultural; INEP H14
+2015,147,,24,analise-combinatoria,analise-combinatoria,MANTIDA,"Conta configurações de notas (princípio multiplicativo); a leitura do quadro é apoio, e H24 do INEP descreve só essa parte"
+2015,151,,30,porcentagem-e-juros,porcentagem-e-juros,MANTIDA,Dados só em imagem ausente na fonte; INEP H30 sugere estatística ou probabilidade mas não dá pra confirmar; mantida com baixa
+2015,163,,17,operacoes-e-conjuntos-numericos,escalas-e-unidades,RECLASSIFICADA,"Converter mL em unidades de 0,01 mL (definição do enunciado) e dividir o refil; o centro é a conversão de unidades"
+2016,22,,10,cultura-e-identidade,seculo-20-mundial,RECLASSIFICADA,A imagem é a HQ Persépolis e trata da Revolução Islâmica de 1979 e do véu obrigatório: o conhecimento é o contexto político do Irã no século XX; INEP H10
+2016,140,,29,equacoes-e-inequacoes,estatistica,RECLASSIFICADA,"A imagem é uma tabela de média mediana e desvio padrão; INEP H29 (estatística); a regra do sorteio falta na fonte, por isso baixa"
+2016,149,,26,geometria-analitica,graficos-de-funcoes,RECLASSIFICADA,Lê duas curvas no gráfico (parábola e reta) e ajusta o coeficiente angular; INEP H26 aponta leitura de gráfico
+2016,159,,30,razao-e-proporcao,razao-e-proporcao,MANTIDA,Sem texto-base na fonte; INEP H30 sugere estatística ou probabilidade mas não dá pra confirmar; mantida com baixa
+2017,15,,23,variacao-linguistica,variacao-linguistica,MANTIDA,Grafia de Gerimum com g como marca de variante regional e identidade com o lugar; H23 descreve a estratégia
+2017,22,,22,variacao-linguistica,intertextualidade,RECLASSIFICADA,Pede o ponto em comum entre dois textos sobre línguas diferentes: a tarefa é relacionar textos; a língua é o tema; INEP H22
+2017,120,,20,solucoes,solucoes,MANTIDA,Osmose reversa pede comparar pressão osmótica e mecânica: propriedade coligativa de soluções; H20 descreve a tarefa
+2017,145,,17,operacoes-e-conjuntos-numericos,operacoes-e-conjuntos-numericos,MANTIDA,Substituição numérica na fórmula do erro com a raiz de N dada e comparação de decimais; o rótulo H17 do INEP descreve o argumento e não o cálculo
+2017,170,,1,leitura-de-graficos-e-tabelas,escalas-e-unidades,RECLASSIFICADA,"Ler um instrumento graduado (termômetro de duas escalas) é medição e escala, não gráfico ou tabela; INEP H1"
+2017,178,,24,analise-combinatoria,analise-combinatoria,MANTIDA,Partidas entre n jogadores = C(n;2); a tabela deixa ver o padrão como sequência mas o conhecimento pedido é combinatório
+2018,37,,21,variacao-linguistica,variacao-linguistica,MANTIDA,Pajubá como variedade e patrimônio linguístico: variação social; H21 do INEP não descreve o conteúdo da questão
+2018,73,,14,geologia-e-relevo,geologia-e-relevo,MANTIDA,Relação entre topografia (relevo) e domínio do território em dois textos; o relevo é o conhecimento central; H14 descreve a tarefa de comparar textos
+2018,139,,26,geometria-plana,geometria-plana,MANTIDA,Menor caminho por arcos e raios (comprimento de arco); H26 do INEP é rótulo genérico desta questão
+2018,149,,14,porcentagem-e-juros,razao-e-proporcao,RECLASSIFICADA,Inclinação é razão entre vertical e horizontal; o percentual é só a unidade; INEP H14 (grandezas e medidas)
+2019,48,,29,filosofia-medieval-e-moderna,filosofia-medieval-e-moderna,MANTIDA,Pede a corrente filosófica (racionalismo cartesiano) por trás da visão da natureza como recurso; H29 descreve o tema do texto
+2019,75,,27,filosofia-medieval-e-moderna,filosofia-medieval-e-moderna,MANTIDA,Natureza objetificada desde Bacon e o método experimental: concepção moderna de ciência; hesitei com questoes-ambientais pelo texto II
+2019,101,,11,fisiologia-humana,fisiologia-humana,MANTIDA,EPO e transporte de oxigênio para produção de ATP: fisiologia; a biotecnologia é só o contexto do doping
+2019,112,,23,ligacoes-e-propriedades,ligacoes-e-propriedades,MANTIDA,Ponto de ebulição das frações do petróleo pede forças intermoleculares; o rótulo H23 descreve o contexto energético
+2020,20,,29,variacao-linguistica,variacao-linguistica,MANTIDA,Identificar o empreendedor de palco pelo jargão e estrangeirismos (registro); o rótulo H29 do INEP não descreve o conteúdo pedido
+2020,75,,11,cartografia,idade-moderna,RECLASSIFICADA,A cartografia é o objeto mas o conhecimento é a invenção da América pelos europeus e a dominação sobre os saberes ameríndios na época moderna; INEP H11
+2020,108,,30,funcoes-inorganicas,fisiologia-humana,RECLASSIFICADA,Revestimento que resiste ao suco gástrico: o conhecimento pedido é o pH ácido do estômago e a digestão; INEP H30 (saúde); era a alternativa do próprio classificador
+2020,122,,15,hidrostatica,hidrostatica,MANTIDA,Comparar a densidade dos ovos com a da solução para ver quem flutua: densidade e flutuação; o parasito é só o contexto
+2021,44,,29,realismo-naturalismo-parnasianismo,realismo-naturalismo-parnasianismo,MANTIDA,Ironia machadiana sobre a matraca como meio de divulgação; o conhecimento é interpretar a ironia do narrador; H29 descreve o tema do meio de comunicação
+2021,106,,22,quimica-organica,quimica-organica,MANTIDA,O que se pede é o tipo de isomeria (geométrica); H22 descreve o contexto da fototerapia
+2021,160,,17,operacoes-e-conjuntos-numericos,razao-e-proporcao,RECLASSIFICADA,Número de sachês proporcional à falta de cada mineral e custo total por suplemento; INEP H17 (variação de grandezas)
+2022,14,,22,variacao-linguistica,intertextualidade,RECLASSIFICADA,O Texto II exemplifica o Texto I: a tarefa é relacionar os dois textos; o léxico é o tema; INEP H22
+2022,122,,11,fisiologia-humana,fisiologia-humana,MANTIDA,Efeito sobre coagulação e trombo: fisiologia do sangue; a proteína recombinante é o contexto
+2022,152,,18,operacoes-e-conjuntos-numericos,razao-e-proporcao,RECLASSIFICADA,"Número de fileiras proporcional à distância permitida (0,6 L a 2,9 L) com fileiras de 1 m; INEP H18"
+2023,14,,29,modernismo,modernismo,MANTIDA,Trecho de Guimarães Rosa; o conhecimento é interpretar o conto (convenção: autor modernista); H29 refere-se ao rádio como tema do trecho
+2023,46,,6,cultura-e-identidade,cultura-e-identidade,MANTIDA,Sertão como lugar de vivências socioafetivas (memória e identidade); o conceito geográfico de lugar não tem assunto próprio e nenhum conhecimento cartográfico é pedido; H6 descreve a imagem
+2023,84,,3,trabalho-e-sociedade,trabalho-e-sociedade,MANTIDA,Racionalização do trabalho doméstico e seus efeitos sobre as mulheres: trabalho e sociedade; H3 descreve a tarefa
+2023,129,,10,ligacoes-e-propriedades,ligacoes-e-propriedades,MANTIDA,Composto apolar se concentra onde há gordura: polaridade e solubilidade; H10 descreve a tarefa
+2023,153,,17,operacoes-e-conjuntos-numericos,razao-e-proporcao,RECLASSIFICADA,Tempo de espera proporcional ao tamanho da fila vezes o tempo de atendimento; INEP H17
+2023,163,,6,graficos-de-funcoes,visao-espacial,RECLASSIFICADA,O gráfico é só o dado; a pergunta é a VISTA SUPERIOR da trajetória; INEP H6 (movimentação no espaço e representação plana)
+2023,177,,15,trigonometria,graficos-de-funcoes,RECLASSIFICADA,Escolher o gráfico da altura em função do tempo (comportamento periódico); INEP H15 (dependência entre grandezas)

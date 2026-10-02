@@ -53,11 +53,24 @@ export type QuestaoDetalhe = {
   /** null = questão ainda não classificada. */
   materia: Rotulo | null;
   assunto: Rotulo | null;
+  /** Habilidade oficial do INEP; null quando não publicada (2009 fora de Matemática). */
+  habilidade: HabilidadeDaMatriz | null;
   /** Nullable: 5% das questões não têm texto-base (ver migration V3). */
   enunciado: string | null;
   comando: string | null;
   gabarito: string | null;
   alternativas: Alternativa[];
+};
+
+/**
+ * Habilidade da Matriz de Referência do ENEM (H1–H30) e a competência de área a
+ * que pertence. O código se repete entre áreas (a H17 de Matemática não é a de
+ * Natureza), por isso o texto vem junto.
+ */
+export type HabilidadeDaMatriz = {
+  codigo: number;
+  descricao: string;
+  competencia: { numero: number; descricao: string };
 };
 
 /**
