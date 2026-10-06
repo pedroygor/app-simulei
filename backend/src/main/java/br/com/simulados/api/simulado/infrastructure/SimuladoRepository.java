@@ -1,7 +1,10 @@
 package br.com.simulados.api.simulado.infrastructure;
 
+import br.com.simulados.api.simulado.domain.ItemDoHistorico;
 import br.com.simulados.api.simulado.domain.LinhaDaComposicao;
 import br.com.simulados.api.simulado.domain.Simulado;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -28,6 +31,41 @@ public interface SimuladoRepository extends JpaRepository<Simulado, UUID> {
             WHERE s.id = :id AND s.criadoPor = :usuario
             """)
     Optional<Simulado> buscarDoUsuario(@Param("id") UUID id, @Param("usuario") UUID usuario);
+
+    /**
+     * O histórico "minhas provas": os simulados do usuário, do mais novo pro mais
+     * velho, cada um com a tentativa dele (se houver) e o placar — numa query só,
+     * qualquer que seja o tamanho da página (nunca o resultado prova por prova).
+     *
+     * - Tudo LEFT JOIN: simulado sem tentativa (montou e não começou) aparece,
+     *   e simulado cujas questões foram TODAS anuladas também (com 0 questões)
+     * - `q.disponivel` no ON, não no WHERE: no WHERE, a questão retirada
+     *   derrubaria a linha em vez de só sair da contagem (a mesma armadilha do
+     *   LEFT JOIN da taxonomia, 2b.3)
+     * - Sem multiplicação de linhas: uma tentativa por (simulado, aluno) e no
+     *   máximo uma resposta por (tentativa, questão) — os UNIQUE da V11
+     *
+     * countQuery explícito: o Spring Data não sabe derivar a contagem de uma
+     * consulta com GROUP BY, e a contagem certa é só "quantos simulados".
+     * A ordem é fixa na query; quem chama passa um Pageable sem sort.
+     */
+    @Query(value = """
+            SELECT new br.com.simulados.api.simulado.domain.ItemDoHistorico(
+                       s.id, s.titulo, s.criadoEm, t.id, t.status, t.iniciadoEm, t.finalizadoEm,
+                       count(q.id),
+                       count(r.questaoId),
+                       coalesce(sum(CASE WHEN r.correta = true THEN 1L ELSE 0L END), 0L))
+            FROM Simulado s
+            LEFT JOIN s.questoes sq
+            LEFT JOIN Questao q ON q.id = sq.questaoId AND q.disponivel = true
+            LEFT JOIN Tentativa t ON t.simuladoId = s.id AND t.alunoId = :usuario
+            LEFT JOIN Resposta r ON r.tentativaId = t.id AND r.questaoId = q.id
+            WHERE s.criadoPor = :usuario
+            GROUP BY s.id, s.titulo, s.criadoEm, t.id, t.status, t.iniciadoEm, t.finalizadoEm
+            ORDER BY s.criadoEm DESC, s.id
+            """,
+            countQuery = "SELECT count(s) FROM Simulado s WHERE s.criadoPor = :usuario")
+    Page<ItemDoHistorico> historicoDoUsuario(@Param("usuario") UUID usuario, Pageable pageable);
 
     /**
      * O simulado com a ordem das questões, SEM filtro de dono: só pra quem já
