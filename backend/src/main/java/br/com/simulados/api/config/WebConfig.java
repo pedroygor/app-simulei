@@ -2,7 +2,6 @@ package br.com.simulados.api.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.http.CacheControl;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -11,12 +10,15 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import java.nio.file.Path;
 import java.time.Duration;
 
-import static org.springframework.data.web.config.EnableSpringDataWebSupport.PageSerializationMode.VIA_DTO;
-
+/**
+ * SEM @EnableSpringDataWebSupport, de propósito. A anotação cria a configuração
+ * web do Spring Data na mão, e aí a autoconfiguração do Boot recua — levando
+ * junto TODAS as propriedades spring.data.web.pageable.* do application.yml. Foi
+ * assim que o teto de 100 por página nunca valeu (achado em 06/10/2026: ?size=1000
+ * devolvia 1000). O formato do JSON (VIA_DTO) agora vem da propriedade
+ * `serialization-mode`, junto com o teto.
+ */
 @Configuration
-// VIA_DTO: serializa Page num JSON estável ({content, page{...}}) em vez do
-// PageImpl interno, cuja estrutura o Spring não garante entre versões
-@EnableSpringDataWebSupport(pageSerializationMode = VIA_DTO)
 public class WebConfig implements WebMvcConfigurer {
 
     private final Path diretorioDeImagens;
