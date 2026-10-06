@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.matchesPattern;
+import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -216,6 +217,61 @@ class SimuladoControllerTest {
                 .andExpect(status().isUnauthorized());
     }
 
+    // --- minhas provas (3d) ---
+
+    @Test
+    void minhasProvasTrazSituacaoENotaSoDaEntregue() throws Exception {
+        var entregue = criarProva();
+        var naoIniciada = criarProva();
+        var tentativa = JsonPath.read(mockMvc.perform(comoAluno(post("/simulados/{id}/tentativas", entregue)))
+                .andReturn().getResponse().getContentAsString(), "$.id");
+        mockMvc.perform(comoAluno(post("/tentativas/{id}/finalizar", tentativa))).andExpect(status().isOk());
+        // A prova de outra pessoa não aparece
+        var outroId = outroUsuario();
+        mockMvc.perform(post("/simulados").contentType(MediaType.APPLICATION_JSON).content("""
+                        { "titulo": "Alheia", "total": 5, "itens": [ { "tipo": "ASSUNTO", "valor": "probabilidade" } ] }
+                        """)
+                        .with(jwt().jwt(j -> j.subject(outroId.toString())).authorities(new SimpleGrantedAuthority("ROLE_ALUNO"))))
+                .andExpect(status().isCreated());
+
+        mockMvc.perform(comoAluno(get("/simulados")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.page.totalElements").value(2))
+                .andExpect(jsonPath("$.content[?(@.simuladoId == '%s')].situacao", entregue).value(hasItem("ENTREGUE")))
+                .andExpect(jsonPath("$.content[?(@.simuladoId == '%s')].placar.questoes", entregue).value(hasItem(10)))
+                .andExpect(jsonPath("$.content[?(@.simuladoId == '%s')].placar.acertos", entregue).value(hasItem(0)))
+                .andExpect(jsonPath("$.content[?(@.simuladoId == '%s')].situacao", naoIniciada).value(hasItem("NAO_INICIADA")))
+                .andExpect(jsonPath("$.content[?(@.simuladoId == '%s')].tentativaId", naoIniciada).value(hasItem(nullValue())))
+                .andExpect(jsonPath("$.content[?(@.titulo == 'Alheia')]").isEmpty());
+    }
+
+    @Test
+    void provaEmAndamentoNaoMostraPlacarNoHistorico() throws Exception {
+        var simulado = criarProva();
+        mockMvc.perform(comoAluno(post("/simulados/{id}/tentativas", simulado))).andExpect(status().isCreated());
+
+        mockMvc.perform(comoAluno(get("/simulados")))
+                .andExpect(jsonPath("$.content[0].situacao").value("EM_ANDAMENTO"))
+                .andExpect(jsonPath("$.content[0].respondidas").value(0))
+                // Acertos de prova aberta seriam o gabarito: o campo vem nulo
+                .andExpect(jsonPath("$.content[0].placar").isEmpty());
+    }
+
+    @Test
+    void minhasProvasPaginaETamanhoTemTeto() throws Exception {
+        criarProva();
+        criarProva();
+        criarProva();
+
+        mockMvc.perform(comoAluno(get("/simulados").param("size", "2")))
+                .andExpect(jsonPath("$.content.length()").value(2))
+                .andExpect(jsonPath("$.page.totalElements").value(3))
+                .andExpect(jsonPath("$.page.totalPages").value(2));
+        // max-page-size global (100): pedir 1000 não carrega mil linhas
+        mockMvc.perform(comoAluno(get("/simulados").param("size", "1000")))
+                .andExpect(jsonPath("$.page.size").value(100));
+    }
+
     // --- apoio ---
 
     private String criarProva() throws Exception {
@@ -231,6 +287,15 @@ class SimuladoControllerTest {
 
     // jwt(): token já validado, sem assinar nada — o `sub` é o id do usuário, como
     // o JwtService gera de verdade
+    private UUID outroUsuario() {
+        var usuario = new Usuario();
+        usuario.setNome("Outro");
+        usuario.setEmail("outro@exemplo.com");
+        usuario.setSenhaHash("hash-irrelevante-aqui");
+        usuario.setRole(Role.ALUNO);
+        return usuarioRepository.save(usuario).getId();
+    }
+
     private MockHttpServletRequestBuilder comoAluno(MockHttpServletRequestBuilder requisicao) {
         return requisicao.contentType(MediaType.APPLICATION_JSON)
                 .with(jwt().jwt(j -> j.subject(aluno.toString())).authorities(new SimpleGrantedAuthority("ROLE_ALUNO")));
