@@ -1,6 +1,7 @@
 package br.com.simulados.api.simulado.api;
 
 import br.com.simulados.api.questao.api.QuestaoMapper;
+import br.com.simulados.api.simulado.application.ConsultaDeResultado;
 import br.com.simulados.api.simulado.application.ConsultaDeTentativa;
 import br.com.simulados.api.simulado.application.ExecucaoDaProva;
 import jakarta.validation.Valid;
@@ -32,6 +33,7 @@ public class TentativaController {
 
     private final ExecucaoDaProva execucao;
     private final ConsultaDeTentativa consulta;
+    private final ConsultaDeResultado resultados;
     private final QuestaoMapper questaoMapper;
 
     /**
@@ -80,6 +82,15 @@ public class TentativaController {
     @PostMapping("/tentativas/{id}/finalizar")
     public TentativaResponse finalizar(@PathVariable UUID id, @AuthenticationPrincipal Jwt jwt) {
         return TentativaResponse.de(execucao.finalizar(id, aluno(jwt)));
+    }
+
+    /**
+     * Nota, placar por área e por assunto e a revisão com gabarito — só da prova
+     * entregue (em andamento: 422). O único endpoint que dá o gabarito ao aluno.
+     */
+    @GetMapping("/tentativas/{id}/resultado")
+    public ResultadoResponse resultado(@PathVariable UUID id, @AuthenticationPrincipal Jwt jwt) {
+        return ResultadoResponse.de(resultados.detalhar(id, aluno(jwt)), questaoMapper);
     }
 
     private static UUID aluno(Jwt jwt) {
