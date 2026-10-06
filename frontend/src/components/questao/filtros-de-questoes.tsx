@@ -2,15 +2,8 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
+import { CampoDeSelecao } from "@/components/formulario/campo-de-selecao";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import {
   AREAS,
   buscarAnosDisponiveis,
@@ -28,15 +21,7 @@ import {
   NOME_DA_AREA,
   NOME_DO_IDIOMA,
   temFiltroAtivo,
-  type OpcaoDeFiltro,
 } from "@/lib/questoes/filtro-da-url";
-
-/**
- * O Select do Radix não representa "sem filtro" com value="", porque string
- * vazia é o jeito dele dizer "nada selecionado". Então usamos um valor
- * sentinela e traduzimos na borda.
- */
-const TODOS = "__todos__";
 
 // Anos e taxonomia só mudam com importação ou migration — não há por que
 // perguntar de novo a cada troca de filtro ou volta pra tela
@@ -52,7 +37,9 @@ export function FiltrosDeQuestoes({ filtro }: { filtro: FiltroDeQuestoes }) {
   });
   const { data: taxonomia } = useQuery({
     queryKey: ["taxonomia"],
-    queryFn: buscarTaxonomia,
+    // Arrow, não a função direto: o TanStack chama queryFn com o contexto da
+    // query como 1º argumento, que cairia no parâmetro `anos` de buscarTaxonomia
+    queryFn: () => buscarTaxonomia(),
     staleTime: UMA_HORA,
   });
 
@@ -144,50 +131,6 @@ export function FiltrosDeQuestoes({ filtro }: { filtro: FiltroDeQuestoes }) {
           </Button>
         </div>
       )}
-    </div>
-  );
-}
-
-function CampoDeSelecao({
-  id,
-  rotulo,
-  valor,
-  aoMudar,
-  opcoes,
-  rotuloDeTodos,
-  desabilitado = false,
-}: {
-  id: string;
-  rotulo: string;
-  valor: string | undefined;
-  aoMudar: (valor: string | undefined) => void;
-  opcoes: OpcaoDeFiltro[];
-  rotuloDeTodos: string;
-  desabilitado?: boolean;
-}) {
-  return (
-    // min-w-0: item de grid não encolhe abaixo do conteúdo por padrão. Sem
-    // isto, "Eletrodinâmica: circuitos, potência e consumo elétrico" alargava
-    // a coluna e a página ganhava rolagem lateral a 360px (medido: 404px)
-    <div className="grid min-w-0 gap-1.5">
-      <Label htmlFor={id}>{rotulo}</Label>
-      <Select
-        value={valor ?? TODOS}
-        onValueChange={(novo) => aoMudar(novo === TODOS ? undefined : novo)}
-        disabled={desabilitado}
-      >
-        <SelectTrigger id={id} className="w-full">
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value={TODOS}>{rotuloDeTodos}</SelectItem>
-          {opcoes.map((opcao) => (
-            <SelectItem key={opcao.valor} value={opcao.valor}>
-              {opcao.rotulo}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
     </div>
   );
 }

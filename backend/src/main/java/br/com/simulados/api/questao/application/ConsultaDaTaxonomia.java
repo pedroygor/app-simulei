@@ -17,7 +17,10 @@ public class ConsultaDaTaxonomia {
     // Sem paginação, e é exceção consciente à regra da seção 8.4: a lista é
     // limitada POR CONSTRUÇÃO — 118 assuntos, que só crescem por migration
     @Transactional(readOnly = true)
-    public List<LinhaDaTaxonomia> listar() {
-        return assuntoRepository.listarComContagem();
+    // anos vazio = todos. O parâmetro booleano existe porque `q.ano IN ()` com
+    // lista vazia não é SQL válido; a lista ganha um valor inócuo nesse caso
+    public List<LinhaDaTaxonomia> listar(List<Integer> anos) {
+        var todosOsAnos = anos.isEmpty();
+        return assuntoRepository.listarComContagem(todosOsAnos, todosOsAnos ? List.of(0) : anos);
     }
 }

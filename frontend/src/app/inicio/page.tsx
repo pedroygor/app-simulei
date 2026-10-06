@@ -61,9 +61,14 @@ function ConteudoDaHome() {
               <dd>{usuario?.plano}</dd>
             </div>
           </dl>
-          <Button asChild className="mt-6 w-full">
-            <Link href="/questoes">Explorar questões</Link>
-          </Button>
+          <div className="mt-6 grid gap-2">
+            <Button asChild size="xl" className="w-full">
+              <Link href="/simulados/novo">Montar prova</Link>
+            </Button>
+            <Button asChild variant="outline" className="w-full">
+              <Link href="/questoes">Explorar questões</Link>
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </main>

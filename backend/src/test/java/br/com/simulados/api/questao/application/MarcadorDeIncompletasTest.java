@@ -111,7 +111,7 @@ class MarcadorDeIncompletasTest {
     // --- apoio ---
 
     private long contagemDeProbabilidade() {
-        return assuntoRepository.listarComContagem().stream()
+        return assuntoRepository.listarComContagem(true, List.of(0)).stream()
                 .filter(l -> l.assuntoSlug().equals("probabilidade")).findFirst().orElseThrow().questoes();
     }
 
