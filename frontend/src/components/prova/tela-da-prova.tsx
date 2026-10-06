@@ -7,7 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ErroDaApi } from "@/lib/api/erros";
 import { buscarProva } from "@/lib/api/tentativas";
 import { ProvaEmAndamento } from "./prova-em-andamento";
-import { ProvaEntregue } from "./prova-entregue";
+import { ResultadoDaProva } from "@/components/resultado/resultado-da-prova";
 
 /**
  * Busca a prova e decide o que mostrar. Client Component pelo motivo de sempre:
@@ -52,7 +52,8 @@ export function TelaDaProva({ id }: { id: string }) {
     );
   }
 
-  if (prova.status === "FINALIZADA") return <ProvaEntregue prova={prova} />;
+  // Prova entregue: a tela vira o resultado (nota, gabarito, por área e assunto)
+  if (prova.status === "FINALIZADA") return <ResultadoDaProva tentativaId={id} />;
 
   // Questão anulada ou incompleta depois da montagem sai da prova (backend). Se
   // todas saíram, não há o que responder

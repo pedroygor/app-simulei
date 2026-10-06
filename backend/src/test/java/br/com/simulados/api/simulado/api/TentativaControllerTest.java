@@ -30,7 +30,9 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.everyItem;
 import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.matchesPattern;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -205,6 +207,65 @@ class TentativaControllerTest {
                 .andExpect(jsonPath("$.mensagem").value("Esta prova já foi finalizada e não aceita mais respostas"));
         mockMvc.perform(como(aluno, post("/tentativas/{id}/finalizar", id)))
                 .andExpect(status().isUnprocessableContent());
+    }
+
+    // --- resultado (3c) ---
+
+    @Test
+    void resultadoDaProvaEntregueTemNotaPlacarERevisao() throws Exception {
+        var id = iniciar();
+        // q1 certa (gabarito A); q2, que é a 1ª da prova, fica em branco
+        responder(id, q1, "A");
+        mockMvc.perform(como(aluno, post("/tentativas/{id}/finalizar", id))).andExpect(status().isOk());
+
+        mockMvc.perform(como(aluno, get("/tentativas/{id}/resultado", id)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.titulo").value("Treino"))
+                .andExpect(jsonPath("$.finalizadoEm").isNotEmpty())
+                .andExpect(jsonPath("$.total.questoes").value(2))
+                .andExpect(jsonPath("$.total.respondidas").value(1))
+                .andExpect(jsonPath("$.total.acertos").value(1))
+                .andExpect(jsonPath("$.total.emBranco").value(1))
+                .andExpect(jsonPath("$.total.percentual").value(50))
+                .andExpect(jsonPath("$.porArea[0].area").value("MATEMATICA"))
+                .andExpect(jsonPath("$.porArea[0].nome").value("Matemática"))
+                // Questões sem classificação: uma linha com assunto nulo, não somem
+                .andExpect(jsonPath("$.porAssunto[0].assunto").isEmpty())
+                .andExpect(jsonPath("$.porAssunto[0].placar.questoes").value(2))
+                // Na ordem da prova, com a numeração que o aluno viu
+                .andExpect(jsonPath("$.questoes[0].ordem").value(1))
+                .andExpect(jsonPath("$.questoes[0].numero").value(137))
+                .andExpect(jsonPath("$.questoes[0].marcada").isEmpty())
+                .andExpect(jsonPath("$.questoes[1].marcada").value(alternativa(q1, "A")))
+                .andExpect(jsonPath("$.questoes[1].gabarito").value("A"))
+                .andExpect(jsonPath("$.questoes[0].alternativas.length()").value(5));
+    }
+
+    @Test
+    void gabaritoSaiNoResultadoEContinuaForaDaProva() throws Exception {
+        var id = iniciar();
+        mockMvc.perform(como(aluno, post("/tentativas/{id}/finalizar", id))).andExpect(status().isOk());
+
+        // Mesmo com a prova entregue, o GET da prova não ganha gabarito: ele só
+        // existe no tipo do resultado
+        mockMvc.perform(como(aluno, get("/tentativas/{id}", id)))
+                .andExpect(jsonPath("$..gabarito").isEmpty());
+        mockMvc.perform(como(aluno, get("/tentativas/{id}/resultado", id)))
+                .andExpect(jsonPath("$.questoes[*].gabarito").value(everyItem(is("A"))));
+    }
+
+    @Test
+    void resultadoDeProvaEmAndamentoEh422EAlheioEh404() throws Exception {
+        var id = iniciar();
+
+        mockMvc.perform(como(aluno, get("/tentativas/{id}/resultado", id)))
+                .andExpect(status().isUnprocessableContent())
+                .andExpect(jsonPath("$.mensagem").value("O resultado sai depois que a prova for entregue"));
+
+        mockMvc.perform(como(aluno, post("/tentativas/{id}/finalizar", id))).andExpect(status().isOk());
+        mockMvc.perform(como(outro, get("/tentativas/{id}/resultado", id)))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.mensagem").value("Tentativa não encontrada: " + id));
     }
 
     // --- dono e formato ---

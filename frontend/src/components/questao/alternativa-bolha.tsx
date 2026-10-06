@@ -1,5 +1,5 @@
 import { cva } from "class-variance-authority";
-import { Check } from "lucide-react";
+import { Check, X } from "lucide-react";
 import type { KeyboardEvent, Ref } from "react";
 import type { Alternativa } from "@/lib/api/questoes";
 import { escaparMarcadoresDeBloco } from "@/lib/questoes/markdown";
@@ -11,13 +11,23 @@ import { TextoDaQuestao } from "./texto-da-questao";
  * docs/identidade-visual.md).
  *
  * Dois modos:
- *   - LEITURA (sem `radio`): `neutra` ou `correta`, no detalhe da questão
+ *   - LEITURA (sem `radio`): `neutra` ou `correta` no detalhe da questão; na
+ *     revisão do resultado (3c), também `acertou` e `incorreta`
  *   - ESCOLHA (com `radio`): `neutra` ou `selecionada`, na prova (3b). Vira
  *     role="radio" — quem monta o radiogroup e o teclado é o GrupoDeAlternativas
  *
- * `incorreta` e `desabilitada` entram com o resultado da prova (3c).
+ * Nenhum estado é só cor (identidade visual): o gabarito vira CHECK, o erro vira
+ * X, a marcada tem contorno duplo, e o estado é dito em texto.
  */
-export type EstadoDaBolha = "neutra" | "selecionada" | "correta";
+export type EstadoDaBolha =
+  | "neutra"
+  | "selecionada"
+  /** Gabarito que o aluno NÃO marcou (ou o detalhe da questão, sem prova). */
+  | "correta"
+  /** O aluno marcou o gabarito. */
+  | "acertou"
+  /** O aluno marcou e não é o gabarito. */
+  | "incorreta";
 
 /** O que o radiogroup passa pra cada opção. */
 export type PropsDeRadio = {
@@ -38,6 +48,10 @@ const cartao = cva("flex items-start gap-3 rounded-lg border p-3 transition-colo
       // contraste sobre fundo claro. O primary é a mesma matiz limão ajustada
       // por tema (#5F6E0F no claro, #D4F03C no escuro)
       correta: "border-primary bg-card",
+      // Marcada (contorno duplo, como a selecionada) E gabarito
+      acertou: "border-primary ring-primary bg-card ring-1",
+      // Marcada e errada: contorno duplo no tom de erro
+      incorreta: "border-destructive ring-destructive bg-card ring-1",
     },
     interativa: {
       true: "focus-visible:ring-ring cursor-pointer select-none focus-visible:ring-2 focus-visible:outline-none",
@@ -60,16 +74,46 @@ const bolha = cva(
         // (11.91 nos dois temas). A borda em primary dá contorno no tema claro
         selecionada: "border-primary bg-marca-texto text-sobre-marca-texto",
         correta: "border-primary bg-marca-texto text-sobre-marca-texto",
+        acertou: "border-primary bg-marca-texto text-sobre-marca-texto",
+        // NÃO preenche de vermelho: texto claro sobre o --destructive do tema
+        // escuro não tem contraste. O que muda é a FORMA (o X) e o texto
+        incorreta: "border-destructive text-destructive",
       },
     },
   },
 );
 
+// text-primary e não marca-texto: como TEXTO, o marca-texto puro some no claro
+const rotuloDoEstado = cva("mt-2 text-xs font-semibold tracking-wide uppercase", {
+  variants: {
+    tom: { acerto: "text-primary", erro: "text-destructive" },
+  },
+});
+
 const ROTULO_DO_ESTADO: Record<EstadoDaBolha, string | null> = {
   neutra: null,
   selecionada: "Sua resposta",
   correta: "Gabarito",
+  acertou: "Sua resposta · Gabarito",
+  incorreta: "Sua resposta",
 };
+
+// O que o leitor de tela ouve depois da letra (a bolha e o rótulo são aria-hidden)
+const ESTADO_FALADO: Record<EstadoDaBolha, string> = {
+  neutra: "",
+  // Na prova o "marcado" já vem do aria-checked do radio
+  selecionada: "",
+  correta: ", gabarito",
+  acertou: ", sua resposta, correta",
+  incorreta: ", sua resposta, errada",
+};
+
+function SimboloDaBolha({ estado, letra }: { estado: EstadoDaBolha; letra: string }) {
+  if (estado === "correta" || estado === "acertou") return <Check className="size-4" strokeWidth={3} />;
+  if (estado === "incorreta") return <X className="size-4" strokeWidth={3} />;
+  // A selecionada mantém a letra: não pode se confundir com o gabarito
+  return <>{letra}</>;
+}
 
 export function AlternativaBolha({
   alternativa,
@@ -88,9 +132,7 @@ export function AlternativaBolha({
   const conteudo = (
     <>
       <span className={bolha({ estado })} aria-hidden>
-        {/* Só o gabarito vira check. A selecionada mantém a letra: na 3c as
-            duas aparecem juntas e não podem se confundir */}
-        {estado === "correta" ? <Check className="size-4" strokeWidth={3} /> : alternativa.letra}
+        <SimboloDaBolha estado={estado} letra={alternativa.letra} />
       </span>
 
       <div className="min-w-0 flex-1 pt-1">
@@ -99,13 +141,12 @@ export function AlternativaBolha({
             conteúdo: "Alternativa B: <texto>". O "marcado" vem do aria-checked */}
         <span className="sr-only">
           Alternativa {alternativa.letra}
-          {estado === "correta" && ", gabarito"}:{" "}
+          {ESTADO_FALADO[estado]}:{" "}
         </span>
         <ConteudoDaAlternativa alternativa={alternativa} />
         {rotulo && (
-          // Estado dito em TEXTO, não só em cor. text-primary: como texto, o
-          // marca-texto puro some no tema claro
-          <p className="text-primary mt-2 text-xs font-semibold tracking-wide uppercase" aria-hidden>
+          // Estado dito em TEXTO, não só em cor
+          <p className={rotuloDoEstado({ tom: estado === "incorreta" ? "erro" : "acerto" })} aria-hidden>
             {rotulo}
           </p>
         )}
