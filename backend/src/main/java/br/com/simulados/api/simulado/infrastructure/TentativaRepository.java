@@ -1,5 +1,6 @@
 package br.com.simulados.api.simulado.infrastructure;
 
+import br.com.simulados.api.simulado.domain.LinhaDoResultado;
 import br.com.simulados.api.simulado.domain.Tentativa;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -8,6 +9,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -32,6 +34,41 @@ public interface TentativaRepository extends JpaRepository<Tentativa, UUID> {
     Optional<Tentativa> buscarDoAlunoParaEscrita(@Param("id") UUID id, @Param("aluno") UUID aluno);
 
     Optional<Tentativa> findBySimuladoIdAndAlunoId(UUID simuladoId, UUID alunoId);
+
+    /**
+     * O placar da tentativa por assunto, num GROUP BY só (seção 8.4). A base pro
+     * desempenho da Etapa 4, que é o mesmo cálculo sobre várias tentativas.
+     *
+     * - Parte das QUESTÕES do simulado, não das respostas: o LEFT JOIN com
+     *   Resposta faz a questão em branco entrar, com r nulo. count(r.questaoId)
+     *   conta só as respondidas (count de coluna ignora nulo)
+     * - `q.disponivel` no WHERE: anulada ou incompleta depois da montagem não
+     *   conta, nem a resposta dada a ela antes (ADR de 02/10/2026)
+     * - LEFT JOIN no assunto: questão ainda sem classificação vira uma linha com
+     *   assunto nulo, em vez de sumir da nota
+     * - `correta` vem da resposta, gravada na hora (seção 6), sem juntar gabarito
+     *
+     * Ordem da taxonomia; o "pior primeiro" é regra de apresentação e fica no service.
+     * Sem filtro de dono: quem chama já autorizou pela tentativa.
+     */
+    @Query("""
+            SELECT new br.com.simulados.api.simulado.domain.LinhaDoResultado(
+                       q.area, m.slug, m.nome, a.slug, a.nome,
+                       count(q),
+                       count(r.questaoId),
+                       sum(CASE WHEN r.correta = true THEN 1 ELSE 0 END))
+            FROM Tentativa t
+            JOIN Simulado s ON s.id = t.simuladoId
+            JOIN s.questoes sq
+            JOIN Questao q ON q.id = sq.questaoId
+            LEFT JOIN q.assunto a
+            LEFT JOIN a.materia m
+            LEFT JOIN Resposta r ON r.tentativaId = t.id AND r.questaoId = q.id
+            WHERE t.id = :tentativa AND q.disponivel = true
+            GROUP BY q.area, m.slug, m.nome, m.ordem, a.slug, a.nome, a.ordem
+            ORDER BY m.ordem, a.ordem
+            """)
+    List<LinhaDoResultado> placarPorAssunto(@Param("tentativa") UUID tentativa);
 
     /**
      * Cria a tentativa se ainda não existir, numa instrução só. Por que não "busca e,

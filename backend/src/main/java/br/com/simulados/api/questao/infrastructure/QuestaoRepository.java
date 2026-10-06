@@ -141,6 +141,21 @@ public interface QuestaoRepository extends JpaRepository<Questao, Long> {
     List<Questao> buscarVariasComAlternativas(@Param("ids") Collection<Long> ids);
 
     /**
+     * As mesmas questões, com assunto e matéria no mesmo fetch: a revisão do
+     * resultado (3c) mostra o assunto de cada questão, e sem o fetch cada
+     * `getAssunto().getNome()` dispararia um SELECT — N+1 escondido num getter.
+     * Na prova não se busca isto: lá o assunto daria dica e nem vai na resposta.
+     */
+    @Query("""
+            SELECT q FROM Questao q
+            LEFT JOIN FETCH q.alternativas
+            LEFT JOIN FETCH q.assunto a
+            LEFT JOIN FETCH a.materia
+            WHERE q.id IN :ids AND q.disponivel = true
+            """)
+    List<Questao> buscarVariasParaResultado(@Param("ids") Collection<Long> ids);
+
+    /**
      * Anos que têm ao menos uma questão utilizável, do mais recente pro mais
      * antigo. Alimenta o filtro de ano da tela.
      *
