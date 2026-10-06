@@ -129,14 +129,14 @@ public interface QuestaoRepository extends JpaRepository<Questao, Long> {
      * tentativa (até 180). O Hibernate 6+ já elimina as linhas repetidas que o
      * JOIN FETCH da coleção produz, sem precisar de DISTINCT.
      *
-     * SEM o filtro `disponivel`, de propósito: o simulado é uma definição fechada.
-     * Uma questão anulada pelo INEP depois da montagem continua na prova (some do
-     * sorteio, não de uma prova que o aluno já começou); o que ela vale é da 3c.
+     * Só as `disponivel` (decidido em 02/10/2026): questão anulada ou marcada
+     * incompleta DEPOIS da montagem some da prova, que encolhe e é renumerada. Não
+     * é trocada por outra — mudar a prova de quem já começou seria pior.
      */
     @Query("""
             SELECT q FROM Questao q
             LEFT JOIN FETCH q.alternativas
-            WHERE q.id IN :ids
+            WHERE q.id IN :ids AND q.disponivel = true
             """)
     List<Questao> buscarVariasComAlternativas(@Param("ids") Collection<Long> ids);
 

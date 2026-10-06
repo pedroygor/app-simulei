@@ -152,16 +152,17 @@ class ExecucaoDaProvaTest {
     }
 
     @Test
-    void questaoAnuladaDepoisDaMontagemContaComoErrada() {
+    void questaoAnuladaDepoisDaMontagemNaoAceitaResposta() {
         var tentativa = iniciar();
-        // A conferência do INEP pode anular uma questão que já estava num simulado
+        // A conferência do INEP pode anular uma questão que já estava num simulado;
+        // ela sai da prova (decidido em 02/10/2026), então responder é inválido
         entityManager.createNativeQuery("UPDATE questoes SET anulada = true, gabarito = NULL WHERE id = :id")
                 .setParameter("id", q1.getId())
                 .executeUpdate();
 
-        execucao.responder(tentativa, aluna, q1.getId(), alternativa(q1, "A"));
-
-        assertThat(respostas(tentativa)).singleElement().extracting(Resposta::isCorreta).isEqualTo(false);
+        assertThatThrownBy(() -> execucao.responder(tentativa, aluna, q1.getId(), alternativa(q1, "A")))
+                .isInstanceOf(RespostaInvalidaException.class);
+        assertThat(respostas(tentativa)).isEmpty();
     }
 
     // --- desmarcar ---

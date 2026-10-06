@@ -2,6 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
+import { useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ErroDaApi } from "@/lib/api/erros";
 import { buscarProva } from "@/lib/api/tentativas";
@@ -22,6 +23,18 @@ export function TelaDaProva({ id }: { id: string }) {
     staleTime: Infinity,
   });
 
+  // Quantas questões sumiram desde que a prova foi aberta (anuladas no meio).
+  // Sem avisar, o aluno veria OUTRA questão no mesmo número e acharia que a tela
+  // trocou sozinho. Estado ajustado durante o render quando a lista muda — o
+  // padrão do React pra "derivar do valor anterior", sem useEffect nem ref
+  const [conhecidas, setConhecidas] = useState<number | null>(null);
+  const [retiradas, setRetiradas] = useState(0);
+  const total = prova?.questoes.length;
+  if (total !== undefined && total !== conhecidas) {
+    if (conhecidas !== null && total < conhecidas) setRetiradas((r) => r + conhecidas - total);
+    setConhecidas(total);
+  }
+
   if (isPending) return <EsqueletoDaProva />;
 
   if (error) {
@@ -40,7 +53,34 @@ export function TelaDaProva({ id }: { id: string }) {
   }
 
   if (prova.status === "FINALIZADA") return <ProvaEntregue prova={prova} />;
-  return <ProvaEmAndamento prova={prova} chaveDaConsulta={chave} />;
+
+  // Questão anulada ou incompleta depois da montagem sai da prova (backend). Se
+  // todas saíram, não há o que responder
+  if (prova.questoes.length === 0) {
+    return (
+      <div className="space-y-3 py-8 text-center text-sm">
+        <p role="alert" className="text-muted-foreground">
+          As questões desta prova foram retiradas (anuladas pelo INEP ou sem o texto necessário) e ela não tem mais o que responder.
+        </p>
+        <Link href="/simulados/novo" className="underline">
+          Montar outra prova
+        </Link>
+      </div>
+    );
+  }
+
+  // key com os ids: se a prova encolher com ela aberta (uma questão anulada no
+  // meio, que o 422 ao responder faz recarregar), a fila de salvamento e a
+  // questão atual nascem de novo com a lista nova — o índice antigo poderia
+  // apontar pra além do fim
+  return (
+    <ProvaEmAndamento
+      key={prova.questoes.map((q) => q.id).join(",")}
+      prova={prova}
+      chaveDaConsulta={chave}
+      retiradas={retiradas}
+    />
+  );
 }
 
 function EsqueletoDaProva() {

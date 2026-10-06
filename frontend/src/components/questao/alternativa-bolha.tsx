@@ -2,6 +2,7 @@ import { cva } from "class-variance-authority";
 import { Check } from "lucide-react";
 import type { KeyboardEvent, Ref } from "react";
 import type { Alternativa } from "@/lib/api/questoes";
+import { escaparMarcadoresDeBloco } from "@/lib/questoes/markdown";
 import { ImagemDaQuestao } from "./imagem-da-questao";
 import { TextoDaQuestao } from "./texto-da-questao";
 
@@ -140,5 +141,12 @@ function ConteudoDaAlternativa({ alternativa }: { alternativa: Alternativa }) {
   if (alternativa.imagemUrl) {
     return <ImagemDaQuestao src={alternativa.imagemUrl} alt={`Alternativa ${alternativa.letra}`} />;
   }
-  return <TextoDaQuestao texto={alternativa.texto} className="text-sm" />;
+  // Alternativa é resposta, nunca lista: "9." tem que aparecer como "9." (ver
+  // escaparMarcadoresDeBloco — 325 alternativas apareciam em branco)
+  return (
+    <TextoDaQuestao
+      texto={alternativa.texto && escaparMarcadoresDeBloco(alternativa.texto)}
+      className="text-sm"
+    />
+  );
 }

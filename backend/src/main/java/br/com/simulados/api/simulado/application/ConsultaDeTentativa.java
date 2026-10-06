@@ -51,10 +51,12 @@ public class ConsultaDeTentativa {
         var simulado = simuladoRepository.buscarComQuestoes(tentativa.getSimuladoId()).orElseThrow();
 
         var ids = simulado.getQuestoes().stream().map(QuestaoDoSimulado::getQuestaoId).toList();
-        // O IN devolve em ordem qualquer; a ordem da prova é a do simulado
+        // O IN devolve em ordem qualquer; a ordem da prova é a do simulado. Questão
+        // que deixou de estar disponível não vem do banco e sai da lista — a prova
+        // encolhe e a posição (ProvaResponse) é renumerada
         Map<Long, Questao> porId = questaoRepository.buscarVariasComAlternativas(ids).stream()
                 .collect(Collectors.toMap(Questao::getId, Function.identity()));
-        var emOrdem = ids.stream().map(porId::get).toList();
+        var emOrdem = ids.stream().filter(porId::containsKey).map(porId::get).toList();
 
         var marcadas = respostaRepository.findByTentativaId(tentativaId).stream()
                 .collect(Collectors.toMap(Resposta::getQuestaoId, Resposta::getAlternativaId));

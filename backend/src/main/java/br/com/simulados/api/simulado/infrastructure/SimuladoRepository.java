@@ -67,9 +67,11 @@ public interface SimuladoRepository extends JpaRepository<Simulado, UUID> {
      * numa query só, em vez de três buscas.
      *
      * CASE e não "a.letra = q.gabarito" direto: o JPQL não aceita comparação como
-     * valor no SELECT. Questão anulada DEPOIS da montagem tem gabarito nulo, e a
-     * comparação com nulo cai no ELSE (false) — o que a anulada vale na nota é
-     * decisão da correção (3c), não daqui.
+     * valor no SELECT.
+     *
+     * `disponivel`: questão anulada ou incompleta depois da montagem saiu da prova
+     * (ver QuestaoRepository.buscarVariasComAlternativas), então responder a ela
+     * é resposta inválida, como uma questão de fora do simulado.
      */
     @Query("""
             SELECT CASE WHEN a.letra = q.gabarito THEN true ELSE false END
@@ -78,6 +80,7 @@ public interface SimuladoRepository extends JpaRepository<Simulado, UUID> {
             JOIN Questao q ON q.id = sq.questaoId
             JOIN q.alternativas a
             WHERE s.id = :simulado AND q.id = :questao AND a.id = :alternativa
+              AND q.disponivel = true
             """)
     Optional<Boolean> alternativaEstaCorreta(@Param("simulado") UUID simulado,
                                              @Param("questao") Long questao,

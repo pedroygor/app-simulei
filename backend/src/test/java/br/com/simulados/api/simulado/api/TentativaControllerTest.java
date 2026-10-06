@@ -122,6 +122,22 @@ class TentativaControllerTest {
     }
 
     @Test
+    void questaoAnuladaDepoisDaMontagemSomeDaProvaQueERenumerada() throws Exception {
+        var id = iniciar();
+        // q2 era a 1ª da prova; o INEP a anula depois da montagem
+        entityManager.createNativeQuery("UPDATE questoes SET anulada = true, gabarito = NULL WHERE id = :id")
+                .setParameter("id", q2.getId())
+                .executeUpdate();
+        entityManager.clear();
+
+        mockMvc.perform(como(aluno, get("/tentativas/{id}", id)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.questoes.length()").value(1))
+                .andExpect(jsonPath("$.questoes[0].numero").value(136))
+                .andExpect(jsonPath("$.questoes[0].ordem").value(1));
+    }
+
+    @Test
     void provaCustaQuatroQueriesQualquerQueSejaOTamanho() throws Exception {
         var id = iniciar();
         entityManager.clear();

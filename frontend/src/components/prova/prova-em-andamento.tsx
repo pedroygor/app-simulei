@@ -7,6 +7,7 @@ import { ErroDaApi } from "@/lib/api/erros";
 import { desmarcar, finalizarTentativa, responder, type Prova } from "@/lib/api/tentativas";
 import { FilaDeSalvamento } from "@/lib/prova/fila-de-salvamento";
 import { contarEmBranco, indiceInicial, marcadasIniciais } from "@/lib/prova/prova";
+import { AvisoDeRetirada } from "./aviso-de-retirada";
 import { ConfirmarEntrega } from "./confirmar-entrega";
 import { MapaDaProva } from "./mapa-da-prova";
 import { NavegacaoDaProva } from "./navegacao-da-prova";
@@ -20,7 +21,16 @@ import { QuestaoDaProva } from "./questao-da-prova";
  * sabe o que já chegou ao servidor e ordena os envios. O cache guarda só a prova
  * como veio do servidor.
  */
-export function ProvaEmAndamento({ prova, chaveDaConsulta }: { prova: Prova; chaveDaConsulta: readonly unknown[] }) {
+export function ProvaEmAndamento({
+  prova,
+  chaveDaConsulta,
+  retiradas,
+}: {
+  prova: Prova;
+  chaveDaConsulta: readonly unknown[];
+  /** Questões que saíram da prova enquanto ela estava aberta (anuladas no meio). */
+  retiradas: number;
+}) {
   const queryClient = useQueryClient();
 
   // useState com inicializador: a fila nasce UMA vez, com o que o servidor tinha
@@ -132,6 +142,8 @@ export function ProvaEmAndamento({ prova, chaveDaConsulta }: { prova: Prova; cha
           </div>
         )}
       </header>
+
+      {retiradas > 0 && <AvisoDeRetirada retiradas={retiradas} />}
 
       {/* key: cada questão monta de novo — foco no título e topo da página */}
       <QuestaoDaProva
