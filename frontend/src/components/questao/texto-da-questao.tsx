@@ -1,4 +1,5 @@
-import Markdown from "react-markdown";
+import type { ComponentProps } from "react";
+import Markdown, { type ExtraProps } from "react-markdown";
 import { cn } from "@/lib/utils";
 import { ImagemDaQuestao } from "./imagem-da-questao";
 
@@ -52,12 +53,33 @@ export function TextoDaQuestao({ texto, className }: Props) {
       <Markdown
         allowedElements={ELEMENTOS_PERMITIDOS}
         unwrapDisallowed
-        components={{ img: ImagemDoMarkdown }}
+        components={{ img: ImagemDoMarkdown, ol: ListaNumerada, ul: ListaComMarcador }}
       >
         {texto}
       </Markdown>
     </div>
   );
+}
+
+/**
+ * Listas com marcador VISÍVEL. O reset do Tailwind zera o list-style, e os 16
+ * enunciados com lista perdiam a numeração ("1) obtenção da massa do
+ * comprimido", 2021/103) — que o próprio comando às vezes cita. O `start` do
+ * markdown ("3." começa em 3) chega nas props e é repassado.
+ * `node` sai das props (semNo): é a árvore do markdown, não atributo de HTML.
+ */
+function ListaNumerada(props: ComponentProps<"ol"> & ExtraProps) {
+  return <ol className="list-decimal space-y-1 pl-6" {...semNo(props)} />;
+}
+
+function ListaComMarcador(props: ComponentProps<"ul"> & ExtraProps) {
+  return <ul className="list-disc space-y-1 pl-6" {...semNo(props)} />;
+}
+
+function semNo<T extends ExtraProps>(props: T): Omit<T, "node"> {
+  const copia = { ...props };
+  delete copia.node;
+  return copia;
 }
 
 /**

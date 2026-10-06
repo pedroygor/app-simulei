@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -122,6 +123,37 @@ public interface QuestaoRepository extends JpaRepository<Questao, Long> {
             WHERE q.id = :id AND q.disponivel = true
             """)
     Optional<Questao> buscarComAlternativas(@Param("id") Long id);
+
+    /**
+     * Várias questões com as alternativas, numa query só — a prova inteira de uma
+     * tentativa (até 180). O Hibernate 6+ já elimina as linhas repetidas que o
+     * JOIN FETCH da coleção produz, sem precisar de DISTINCT.
+     *
+     * Só as `disponivel` (decidido em 02/10/2026): questão anulada ou marcada
+     * incompleta DEPOIS da montagem some da prova, que encolhe e é renumerada. Não
+     * é trocada por outra — mudar a prova de quem já começou seria pior.
+     */
+    @Query("""
+            SELECT q FROM Questao q
+            LEFT JOIN FETCH q.alternativas
+            WHERE q.id IN :ids AND q.disponivel = true
+            """)
+    List<Questao> buscarVariasComAlternativas(@Param("ids") Collection<Long> ids);
+
+    /**
+     * As mesmas questões, com assunto e matéria no mesmo fetch: a revisão do
+     * resultado (3c) mostra o assunto de cada questão, e sem o fetch cada
+     * `getAssunto().getNome()` dispararia um SELECT — N+1 escondido num getter.
+     * Na prova não se busca isto: lá o assunto daria dica e nem vai na resposta.
+     */
+    @Query("""
+            SELECT q FROM Questao q
+            LEFT JOIN FETCH q.alternativas
+            LEFT JOIN FETCH q.assunto a
+            LEFT JOIN FETCH a.materia
+            WHERE q.id IN :ids AND q.disponivel = true
+            """)
+    List<Questao> buscarVariasParaResultado(@Param("ids") Collection<Long> ids);
 
     /**
      * Anos que têm ao menos uma questão utilizável, do mais recente pro mais
