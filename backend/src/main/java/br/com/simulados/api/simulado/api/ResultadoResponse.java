@@ -24,6 +24,9 @@ public record ResultadoResponse(
         UUID simuladoId,
         String titulo,
         Instant finalizadoEm,
+        // A prova acabou pelo cronômetro (entregue no prazo pelo front ou pelo
+        // job), não pelo aluno: a tela diz "Tempo esgotado"
+        boolean tempoEsgotado,
         PlacarResponse total,
         // Na ordem fixa do ENEM, só as áreas que estavam na prova
         List<PorArea> porArea,
@@ -98,7 +101,7 @@ public record ResultadoResponse(
                 .toList();
         var tentativa = resultado.tentativa();
         return new ResultadoResponse(tentativa.getId(), resultado.simulado().getId(), resultado.simulado().getTitulo(),
-                tentativa.getFinalizadoEm(), PlacarResponse.de(resultado.total()), porArea,
+                tentativa.getFinalizadoEm(), tentativa.encerradaPeloTempo(), PlacarResponse.de(resultado.total()), porArea,
                 resultado.porAssunto().stream().map(PorAssunto::de).toList(), questoes);
     }
 }

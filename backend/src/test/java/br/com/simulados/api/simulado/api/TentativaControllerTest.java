@@ -26,6 +26,8 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -268,6 +270,48 @@ class TentativaControllerTest {
                 .andExpect(jsonPath("$.mensagem").value("Tentativa não encontrada: " + id));
     }
 
+    // --- cronômetro (3d) ---
+
+    @Test
+    void provaComTempoTrazPrazoEAHoraDoServidor() throws Exception {
+        var id = iniciar();
+
+        var corpo = mockMvc.perform(como(aluno, get("/tentativas/{id}", id)))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+        Instant iniciado = Instant.parse(JsonPath.read(corpo, "$.iniciadoEm"));
+        Instant prazo = Instant.parse(JsonPath.read(corpo, "$.prazo"));
+        Instant agora = Instant.parse(JsonPath.read(corpo, "$.agora"));
+        // O simulado do setUp tem 3600 s
+        assertThat(Duration.between(iniciado, prazo)).isEqualTo(Duration.ofHours(1));
+        assertThat(agora).isBetween(iniciado.minusSeconds(60), prazo);
+    }
+
+    @Test
+    void respostaDepoisDoPrazoEh422EEntregaMarcaTempoEsgotado() throws Exception {
+        var id = iniciar();
+        vencerOPrazo(id);
+
+        responder(id, q1, "A")
+                .andExpect(status().isUnprocessableContent())
+                .andExpect(jsonPath("$.mensagem").value("O tempo da prova acabou"));
+        // Entregar depois do prazo é o que a tela faz quando o cronômetro zera
+        mockMvc.perform(como(aluno, post("/tentativas/{id}/finalizar", id))).andExpect(status().isOk());
+
+        mockMvc.perform(como(aluno, get("/tentativas/{id}/resultado", id)))
+                .andExpect(jsonPath("$.tempoEsgotado").value(true));
+    }
+
+    @Test
+    void entregueAntesDoPrazoNaoEhTempoEsgotado() throws Exception {
+        var id = iniciar();
+        mockMvc.perform(como(aluno, post("/tentativas/{id}/finalizar", id))).andExpect(status().isOk());
+
+        mockMvc.perform(como(aluno, get("/tentativas/{id}/resultado", id)))
+                .andExpect(jsonPath("$.tempoEsgotado").value(false));
+    }
+
     // --- dono e formato ---
 
     @Test
@@ -309,6 +353,19 @@ class TentativaControllerTest {
             throws Exception {
         return mockMvc.perform(como(aluno, put("/tentativas/{id}/respostas/{q}", tentativa, questao.getId()))
                 .content("{ \"alternativaId\": " + alternativa(questao, letra) + " }"));
+    }
+
+    /** Prazo uma hora atrás (e início duas horas atrás, pelo CHECK prazo > início). */
+    private void vencerOPrazo(String tentativa) {
+        entityManager.flush();
+        entityManager.createNativeQuery("""
+                        UPDATE tentativas
+                        SET iniciado_em = now() - interval '2 hours', prazo = now() - interval '1 hour'
+                        WHERE id = CAST(:id AS uuid)
+                        """)
+                .setParameter("id", tentativa)
+                .executeUpdate();
+        entityManager.clear();
     }
 
     // jwt(): token já validado, sem assinar nada — o `sub` é o id do usuário

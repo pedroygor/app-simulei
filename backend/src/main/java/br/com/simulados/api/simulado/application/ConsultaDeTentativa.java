@@ -14,6 +14,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Clock;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -28,12 +30,16 @@ public class ConsultaDeTentativa {
     private final SimuladoRepository simuladoRepository;
     private final QuestaoRepository questaoRepository;
     private final RespostaRepository respostaRepository;
+    private final Clock clock;
 
     /**
      * @param questoes na ordem da prova
      * @param marcadas id da questão → id da alternativa marcada; questão em branco não aparece
+     * @param agora    a hora do SERVIDOR na consulta: o cronômetro da tela desconta a
+     *                 diferença pro relógio do celular, que o aluno pode ter ajustado
      */
-    public record Prova(Tentativa tentativa, Simulado simulado, List<Questao> questoes, Map<Long, Long> marcadas) {
+    public record Prova(Tentativa tentativa, Simulado simulado, List<Questao> questoes, Map<Long, Long> marcadas,
+                        Instant agora) {
     }
 
     /**
@@ -61,6 +67,6 @@ public class ConsultaDeTentativa {
         var marcadas = respostaRepository.findByTentativaId(tentativaId).stream()
                 .collect(Collectors.toMap(Resposta::getQuestaoId, Resposta::getAlternativaId));
 
-        return new Prova(tentativa, simulado, emOrdem, marcadas);
+        return new Prova(tentativa, simulado, emOrdem, marcadas, clock.instant());
     }
 }

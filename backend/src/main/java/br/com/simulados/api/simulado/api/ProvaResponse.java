@@ -26,6 +26,12 @@ public record ProvaResponse(
         Integer tempoLimiteSeg,
         StatusDaTentativa status,
         Instant iniciadoEm,
+        // Até quando dá pra responder; null = sem cronômetro. O servidor recusa
+        // resposta depois dele (com 10 s de folga)
+        Instant prazo,
+        // Hora do servidor nesta resposta: a tela calcula o tempo restante como
+        // prazo − agora, sem confiar no relógio do celular
+        Instant agora,
         Instant finalizadoEm,
         List<QuestaoDaProvaResponse> questoes
 ) {
@@ -60,6 +66,6 @@ public record ProvaResponse(
                 .toList();
         return new ProvaResponse(tentativa.getId(), prova.simulado().getId(), prova.simulado().getTitulo(),
                 prova.simulado().getTempoLimiteSeg(), tentativa.getStatus(), tentativa.getIniciadoEm(),
-                tentativa.getFinalizadoEm(), questoes);
+                tentativa.getPrazo(), prova.agora(), tentativa.getFinalizadoEm(), questoes);
     }
 }
