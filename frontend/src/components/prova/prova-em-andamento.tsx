@@ -9,6 +9,7 @@ import { FilaDeSalvamento } from "@/lib/prova/fila-de-salvamento";
 import { contarEmBranco, indiceInicial, marcadasIniciais } from "@/lib/prova/prova";
 import { AvisoDeRetirada } from "./aviso-de-retirada";
 import { ConfirmarEntrega } from "./confirmar-entrega";
+import { CronometroDaProva } from "./cronometro-da-prova";
 import { MapaDaProva } from "./mapa-da-prova";
 import { NavegacaoDaProva } from "./navegacao-da-prova";
 import { QuestaoDaProva } from "./questao-da-prova";
@@ -25,11 +26,14 @@ export function ProvaEmAndamento({
   prova,
   chaveDaConsulta,
   retiradas,
+  desvio,
 }: {
   prova: Prova;
   chaveDaConsulta: readonly unknown[];
   /** Questões que saíram da prova enquanto ela estava aberta (anuladas no meio). */
   retiradas: number;
+  /** Quanto o relógio do servidor está à frente do celular, em ms (ver cronometro.ts). */
+  desvio: number;
 }) {
   const queryClient = useQueryClient();
 
@@ -111,6 +115,12 @@ export function ProvaEmAndamento({
             <p className="text-muted-foreground text-sm tabular-nums">
               {total - emBranco} de {total} respondidas
             </p>
+            {/* Só com tempo-limite; a entrega automática no zero é o próximo passo */}
+            {prova.prazo && (
+              <div className="mt-2">
+                <CronometroDaProva prazo={prova.prazo} desvio={desvio} />
+              </div>
+            )}
           </div>
           <Button
             type="button"

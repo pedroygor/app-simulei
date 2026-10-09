@@ -37,6 +37,10 @@ export type Prova = {
   tempoLimiteSeg: number | null;
   status: StatusDaTentativa;
   iniciadoEm: string;
+  /** Até quando dá pra responder; null = sem cronômetro. O servidor recusa depois. */
+  prazo: string | null;
+  /** Hora do servidor na resposta: base pra descontar o relógio do celular. */
+  agora: string;
   finalizadoEm: string | null;
   questoes: QuestaoDaProva[];
 };
