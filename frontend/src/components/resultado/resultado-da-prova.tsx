@@ -51,6 +51,9 @@ export function ResultadoDaProva({ tentativaId }: { tentativaId: string }) {
           <span className="font-medium">{resultado.titulo}</span>
           <span className="text-muted-foreground"> · entregue em {HORA.format(new Date(resultado.finalizadoEm))}</span>
         </p>
+        {resultado.tempoEsgotado && (
+          <p className="text-destructive text-sm font-medium">O tempo acabou e a prova foi entregue automaticamente.</p>
+        )}
       </header>
 
       <NotaDaProva placar={resultado.total} />
