@@ -37,6 +37,8 @@ export type Resultado = {
   simuladoId: string;
   titulo: string;
   finalizadoEm: string;
+  /** A prova acabou pelo cronômetro (entregue no zero ou pelo servidor), não pelo aluno. */
+  tempoEsgotado: boolean;
   total: Placar;
   /** Na ordem fixa do ENEM. */
   porArea: { area: Area; nome: string; placar: Placar }[];

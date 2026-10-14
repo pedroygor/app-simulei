@@ -128,4 +128,40 @@ describe("FilaDeSalvamento", () => {
     expect(fila.retrato()).not.toBe(antes);
     expect(ouvinte).toHaveBeenCalled();
   });
+
+  it("aguardarEnvios espera o envio em voo terminar", async () => {
+    const { envio, chamadas } = envioControlado();
+    const fila = new FilaDeSalvamento(new Map(), envio);
+    fila.marcar(1, 10);
+
+    let terminou = false;
+    const espera = fila.aguardarEnvios(5000).then(() => (terminou = true));
+    await microtarefas();
+    expect(terminou).toBe(false);
+
+    chamadas[0].resolver();
+    await espera;
+    expect(terminou).toBe(true);
+  });
+
+  it("aguardarEnvios desiste no limite (rede caída não trava a entrega)", async () => {
+    vi.useFakeTimers();
+    try {
+      const { envio } = envioControlado();
+      const fila = new FilaDeSalvamento(new Map(), envio);
+      fila.marcar(1, 10);
+
+      const espera = fila.aguardarEnvios(8000);
+      vi.advanceTimersByTime(8000);
+      await espera;
+      expect(fila.pendentes()).toBe(1);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("aguardarEnvios sem nada em voo resolve na hora", async () => {
+    const { envio } = envioControlado();
+    await new FilaDeSalvamento(new Map(), envio).aguardarEnvios(8000);
+  });
 });

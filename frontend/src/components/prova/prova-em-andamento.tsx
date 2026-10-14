@@ -9,9 +9,11 @@ import { FilaDeSalvamento } from "@/lib/prova/fila-de-salvamento";
 import { contarEmBranco, indiceInicial, marcadasIniciais } from "@/lib/prova/prova";
 import { AvisoDeRetirada } from "./aviso-de-retirada";
 import { ConfirmarEntrega } from "./confirmar-entrega";
+import { CronometroDaProva } from "./cronometro-da-prova";
 import { MapaDaProva } from "./mapa-da-prova";
 import { NavegacaoDaProva } from "./navegacao-da-prova";
 import { QuestaoDaProva } from "./questao-da-prova";
+import { TempoEsgotado } from "./tempo-esgotado";
 
 /**
  * A prova sendo respondida. Uma questão por tela (densidade de aluno, ver
@@ -25,11 +27,14 @@ export function ProvaEmAndamento({
   prova,
   chaveDaConsulta,
   retiradas,
+  desvio,
 }: {
   prova: Prova;
   chaveDaConsulta: readonly unknown[];
   /** Questões que saíram da prova enquanto ela estava aberta (anuladas no meio). */
   retiradas: number;
+  /** Quanto o relógio do servidor está à frente do celular, em ms (ver cronometro.ts). */
+  desvio: number;
 }) {
   const queryClient = useQueryClient();
 
@@ -58,6 +63,8 @@ export function ProvaEmAndamento({
   const [indice, setIndice] = useState(() => indiceInicial(prova.questoes));
   const [mapaAberto, setMapaAberto] = useState(false);
   const [confirmando, setConfirmando] = useState(false);
+  // O cronômetro zerou: a prova trava e se entrega sozinha
+  const [esgotado, setEsgotado] = useState(false);
 
   // Fechar a aba com resposta em voo perderia a resposta: o navegador pergunta
   useEffect(() => {
@@ -100,6 +107,18 @@ export function ProvaEmAndamento({
   function abrirEntrega() {
     entrega.reset();
     setConfirmando(true);
+  }
+
+  /**
+   * Cronômetro em zero: trava a tela, espera a resposta tocada no último segundo
+   * chegar (até 8 s, dentro da folga de 10 s do servidor) e entrega. Se o job do
+   * servidor já entregou, o finalizar dá 422 e o onError recarrega — o aluno cai
+   * no resultado do mesmo jeito.
+   */
+  function aoEsgotar() {
+    setEsgotado(true);
+    setConfirmando(false);
+    void fila.aguardarEnvios(8000).then(() => entrega.mutate());
   }
 
   return (
@@ -145,18 +164,34 @@ export function ProvaEmAndamento({
 
       {retiradas > 0 && <AvisoDeRetirada retiradas={retiradas} />}
 
-      {/* key: cada questão monta de novo — foco no título e topo da página */}
-      <QuestaoDaProva
-        key={questao.id}
-        questao={questao}
-        total={total}
-        marcada={marcadas.get(questao.id) ?? null}
-        situacao={situacoes.get(questao.id) ?? "salva"}
-        aoMarcar={(alternativa) => fila.marcar(questao.id, alternativa)}
-        aoTentarDeNovo={() => fila.tentarDeNovo(questao.id)}
-      />
-
-      <NavegacaoDaProva indice={indice} total={total} aoIr={irPara} aoEntregar={abrirEntrega} />
+      {esgotado ? (
+        <TempoEsgotado
+          erro={entrega.error && !(entrega.error instanceof ErroDaApi && entrega.error.status === 422) ? entrega.error.message : null}
+          aoTentarDeNovo={() => entrega.mutate()}
+        />
+      ) : (
+        <>
+          {/* key: cada questão monta de novo — foco no título e topo da página */}
+          <QuestaoDaProva
+            key={questao.id}
+            questao={questao}
+            total={total}
+            marcada={marcadas.get(questao.id) ?? null}
+            situacao={situacoes.get(questao.id) ?? "salva"}
+            aoMarcar={(alternativa) => fila.marcar(questao.id, alternativa)}
+            aoTentarDeNovo={() => fila.tentarDeNovo(questao.id)}
+          />
+          <NavegacaoDaProva
+            indice={indice}
+            total={total}
+            aoIr={irPara}
+            aoEntregar={abrirEntrega}
+            cronometro={
+              prova.prazo && <CronometroDaProva prazo={prova.prazo} desvio={desvio} aoEsgotar={aoEsgotar} />
+            }
+          />
+        </>
+      )}
 
       <ConfirmarEntrega
         aberto={confirmando}

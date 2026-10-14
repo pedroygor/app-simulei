@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -51,6 +52,18 @@ public class Tentativa {
     @Column(name = "finalizado_em")
     private Instant finalizadoEm;
 
+    // Até quando dá pra responder; NULL = prova sem tempo-limite. Fixado ao
+    // iniciar (ver TentativaRepository.criarSeNaoExistir), nunca muda depois
+    @Column(updatable = false)
+    private Instant prazo;
+
+    /**
+     * Folga depois do prazo pra resposta que o aluno tocou no último segundo e
+     * ainda estava a caminho (rede lenta do cursinho). O job de encerramento
+     * espera a mesma folga, pra não fechar a prova com essa resposta em voo.
+     */
+    public static final Duration TOLERANCIA = Duration.ofSeconds(10);
+
     // Nasce em andamento: sem turma (Etapa 5), criar a tentativa É iniciar a prova
     public Tentativa(UUID simuladoId, UUID alunoId) {
         this.simuladoId = simuladoId;
@@ -69,9 +82,30 @@ public class Tentativa {
         }
     }
 
+    /**
+     * A prova acabou pelo TEMPO (o front entregou com o cronômetro zerado, ou o
+     * job encerrou a abandonada): nos dois casos `finalizar` grava o próprio
+     * prazo como hora da entrega. Entregue antes do prazo = acabou pelo aluno.
+     */
+    public boolean encerradaPeloTempo() {
+        return prazo != null && finalizadoEm != null && !finalizadoEm.isBefore(prazo);
+    }
+
+    /** Pra quem vai RESPONDER: depois do prazo (e da folga), não aceita mais. */
+    public void exigirDentroDoPrazo(Instant agora) {
+        if (prazo != null && agora.isAfter(prazo.plus(TOLERANCIA))) {
+            throw new TempoEsgotadoException();
+        }
+    }
+
+    /**
+     * Entregar é permitido mesmo depois do prazo — é o que o front faz quando o
+     * cronômetro zera. Mas o horário gravado é no máximo o prazo: tempo além do
+     * limite não é "tempo de prova" (e a 4c vai medir duração por ele).
+     */
     public void finalizar(Instant agora) {
         exigirEmAndamento();
         this.status = StatusDaTentativa.FINALIZADA;
-        this.finalizadoEm = agora;
+        this.finalizadoEm = prazo != null && agora.isAfter(prazo) ? prazo : agora;
     }
 }

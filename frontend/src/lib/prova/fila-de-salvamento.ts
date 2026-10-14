@@ -72,6 +72,28 @@ export class FilaDeSalvamento {
     this.marcar(questao, this.desejado.get(questao) ?? null);
   }
 
+  /**
+   * Resolve quando não há mais envio EM VOO, ou quando `limiteMs` passa — o que
+   * vier primeiro. É o que a entrega automática espera quando o cronômetro zera:
+   * a resposta tocada no último segundo ainda está a caminho, e entregar antes
+   * dela a perderia. Falha não conta como em voo: com o tempo acabado, ninguém
+   * vai tentar de novo. O limite fica dentro da folga que o servidor dá (10 s).
+   */
+  aguardarEnvios(limiteMs: number): Promise<void> {
+    if (this.emVoo.size === 0) return Promise.resolve();
+    return new Promise((resolver) => {
+      const prazo = setTimeout(acabar, limiteMs);
+      const desassinar = this.assinar(() => {
+        if (this.emVoo.size === 0) acabar();
+      });
+      function acabar() {
+        clearTimeout(prazo);
+        desassinar();
+        resolver();
+      }
+    });
+  }
+
   /** Quantas questões ainda não estão garantidas no servidor. */
   pendentes() {
     return this.emVoo.size + this.falhas.size;
