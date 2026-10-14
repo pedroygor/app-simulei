@@ -56,6 +56,7 @@ public class ExecucaoDaProva {
     @Transactional
     public void responder(UUID tentativaId, UUID aluno, Long questao, Long alternativa) {
         var tentativa = tentativaParaEscrita(tentativaId, aluno);
+        tentativa.exigirDentroDoPrazo(clock.instant());
         var correta = simuladoRepository.alternativaEstaCorreta(tentativa.getSimuladoId(), questao, alternativa)
                 .orElseThrow(() -> new RespostaInvalidaException(questao, alternativa));
         respostaRepository.registrar(tentativaId, questao, alternativa, correta);
@@ -68,13 +69,17 @@ public class ExecucaoDaProva {
      */
     @Transactional
     public void desmarcar(UUID tentativaId, UUID aluno, Long questao) {
-        tentativaParaEscrita(tentativaId, aluno);
+        // Desmarcar também é mudar a prova: depois do prazo, não
+        tentativaParaEscrita(tentativaId, aluno).exigirDentroDoPrazo(clock.instant());
         respostaRepository.apagar(tentativaId, questao);
     }
 
     /**
      * Entrega a prova. O UPDATE sai pelo dirty checking no commit: a entidade foi
      * carregada nesta transação, e o Hibernate grava o que mudou nela.
+     *
+     * Sem checar o prazo, de propósito: entregar depois do tempo é justamente o
+     * que o front faz quando o cronômetro zera (e o horário gravado é o prazo).
      */
     @Transactional
     public Tentativa finalizar(UUID tentativaId, UUID aluno) {

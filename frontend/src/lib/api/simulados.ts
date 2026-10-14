@@ -1,5 +1,6 @@
 import { requisitar } from "./cliente";
-import type { Area, Idioma, Rotulo } from "./questoes";
+import { normalizarPagina, type Area, type EnvelopeDePagina, type Idioma, type Pagina, type Rotulo } from "./questoes";
+import type { Placar } from "./resultados";
 
 /** Espelham os DTOs de SimuladoController no backend. */
 
@@ -46,4 +47,30 @@ export type Simulado = {
 
 export function criarSimulado(pedido: PedidoDeSimulado): Promise<SimuladoCriado> {
   return requisitar<SimuladoCriado>("/simulados", { method: "POST", body: pedido });
+}
+
+/** Como a prova aparece em "minhas provas" (espelha SituacaoDaProva do backend). */
+export type SituacaoDaProva = "NAO_INICIADA" | "EM_ANDAMENTO" | "ENTREGUE";
+
+export type ProvaDoHistorico = {
+  simuladoId: string;
+  titulo: string;
+  criadoEm: string;
+  situacao: SituacaoDaProva;
+  /** null = não iniciada. */
+  tentativaId: string | null;
+  iniciadoEm: string | null;
+  finalizadoEm: string | null;
+  questoes: number;
+  respondidas: number;
+  /** Só da prova entregue: com ela aberta, acertos vazariam o gabarito. */
+  placar: Placar | null;
+};
+
+export const PROVAS_POR_PAGINA = 20;
+
+/** GET /simulados: as provas do usuário, da mais nova pra mais velha. */
+export async function buscarMinhasProvas(pagina: number): Promise<Pagina<ProvaDoHistorico>> {
+  const params = new URLSearchParams({ page: String(pagina), size: String(PROVAS_POR_PAGINA) });
+  return normalizarPagina(await requisitar<EnvelopeDePagina<ProvaDoHistorico>>(`/simulados?${params}`));
 }

@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -82,11 +83,35 @@ public interface TentativaRepository extends JpaRepository<Tentativa, UUID> {
      */
     @Modifying(flushAutomatically = true)
     @Query(value = """
-            INSERT INTO tentativas (simulado_id, aluno_id, status)
-            SELECT s.id, :aluno, 'EM_ANDAMENTO'
+            INSERT INTO tentativas (simulado_id, aluno_id, status, prazo)
+            SELECT s.id, :aluno, 'EM_ANDAMENTO',
+                   -- now() é o MESMO instante do iniciado_em (default da coluna):
+                   -- dentro de uma transação o now() do Postgres não anda.
+                   -- Sem tempo-limite, make_interval(NULL) dá NULL = sem prazo
+                   now() + make_interval(secs => s.tempo_limite_seg)
             FROM simulados s
             WHERE s.id = :simulado AND s.criado_por = :aluno
             ON CONFLICT (simulado_id, aluno_id) DO NOTHING
             """, nativeQuery = true)
     int criarSeNaoExistir(@Param("simulado") UUID simulado, @Param("aluno") UUID aluno);
+
+    /**
+     * Entrega as provas abandonadas com o tempo vencido (o aluno fechou o app).
+     * Um UPDATE só, qualquer que seja o número de provas — pelo índice parcial da
+     * V12. `finalizado_em = prazo`: a prova acabou no prazo, não quando o job passou.
+     *
+     * `limite` = agora − tolerância (calculado em Java, com o Clock injetado): a
+     * resposta tocada no último segundo ainda pode estar chegando, e o responder
+     * a aceita até o prazo + tolerância.
+     *
+     * Concorrência: o UPDATE trava cada linha que muda. Um responder que tenha
+     * pego o FOR UPDATE antes termina primeiro; um que chegue depois vê FINALIZADA.
+     */
+    @Modifying
+    @Query(value = """
+            UPDATE tentativas
+            SET status = 'FINALIZADA', finalizado_em = prazo
+            WHERE status = 'EM_ANDAMENTO' AND prazo IS NOT NULL AND prazo <= :limite
+            """, nativeQuery = true)
+    int encerrarVencidas(@Param("limite") Instant limite);
 }

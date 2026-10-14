@@ -48,8 +48,13 @@ spring:
   data:
     web:
       pageable:
-        # Teto do ?size= nas listagens paginadas (o default do Spring é 2000)
+        # Teto do ?size= nas listagens paginadas (o default do Spring é 2000).
+        # Só vale porque NÃO há @EnableSpringDataWebSupport no código: com ela,
+        # o Boot ignora este bloco inteiro (ver WebConfig)
         max-page-size: 100
+        # Page como JSON estável ({content, page{...}}) e não o PageImpl
+        # interno, cuja estrutura o Spring não garante entre versões
+        serialization-mode: via-dto
 
 jwt:
   # Segredo HMAC do JWT: só via ambiente, mínimo 32 bytes (HS256)

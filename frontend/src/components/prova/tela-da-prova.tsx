@@ -6,6 +6,7 @@ import { useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ErroDaApi } from "@/lib/api/erros";
 import { buscarProva } from "@/lib/api/tentativas";
+import { desvioDoRelogio } from "@/lib/prova/cronometro";
 import { ProvaEmAndamento } from "./prova-em-andamento";
 import { ResultadoDaProva } from "@/components/resultado/resultado-da-prova";
 
@@ -17,7 +18,9 @@ export function TelaDaProva({ id }: { id: string }) {
   const chave = ["tentativas", id] as const;
   const { data: prova, isPending, error } = useQuery({
     queryKey: chave,
-    queryFn: () => buscarProva(id),
+    // recebidoEm: a hora DO CELULAR em que a prova chegou. Junto com o `agora`
+    // do servidor dá o desvio do relógio, que o cronômetro desconta
+    queryFn: async () => ({ ...(await buscarProva(id)), recebidoEm: Date.now() }),
     // A prova (questões e ordem) não muda; as marcações vivem na fila de
     // salvamento. Rebuscar ao voltar pra aba não traria nada novo
     staleTime: Infinity,
@@ -80,6 +83,7 @@ export function TelaDaProva({ id }: { id: string }) {
       prova={prova}
       chaveDaConsulta={chave}
       retiradas={retiradas}
+      desvio={desvioDoRelogio(prova.agora, prova.recebidoEm)}
     />
   );
 }

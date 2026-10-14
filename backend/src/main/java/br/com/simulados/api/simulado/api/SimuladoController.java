@@ -2,8 +2,12 @@ package br.com.simulados.api.simulado.api;
 
 import br.com.simulados.api.simulado.application.ConsultaDeSimulado;
 import br.com.simulados.api.simulado.application.CriacaoDeSimulado;
+import br.com.simulados.api.simulado.application.HistoricoDeProvas;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -24,6 +28,7 @@ public class SimuladoController {
 
     private final CriacaoDeSimulado criacao;
     private final ConsultaDeSimulado consulta;
+    private final HistoricoDeProvas historico;
 
     /**
      * Monta uma prova. ALUNO e PROFESSOR podem (exige só estar autenticado — regra
@@ -42,6 +47,20 @@ public class SimuladoController {
         // 201 + Location, mesmo contrato do POST /usuarios
         var location = uriBuilder.path("/simulados/{id}").buildAndExpand(criado.simulado().getId()).toUri();
         return ResponseEntity.created(location).body(SimuladoCriadoResponse.de(criado));
+    }
+
+    /**
+     * "Minhas provas": os simulados do usuário autenticado, do mais novo pro mais
+     * velho, com a situação (não iniciada, em andamento, entregue) e a nota das
+     * entregues. Paginado (seção 8.4): `?page=&size=`, teto global de 100 por
+     * página. Um `?sort=` é ignorado — a ordem é fixa (ver HistoricoDeProvas).
+     *
+     * @PageableDefault: o tamanho quando o cliente não manda `size`.
+     */
+    @GetMapping
+    public Page<ProvaDoHistoricoResponse> minhas(@AuthenticationPrincipal Jwt jwt,
+                                                 @PageableDefault(size = 20) Pageable pageable) {
+        return historico.listar(UUID.fromString(jwt.getSubject()), pageable).map(ProvaDoHistoricoResponse::de);
     }
 
     /**

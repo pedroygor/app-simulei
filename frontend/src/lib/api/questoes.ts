@@ -83,7 +83,7 @@ export type HabilidadeDaMatriz = {
  * trazia `first`/`last`. Quem escrever o tipo de memória erra: os campos
  * chegam como `undefined` e a tela mostra "undefined questões".
  */
-type EnvelopeDePagina<T> = {
+export type EnvelopeDePagina<T> = {
   content: T[];
   page: {
     size: number;

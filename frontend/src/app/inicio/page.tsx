@@ -66,6 +66,9 @@ function ConteudoDaHome() {
               <Link href="/simulados/novo">Montar prova</Link>
             </Button>
             <Button asChild variant="outline" className="w-full">
+              <Link href="/provas">Minhas provas</Link>
+            </Button>
+            <Button asChild variant="outline" className="w-full">
               <Link href="/questoes">Explorar questões</Link>
             </Button>
           </div>
