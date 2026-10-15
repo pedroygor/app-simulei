@@ -20,7 +20,7 @@ public class UsuarioDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // Prefixo ROLE_ é convenção do Spring: hasRole("PROFESSOR") procura ROLE_PROFESSOR
+        // Prefixo ROLE_ é convenção do Spring: hasRole("ALUNO") procura ROLE_ALUNO
         return List.of(new SimpleGrantedAuthority("ROLE_" + usuario.getRole().name()));
     }
 

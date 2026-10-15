@@ -13,12 +13,20 @@ import org.springframework.web.bind.annotation.RestController;
 @TestConfiguration(proxyBeanMethods = false)
 public class RotasDeTesteConfiguration {
 
+    // ADMIN não existe no enum: a rota prova que o @PreAuthorize RECUSA papel
+    // que o token não tem (403), sem precisar de um segundo papel de verdade
     @RestController
-    public static class RotaSoProfessor {
+    public static class RotasPorPapel {
 
-        @GetMapping("/teste/so-professor")
-        @PreAuthorize("hasRole('PROFESSOR')")
-        public String soProfessor() {
+        @GetMapping("/teste/so-admin")
+        @PreAuthorize("hasRole('ADMIN')")
+        public String soAdmin() {
+            return "ok";
+        }
+
+        @GetMapping("/teste/so-aluno")
+        @PreAuthorize("hasRole('ALUNO')")
+        public String soAluno() {
             return "ok";
         }
     }

@@ -42,7 +42,7 @@ public class RespostaDeErroDeSeguranca implements AuthenticationEntryPoint, Acce
         escrever(request, response, HttpStatus.UNAUTHORIZED, "Autenticação necessária ou token inválido");
     }
 
-    /** Autenticado, mas sem permissão (ex: ALUNO numa rota de PROFESSOR). */
+    /** Autenticado, mas sem permissão (ex: ALUNO numa rota de ADMIN). */
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response,
                        AccessDeniedException accessDeniedException) throws IOException {

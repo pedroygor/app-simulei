@@ -35,8 +35,7 @@ class UsuarioControllerTest {
                                 {
                                   "nome": "Ana Souza",
                                   "email": "ana@teste.com",
-                                  "senha": "senha-forte-123",
-                                  "role": "ALUNO"
+                                  "senha": "senha-forte-123"
                                 }
                                 """))
                 .andExpect(status().isCreated())
@@ -55,8 +54,7 @@ class UsuarioControllerTest {
                 {
                   "nome": "Bruno Lima",
                   "email": "bruno@teste.com",
-                  "senha": "senha-forte-123",
-                  "role": "PROFESSOR"
+                  "senha": "senha-forte-123"
                 }
                 """;
 
@@ -83,15 +81,17 @@ class UsuarioControllerTest {
                 .andExpect(jsonPath("$.mensagem").value("Corpo da requisição inválido ou malformado"));
     }
 
+    // O papel é decidido pelo servidor: quem manda "role" (cliente antigo ou
+    // alguém tentando se promover) recebe ALUNO do mesmo jeito
     @Test
-    void roleInexistenteRetorna400ENao401() throws Exception {
+    void cadastroEhSempreAlunoMesmoPedindoOutroPapel() throws Exception {
         mockMvc.perform(post("/usuarios")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"nome":"Ana","email":"role.x@teste.com","senha":"senha-forte-123","role":"FOO"}
+                                {"nome":"Ana","email":"role.x@teste.com","senha":"senha-forte-123","role":"PROFESSOR"}
                                 """))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.status").value(400));
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.role").value("ALUNO"));
     }
 
     @Test
@@ -102,8 +102,7 @@ class UsuarioControllerTest {
                                 {
                                   "nome": "",
                                   "email": "nao-e-email",
-                                  "senha": "curta",
-                                  "role": "ALUNO"
+                                  "senha": "curta"
                                 }
                                 """))
                 .andExpect(status().isBadRequest())
