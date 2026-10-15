@@ -52,14 +52,6 @@ function ConteudoDaHome() {
               <dt className="text-muted-foreground">E-mail</dt>
               <dd>{usuario?.email}</dd>
             </div>
-            <div className="flex justify-between gap-4">
-              <dt className="text-muted-foreground">Perfil</dt>
-              <dd>{usuario?.role === "PROFESSOR" ? "Professor" : "Aluno"}</dd>
-            </div>
-            <div className="flex justify-between gap-4">
-              <dt className="text-muted-foreground">Plano</dt>
-              <dd>{usuario?.plano}</dd>
-            </div>
           </dl>
           <div className="mt-6 grid gap-2">
             <Button asChild size="xl" className="w-full">

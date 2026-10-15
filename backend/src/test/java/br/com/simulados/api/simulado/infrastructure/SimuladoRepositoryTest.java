@@ -55,7 +55,7 @@ class SimuladoRepositoryTest {
         usuario.setNome("Professora");
         usuario.setEmail("professora@exemplo.com");
         usuario.setSenhaHash("hash-irrelevante-aqui");
-        usuario.setRole(Role.PROFESSOR);
+        usuario.setRole(Role.ALUNO);
         dono = usuarioRepository.save(usuario).getId();
         q1 = questaoRepository.save(questao(1)).getId();
         q2 = questaoRepository.save(questao(2)).getId();

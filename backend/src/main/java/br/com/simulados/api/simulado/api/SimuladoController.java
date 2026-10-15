@@ -31,9 +31,8 @@ public class SimuladoController {
     private final HistoricoDeProvas historico;
 
     /**
-     * Monta uma prova. ALUNO e PROFESSOR podem (exige só estar autenticado — regra
-     * geral do SecurityConfig): o aluno monta o próprio treino, o professor a prova
-     * da turma (Etapa 5).
+     * Monta uma prova. Exige só estar autenticado (regra geral do SecurityConfig):
+     * o aluno monta o próprio treino.
      *
      * O dono é o `sub` do token, nunca um campo do corpo (seção 8.1): quem manda o
      * pedido não escolhe em nome de quem o simulado é criado.

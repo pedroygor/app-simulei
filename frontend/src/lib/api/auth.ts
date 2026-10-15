@@ -1,6 +1,6 @@
 import { requisitar } from "./cliente";
 import { guardarAccessToken, limparAccessToken } from "./token";
-import type { RespostaDeToken, Role, Usuario } from "./tipos";
+import type { RespostaDeToken, Usuario } from "./tipos";
 
 export type DadosDeLogin = {
   email: string;
@@ -11,7 +11,6 @@ export type DadosDeCadastro = {
   nome: string;
   email: string;
   senha: string;
-  role: Role;
 };
 
 export async function entrar(dados: DadosDeLogin): Promise<Usuario> {

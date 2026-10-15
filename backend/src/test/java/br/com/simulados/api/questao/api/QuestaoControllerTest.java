@@ -346,27 +346,16 @@ class QuestaoControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = "PROFESSOR")
-    void professorRecebeOGabaritoNoDetalhe() throws Exception {
-        var id = questaoRepository.findAll().stream()
-                .filter(q -> q.getNumero() == 90).findFirst().orElseThrow().getId();
-
-        mockMvc.perform(get("/questoes/{id}", id))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.gabarito").isNotEmpty());
-    }
-
-    @Test
     @WithMockUser(roles = "ALUNO")
-    void alunoNaoRecebeOGabaritoNoDetalhe() throws Exception {
-        // O aluno vê o gabarito só no resultado da prova finalizada: aqui ele
-        // abriria a questão em outra aba durante a prova
+    void alunoRecebeOGabaritoNoDetalhe() throws Exception {
+        // Banco de questões é treino (decidido em 15/10/2026). A PROVA segue sem
+        // gabarito até a entrega: isso é testado no TentativaControllerTest
         var id = questaoRepository.findAll().stream()
                 .filter(q -> q.getNumero() == 90).findFirst().orElseThrow().getId();
 
         mockMvc.perform(get("/questoes/{id}", id))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.gabarito").value(org.hamcrest.Matchers.nullValue()))
+                .andExpect(jsonPath("$.gabarito").isNotEmpty())
                 .andExpect(jsonPath("$.alternativas.length()").value(5));
     }
 

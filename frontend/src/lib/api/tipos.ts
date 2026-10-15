@@ -1,6 +1,8 @@
 /** Espelham os DTOs de resposta do backend. */
 
-export type Role = "ALUNO" | "PROFESSOR";
+// Um papel só desde 15/10/2026 (o professor saiu do produto); o tipo fica
+// porque o backend continua mandando o campo
+export type Role = "ALUNO";
 export type Plano = "FREE" | "PRO";
 
 export type Usuario = {

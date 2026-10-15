@@ -85,7 +85,7 @@ class SegurancaWebTest {
     @Test
     @WithMockUser(roles = "ALUNO")
     void semPermissaoDevolve403NoNossoFormatoJson() throws Exception {
-        mockMvc.perform(get("/teste/so-professor"))
+        mockMvc.perform(get("/teste/so-admin"))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.status").value(403))
                 .andExpect(jsonPath("$.erro").value("Forbidden"))

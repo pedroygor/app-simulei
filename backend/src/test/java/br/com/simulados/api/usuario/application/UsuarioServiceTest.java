@@ -35,13 +35,13 @@ class UsuarioServiceTest {
     private UsuarioService usuarioService;
 
     @Test
-    void criaUsuarioComSenhaHasheadaEPlanoFree() {
+    void criaAlunoComSenhaHasheadaEPlanoFree() {
         when(usuarioRepository.existsByEmail("ana@teste.com")).thenReturn(false);
         when(passwordEncoder.encode("senha-forte-123")).thenReturn("$2a$hash-fake");
         // Devolve a própria entidade recebida, como o save real faria
         when(usuarioRepository.save(any(Usuario.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        var usuario = usuarioService.criar("Ana", "ana@teste.com", "senha-forte-123", Role.ALUNO);
+        var usuario = usuarioService.criar("Ana", "ana@teste.com", "senha-forte-123");
 
         assertThat(usuario.getSenhaHash()).isEqualTo("$2a$hash-fake");
         assertThat(usuario.getPlano()).isEqualTo(Plano.FREE);
@@ -53,7 +53,7 @@ class UsuarioServiceTest {
     void lancaExcecaoQuandoEmailJaExiste() {
         when(usuarioRepository.existsByEmail("ana@teste.com")).thenReturn(true);
 
-        assertThatThrownBy(() -> usuarioService.criar("Ana", "ana@teste.com", "senha-forte-123", Role.ALUNO))
+        assertThatThrownBy(() -> usuarioService.criar("Ana", "ana@teste.com", "senha-forte-123"))
                 .isInstanceOf(EmailJaCadastradoException.class);
 
         verify(usuarioRepository, never()).save(any());

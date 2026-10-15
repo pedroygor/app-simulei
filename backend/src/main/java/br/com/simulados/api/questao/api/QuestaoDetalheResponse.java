@@ -25,10 +25,4 @@ public record QuestaoDetalheResponse(
         String gabarito,
         List<AlternativaResponse> alternativas
 ) {
-
-    // Mesma questão sem a resposta, pra quem não pode vê-la fora da prova
-    public QuestaoDetalheResponse semGabarito() {
-        return new QuestaoDetalheResponse(id, ano, numero, area, idioma, materia, assunto, habilidade,
-                enunciado, comando, null, alternativas);
-    }
 }
