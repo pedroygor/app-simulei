@@ -45,7 +45,7 @@ public class UsuarioService {
      * chamada interna não passa por ele — a anotação seria ignorada em
      * silêncio. Nesse caso, o método público é que leva a anotação.
      */
-    public Usuario criar(String nome, String email, String senha, Role role) {
+    public Usuario criar(String nome, String email, String senha) {
         // Checagem antecipada pra dar erro amigável; contra requisições
         // concorrentes, o backstop real é a constraint UNIQUE do banco.
         //
@@ -64,7 +64,7 @@ public class UsuarioService {
         usuario.setNome(nome);
         usuario.setEmail(email);
         usuario.setSenhaHash(senhaHash);
-        usuario.setRole(role);
+        usuario.setRole(Role.ALUNO);
         // plano FREE e ativo=true são defaults da própria entidade
         return usuarioRepository.save(usuario);
     }

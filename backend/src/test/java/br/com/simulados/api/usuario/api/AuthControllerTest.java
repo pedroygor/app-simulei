@@ -38,7 +38,7 @@ class AuthControllerTest {
 
     @Test
     void loginDevolveAccessTokenECookieHttpOnlyDeRefresh() throws Exception {
-        cadastrar("Ana", "auth.ana@teste.com", "ALUNO");
+        cadastrar("Ana", "auth.ana@teste.com");
 
         var resposta = login("auth.ana@teste.com", SENHA)
                 .andExpect(status().isOk())
@@ -55,7 +55,7 @@ class AuthControllerTest {
 
     @Test
     void loginComSenhaErradaDevolve401SemRevelarSeEmailExiste() throws Exception {
-        cadastrar("Bia", "auth.bia@teste.com", "ALUNO");
+        cadastrar("Bia", "auth.bia@teste.com");
 
         login("auth.bia@teste.com", "senha-errada-999")
                 .andExpect(status().isUnauthorized())
@@ -75,7 +75,7 @@ class AuthControllerTest {
 
     @Test
     void endpointProtegidoDevolveUsuarioDoToken() throws Exception {
-        cadastrar("Caio", "auth.caio@teste.com", "ALUNO");
+        cadastrar("Caio", "auth.caio@teste.com");
         var accessToken = extrairAccessToken(login("auth.caio@teste.com", SENHA).andReturn());
 
         mockMvc.perform(get("/usuarios/me")
@@ -86,23 +86,20 @@ class AuthControllerTest {
     }
 
     @Test
-    void rotaDeProfessorRejeitaAlunoCom403() throws Exception {
-        cadastrar("Duda", "auth.duda@teste.com", "ALUNO");
-        cadastrar("Edu", "auth.edu@teste.com", "PROFESSOR");
-
+    void papelDoTokenDecideARota() throws Exception {
+        cadastrar("Duda", "auth.duda@teste.com");
         var tokenAluno = extrairAccessToken(login("auth.duda@teste.com", SENHA).andReturn());
-        var tokenProfessor = extrairAccessToken(login("auth.edu@teste.com", SENHA).andReturn());
 
-        mockMvc.perform(get("/teste/so-professor").header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenAluno))
-                .andExpect(status().isForbidden());
-
-        mockMvc.perform(get("/teste/so-professor").header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenProfessor))
+        // Claim "role" do JWT -> authority ROLE_ALUNO -> @PreAuthorize, de ponta a ponta
+        mockMvc.perform(get("/teste/so-aluno").header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenAluno))
                 .andExpect(status().isOk());
+        mockMvc.perform(get("/teste/so-admin").header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenAluno))
+                .andExpect(status().isForbidden());
     }
 
     @Test
     void refreshComCookieDevolveNovoAccessToken() throws Exception {
-        cadastrar("Fabi", "auth.fabi@teste.com", "ALUNO");
+        cadastrar("Fabi", "auth.fabi@teste.com");
         var cookieRefresh = extrairCookieRefresh(login("auth.fabi@teste.com", SENHA).andReturn());
 
         var novoToken = extrairAccessToken(mockMvc.perform(post("/auth/refresh").cookie(cookieRefresh))
@@ -127,7 +124,7 @@ class AuthControllerTest {
 
     @Test
     void accessTokenNaoServeComoRefreshERefreshNaoServeComoAccess() throws Exception {
-        cadastrar("Gil", "auth.gil@teste.com", "ALUNO");
+        cadastrar("Gil", "auth.gil@teste.com");
         var resultado = login("auth.gil@teste.com", SENHA).andReturn();
         var accessToken = extrairAccessToken(resultado);
         var cookieRefresh = extrairCookieRefresh(resultado);
@@ -144,7 +141,7 @@ class AuthControllerTest {
 
     @Test
     void logoutExpiraOCookieDeRefresh() throws Exception {
-        cadastrar("Hugo", "auth.hugo@teste.com", "ALUNO");
+        cadastrar("Hugo", "auth.hugo@teste.com");
         var cookieRefresh = extrairCookieRefresh(login("auth.hugo@teste.com", SENHA).andReturn());
 
         var resposta = mockMvc.perform(post("/auth/logout"))
@@ -169,7 +166,7 @@ class AuthControllerTest {
         // E-mail exclusivo deste teste: o limitador é singleton e guarda estado
         // entre testes da mesma suíte
         var alvo = "auth.brute@teste.com";
-        cadastrar("Alvo", alvo, "ALUNO");
+        cadastrar("Alvo", alvo);
 
         // 5 falhas seguidas: as primeiras devolvem 401
         for (var i = 0; i < 5; i++) {
@@ -193,8 +190,8 @@ class AuthControllerTest {
         // pode derrubar o login dos colegas. Por isso limitamos por conta.
         var azarado = "auth.azarado@teste.com";
         var colega = "auth.colega@teste.com";
-        cadastrar("Azarado", azarado, "ALUNO");
-        cadastrar("Colega", colega, "ALUNO");
+        cadastrar("Azarado", azarado);
+        cadastrar("Colega", colega);
 
         for (var i = 0; i < 5; i++) {
             login(azarado, "errada-" + i).andExpect(status().isUnauthorized());
@@ -205,12 +202,12 @@ class AuthControllerTest {
         login(colega, SENHA).andExpect(status().isOk());
     }
 
-    private void cadastrar(String nome, String email, String role) throws Exception {
+    private void cadastrar(String nome, String email) throws Exception {
         mockMvc.perform(post("/usuarios")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"nome": "%s", "email": "%s", "senha": "%s", "role": "%s"}
-                                """.formatted(nome, email, SENHA, role)))
+                                {"nome": "%s", "email": "%s", "senha": "%s"}
+                                """.formatted(nome, email, SENHA)))
                 .andExpect(status().isCreated());
     }
 

@@ -26,7 +26,7 @@ public class UsuarioController {
     @PostMapping
     public ResponseEntity<UsuarioResponse> criar(@Valid @RequestBody CriarUsuarioRequest request,
                                                  UriComponentsBuilder uriBuilder) {
-        var usuario = usuarioService.criar(request.nome(), request.email(), request.senha(), request.role());
+        var usuario = usuarioService.criar(request.nome(), request.email(), request.senha());
 
         // 201 com Location apontando pro recurso criado, mesmo que o GET /usuarios/{id}
         // ainda não exista — é o contrato REST correto desde já

@@ -27,7 +27,6 @@ export const esquemaDeCadastro = z.object({
     .string()
     .min(8, "A senha precisa de pelo menos 8 caracteres")
     .max(72, "A senha pode ter no máximo 72 caracteres"),
-  role: z.enum(["ALUNO", "PROFESSOR"]),
 });
 
 export type FormularioDeLogin = z.infer<typeof esquemaDeLogin>;

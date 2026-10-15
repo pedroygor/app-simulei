@@ -2,10 +2,9 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { MolduraDeAcesso } from "@/components/auth/moldura-de-acesso";
-import { SeletorDePerfil } from "@/components/auth/seletor-de-perfil";
 import { CampoDeSenha } from "@/components/formulario/campo-de-senha";
 import { CampoDeTexto } from "@/components/formulario/campo-de-texto";
 import { Button } from "@/components/ui/button";
@@ -14,21 +13,20 @@ import { aplicarErrosDeCampo } from "@/lib/api/erros-de-formulario";
 import { esquemaDeCadastro, type FormularioDeCadastro } from "@/lib/validacao/auth";
 import { useSessao } from "@/providers/auth-provider";
 
-const CAMPOS_DO_FORMULARIO = ["nome", "email", "senha", "role"] as const;
+const CAMPOS_DO_FORMULARIO = ["nome", "email", "senha"] as const;
 
 export default function PaginaDeCadastro() {
   const router = useRouter();
   const { cadastrar, entrar } = useSessao();
 
   const {
-    control,
     register,
     handleSubmit,
     setError,
     formState: { errors, isSubmitting },
   } = useForm<FormularioDeCadastro>({
     resolver: zodResolver(esquemaDeCadastro),
-    defaultValues: { nome: "", email: "", senha: "", role: "ALUNO" },
+    defaultValues: { nome: "", email: "", senha: "" },
   });
 
   async function aoEnviar(dados: FormularioDeCadastro) {
@@ -60,19 +58,9 @@ export default function PaginaDeCadastro() {
       ativo="cadastro"
     >
       <form onSubmit={handleSubmit(aoEnviar)} className="flex flex-1 flex-col gap-5" noValidate>
-        {/* Controller é o caminho pra componente controlado customizado:
-            watch() não é memoizável e o React Compiler avisa sobre isso */}
-        <Controller
-          control={control}
-          name="role"
-          render={({ field }) => (
-            <SeletorDePerfil valor={field.value} aoMudar={field.onChange} />
-          )}
-        />
         <CampoDeTexto
           rotulo="Nome completo"
           autoComplete="name"
-          // Nome completo: é como o professor identifica o aluno na turma
           placeholder="Seu nome e sobrenome"
           erro={errors.nome?.message}
           {...register("nome")}

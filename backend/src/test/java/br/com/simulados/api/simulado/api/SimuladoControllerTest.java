@@ -192,11 +192,11 @@ class SimuladoControllerTest {
         outro.setNome("Outra pessoa");
         outro.setEmail("outra@exemplo.com");
         outro.setSenhaHash("hash-irrelevante-aqui");
-        outro.setRole(Role.PROFESSOR);
+        outro.setRole(Role.ALUNO);
         var outroId = usuarioRepository.save(outro).getId();
 
         mockMvc.perform(get("/simulados/{id}", id)
-                        .with(jwt().jwt(j -> j.subject(outroId.toString())).authorities(new SimpleGrantedAuthority("ROLE_PROFESSOR"))))
+                        .with(jwt().jwt(j -> j.subject(outroId.toString())).authorities(new SimpleGrantedAuthority("ROLE_ALUNO"))))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.mensagem").value("Simulado não encontrado: " + id));
         mockMvc.perform(comoAluno(get("/simulados/{id}", UUID.randomUUID())))
