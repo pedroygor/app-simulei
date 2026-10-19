@@ -20,7 +20,7 @@ export function LinhaDePlacar({ rotulo, placar }: { rotulo: ReactNode; placar: P
   );
 }
 
-function BarraDeAcerto({ percentual }: { percentual: number | null }) {
+export function BarraDeAcerto({ percentual }: { percentual: number | null }) {
   return (
     <div aria-hidden className="bg-muted h-1.5 overflow-hidden rounded-full">
       {/* width inline: é DADO (o percentual), não estilo — não existe classe

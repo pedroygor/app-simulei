@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { contarEmBranco, indiceInicial, lerIdDaTentativa, marcadasIniciais } from "./prova";
+import { contarEmBranco, indiceInicial, lerIdDaTentativa, marcadasIniciais, primeiraEmBranco } from "./prova";
 
 describe("lerIdDaTentativa", () => {
   it("aceita UUID e normaliza pra minúsculas", () => {
@@ -39,5 +39,17 @@ describe("marcadasIniciais", () => {
         [2, null],
       ]),
     );
+  });
+});
+
+describe("primeiraEmBranco", () => {
+  it("usa o que está marcado na tela, inclusive o que acabou de ser desmarcado", () => {
+    const questoes = [{ id: 1 }, { id: 2 }, { id: 3 }];
+    expect(primeiraEmBranco(questoes, new Map([[1, 10], [2, null], [3, 30]]))).toBe(1);
+    expect(primeiraEmBranco(questoes, new Map([[1, 10], [2, 20]]))).toBe(2);
+  });
+
+  it("tudo respondido não tem para onde ir", () => {
+    expect(primeiraEmBranco([{ id: 1 }], new Map([[1, 10]]))).toBeNull();
   });
 });
