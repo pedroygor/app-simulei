@@ -4,6 +4,7 @@ import br.com.simulados.api.questao.api.QuestaoMapper;
 import br.com.simulados.api.simulado.application.ConsultaDeResultado;
 import br.com.simulados.api.simulado.application.ConsultaDeTentativa;
 import br.com.simulados.api.simulado.application.ExecucaoDaProva;
+import br.com.simulados.api.simulado.application.ProvasEmAndamento;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -34,6 +35,7 @@ public class TentativaController {
     private final ExecucaoDaProva execucao;
     private final ConsultaDeTentativa consulta;
     private final ConsultaDeResultado resultados;
+    private final ProvasEmAndamento emAndamento;
     private final QuestaoMapper questaoMapper;
 
     /**
@@ -51,6 +53,16 @@ public class TentativaController {
         }
         var location = uriBuilder.path("/tentativas/{id}").buildAndExpand(corpo.id()).toUri();
         return ResponseEntity.created(location).body(corpo);
+    }
+
+    /**
+     * Até 3 provas abertas do aluno, as mais recentes primeiro (o "Continuar" do
+     * painel). Convive com /tentativas/{id}: o Spring escolhe o caminho mais
+     * específico, e o literal "em-andamento" vence a variável — nunca vira um id.
+     */
+    @GetMapping("/tentativas/em-andamento")
+    public ProvasEmAndamentoResponse emAndamento(@AuthenticationPrincipal Jwt jwt) {
+        return ProvasEmAndamentoResponse.de(emAndamento.doAluno(aluno(jwt)));
     }
 
     @GetMapping("/tentativas/{id}")

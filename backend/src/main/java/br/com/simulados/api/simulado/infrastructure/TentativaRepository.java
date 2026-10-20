@@ -1,8 +1,10 @@
 package br.com.simulados.api.simulado.infrastructure;
 
 import br.com.simulados.api.simulado.domain.LinhaDoResultado;
+import br.com.simulados.api.simulado.domain.ProvaEmAndamento;
 import br.com.simulados.api.simulado.domain.Tentativa;
 import jakarta.persistence.LockModeType;
+import org.springframework.data.domain.Limit;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Modifying;
@@ -114,4 +116,31 @@ public interface TentativaRepository extends JpaRepository<Tentativa, UUID> {
             WHERE status = 'EM_ANDAMENTO' AND prazo IS NOT NULL AND prazo <= :limite
             """, nativeQuery = true)
     int encerrarVencidas(@Param("limite") Instant limite);
+
+    /**
+     * As provas abertas do aluno, pro "Continuar" do painel (4d): da mais recente pra
+     * mais antiga, com quantas questões e quantas respondidas — um GROUP BY só.
+     *
+     * - Prazo já vencido fica de fora: o job (EncerramentoDeProvasVencidas) vai
+     *   entregá-la, e "Continuar" levaria a uma prova que acabou. `agora` vem do Clock
+     * - `Limit`: o Spring Data aplica o teto na própria query (LIMIT), sem paginação
+     *   nem corte em Java
+     * - Filtro de dono no WHERE: só as do aluno do token
+     */
+    @Query("""
+            SELECT new br.com.simulados.api.simulado.domain.ProvaEmAndamento(
+                       t.id, s.id, s.titulo, t.iniciadoEm, t.prazo, count(q), count(r.questaoId))
+            FROM Tentativa t
+            JOIN Simulado s ON s.id = t.simuladoId
+            JOIN s.questoes sq
+            JOIN Questao q ON q.id = sq.questaoId
+            LEFT JOIN Resposta r ON r.tentativaId = t.id AND r.questaoId = q.id
+            WHERE t.alunoId = :aluno
+              AND t.status = br.com.simulados.api.simulado.domain.StatusDaTentativa.EM_ANDAMENTO
+              AND (t.prazo IS NULL OR t.prazo > :agora)
+              AND q.disponivel = true
+            GROUP BY t.id, s.id, s.titulo, t.iniciadoEm, t.prazo
+            ORDER BY t.iniciadoEm DESC
+            """)
+    List<ProvaEmAndamento> emAndamentoDoAluno(@Param("aluno") UUID aluno, @Param("agora") Instant agora, Limit limite);
 }
