@@ -1,6 +1,8 @@
 package br.com.simulados.api.desempenho.api;
 
 import br.com.simulados.api.desempenho.application.ConsultaDeDesempenho;
+import br.com.simulados.api.desempenho.application.EvolucaoDoDesempenho;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -14,6 +16,7 @@ import java.util.UUID;
 public class DesempenhoController {
 
     private final ConsultaDeDesempenho consulta;
+    private final EvolucaoDoDesempenho evolucao;
 
     /**
      * O desempenho de quem está logado. Sem parâmetro nem corpo de propósito: o aluno
@@ -23,5 +26,19 @@ public class DesempenhoController {
     @GetMapping("/desempenho")
     public DesempenhoResponse meu(@AuthenticationPrincipal Jwt jwt) {
         return DesempenhoResponse.de(consulta.doAluno(UUID.fromString(jwt.getSubject())));
+    }
+
+    /**
+     * O aproveitamento por semana, geral e por área; com `?assunto=`, só daquele
+     * assunto. `?semanas=` de 1 a 52 (padrão 4).
+     */
+    @GetMapping("/desempenho/evolucao")
+    public EvolucaoResponse evolucao(@Valid FiltroDaEvolucao filtro, @AuthenticationPrincipal Jwt jwt) {
+        var aluno = UUID.fromString(jwt.getSubject());
+        if (filtro.assunto() == null) {
+            return EvolucaoResponse.de(evolucao.doAluno(aluno, filtro.semanasOuPadrao()));
+        }
+        var noAssunto = evolucao.doAlunoNoAssunto(aluno, filtro.semanasOuPadrao(), filtro.assunto());
+        return EvolucaoResponse.de(noAssunto.assunto(), noAssunto.semanas());
     }
 }

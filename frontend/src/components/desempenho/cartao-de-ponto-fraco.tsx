@@ -2,6 +2,7 @@ import { Dices } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import type { DesempenhoNoAssunto } from "@/lib/api/desempenho";
 import { BotaoDeTreino } from "./botao-de-treino";
+import { LinkDoAssunto } from "./link-do-assunto";
 
 /**
  * Um dos assuntos com menor acerto. "Perto do chute" vai em TEXTO (o ícone e a cor
@@ -13,7 +14,9 @@ export function CartaoDePontoFraco({ ponto }: { ponto: DesempenhoNoAssunto }) {
     <li className="grid gap-3 rounded-lg border p-4">
       <div className="grid gap-1">
         <div className="flex items-baseline justify-between gap-3">
-          <h3 className="min-w-0 font-medium break-words">{ponto.assunto.nome}</h3>
+          <h3 className="min-w-0 font-medium break-words">
+            <LinkDoAssunto assunto={ponto.assunto} />
+          </h3>
           <span className="font-heading shrink-0 text-lg font-bold tabular-nums">{aproveitamento.percentual}%</span>
         </div>
         <p className="text-muted-foreground text-sm tabular-nums">

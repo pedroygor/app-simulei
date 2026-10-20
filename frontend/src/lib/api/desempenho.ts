@@ -36,3 +36,30 @@ export type Desempenho = {
 export function buscarDesempenho(): Promise<Desempenho> {
   return requisitar<Desempenho>("/desempenho");
 }
+
+export type SemanaDaEvolucao = {
+  /** A segunda-feira da semana (fuso de Brasília), "2026-10-13". */
+  inicio: string;
+  /** percentual null = semana sem prova entregue: um buraco no gráfico, nunca 0%. */
+  geral: Aproveitamento;
+  porArea: DesempenhoNaArea[];
+};
+
+export type Evolucao = {
+  amostraMinima: number;
+  /** Só na evolução de um assunto: qual é (nome e matéria pra tela). */
+  assunto: { area: Area; materia: Rotulo; assunto: Rotulo } | null;
+  semanas: SemanaDaEvolucao[];
+};
+
+/**
+ * Toda semana da janela, em ordem, inclusive as vazias. Sem `semanas`, o backend usa
+ * 4; com `assunto` (slug), só aquele assunto — slug inexistente é 404.
+ */
+export function buscarEvolucao({ semanas, assunto }: { semanas?: number; assunto?: string } = {}): Promise<Evolucao> {
+  const parametros = new URLSearchParams();
+  if (semanas) parametros.set("semanas", String(semanas));
+  if (assunto) parametros.set("assunto", assunto);
+  const consulta = parametros.toString();
+  return requisitar<Evolucao>(consulta ? `/desempenho/evolucao?${consulta}` : "/desempenho/evolucao");
+}

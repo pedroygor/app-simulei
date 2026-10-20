@@ -1,5 +1,6 @@
 import { separarPorAmostra, type AreaComAssuntos } from "@/lib/desempenho/desempenho";
 import { AssuntosSemAmostra } from "./assuntos-sem-amostra";
+import { LinkDoAssunto } from "./link-do-assunto";
 import { LinhaDeAproveitamento } from "./linha-de-aproveitamento";
 
 /**
@@ -33,7 +34,7 @@ export function AreaDoDesempenho({ area, amostraMinima }: { area: AreaComAssunto
               key={a.assunto.slug}
               rotulo={
                 <>
-                  {a.assunto.nome}
+                  <LinkDoAssunto assunto={a.assunto} />
                   <span className="text-muted-foreground"> · {a.materia.nome}</span>
                 </>
               }

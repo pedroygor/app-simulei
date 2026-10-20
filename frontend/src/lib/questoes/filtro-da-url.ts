@@ -34,7 +34,7 @@ function lerOpcao<T extends string>(
 const SLUG = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 const TAMANHO_MAXIMO_DO_SLUG = 60;
 
-function lerSlug(valor: string | string[] | undefined): string | undefined {
+export function lerSlug(valor: string | string[] | undefined): string | undefined {
   const texto = primeiro(valor)?.trim();
   if (!texto || texto.length > TAMANHO_MAXIMO_DO_SLUG || !SLUG.test(texto)) return undefined;
   return texto;

@@ -37,8 +37,8 @@ public record BuscarQuestoesFiltro(
         @Size(max = 60) @Pattern(regexp = SLUG, message = SLUG_INVALIDO) String assunto
 ) {
 
-    static final String SLUG = "[a-z0-9]+(-[a-z0-9]+)*";
-    static final String SLUG_INVALIDO = "deve ser um identificador da taxonomia (ex.: probabilidade)";
+    public static final String SLUG = "[a-z0-9]+(-[a-z0-9]+)*";
+    public static final String SLUG_INVALIDO = "deve ser um identificador da taxonomia (ex.: probabilidade)";
 
     // Tolera o usuário mandando o intervalo invertido (?anoInicial=2023&anoFinal=2010)
     // em vez de devolver lista vazia sem explicação.
