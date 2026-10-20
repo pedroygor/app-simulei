@@ -13,6 +13,7 @@ const ap = (respondidas: number, acertos: number): Aproveitamento => ({
 
 const evolucao: Evolucao = {
   amostraMinima: 5,
+  assunto: null,
   semanas: [
     { inicio: "2026-09-28", geral: ap(0, 0), porArea: [] },
     {

@@ -1,5 +1,6 @@
 import type { DesempenhoNoAssunto } from "@/lib/api/desempenho";
 import { faltamRespostas, placarCurto } from "@/lib/desempenho/desempenho";
+import { LinkDoAssunto } from "./link-do-assunto";
 
 /**
  * Os assuntos que ainda não dá pra medir, recolhidos: com 2 respostas um chute
@@ -20,7 +21,7 @@ export function AssuntosSemAmostra({ assuntos, amostraMinima }: { assuntos: Dese
         {assuntos.map((a) => (
           <li key={a.assunto.slug} className="flex items-baseline justify-between gap-3">
             <span className="min-w-0 break-words">
-              {a.assunto.nome}
+              <LinkDoAssunto assunto={a.assunto} />
               <span className="text-muted-foreground"> · faltam {faltamRespostas(a.aproveitamento, amostraMinima)}</span>
             </span>
             <span className="text-muted-foreground shrink-0 tabular-nums">{placarCurto(a.aproveitamento)}</span>
