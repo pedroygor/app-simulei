@@ -338,6 +338,21 @@ class TentativaControllerTest {
                 .andExpect(status().isUnauthorized());
     }
 
+    @Test
+    void emAndamentoNaoViraIdEDevolveAProvaAbertaSemAcertos() throws Exception {
+        // "em-andamento" no lugar do {id} seria 400 (não é UUID): a rota literal tem que vencer
+        var id = iniciar();
+
+        mockMvc.perform(como(aluno, get("/tentativas/em-andamento")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.agora").isString())
+                .andExpect(jsonPath("$.provas.length()").value(1))
+                .andExpect(jsonPath("$.provas[0].tentativaId").value(id))
+                .andExpect(jsonPath("$.provas[0].respondidas").value(0))
+                .andExpect(jsonPath("$.provas[0].acertos").doesNotExist());
+        mockMvc.perform(get("/tentativas/em-andamento")).andExpect(status().isUnauthorized());
+    }
+
     // --- apoio ---
 
     private String iniciar() throws Exception {
