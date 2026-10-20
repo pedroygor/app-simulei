@@ -5,7 +5,10 @@
 !.env.example
 
 ### Dado importado da enem.dev (não é código; ~116 arquivos, 6MB) ###
-storage/
+# Ancorado na raiz com a "/" da frente: sem ela, `storage/` casava com QUALQUER
+# pasta storage — inclusive o pacote Java questao/infrastructure/storage/, e o
+# ImagemStorageLocal nunca foi pro git (a main não subia num clone novo)
+/storage/
 
 ### Rede de segurança: build do Maven só deve existir em backend/, mas se
 ### alguém rodar da raiz por engano, não vai parar num commit ###
