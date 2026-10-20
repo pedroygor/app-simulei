@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.query.Param;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -61,4 +62,33 @@ public interface DesempenhoRepository extends Repository<Tentativa, UUID> {
               AND t.status = br.com.simulados.api.simulado.domain.StatusDaTentativa.FINALIZADA
             """)
     long provasEntregues(@Param("aluno") UUID aluno);
+
+    /**
+     * A evolução por semana (4c): o mesmo recorte de linhasDoAluno (só entregues, só
+     * `disponivel`, classificação de hoje), agrupado por SEMANA e área, a partir de
+     * `desde`. Um SELECT só pra janela inteira.
+     *
+     * SQL nativo porque o JPQL não tem date_trunc com fuso. A semana é a de
+     * Brasília, segunda a domingo: `finalizado_em` é TIMESTAMPTZ, e sem o AT TIME
+     * ZONE uma prova entregue domingo às 22h (já segunda em UTC) cairia na semana
+     * seguinte. A prova conta na semana em que foi ENTREGUE.
+     */
+    @Query(value = """
+            SELECT CAST(date_trunc('week', t.finalizado_em AT TIME ZONE 'America/Sao_Paulo') AS date) AS semana,
+                   q.area AS area,
+                   count(*) AS questoes,
+                   count(r.questao_id) AS respondidas,
+                   count(*) FILTER (WHERE r.correta) AS acertos
+            FROM tentativas t
+            JOIN simulado_questoes sq ON sq.simulado_id = t.simulado_id
+            JOIN questoes q ON q.id = sq.questao_id
+            LEFT JOIN respostas r ON r.tentativa_id = t.id AND r.questao_id = q.id
+            WHERE t.aluno_id = :aluno
+              AND t.status = 'FINALIZADA'
+              AND t.finalizado_em >= :desde
+              AND q.disponivel
+            GROUP BY 1, 2
+            ORDER BY 1, 2
+            """, nativeQuery = true)
+    List<LinhaDaSemana> semanasDoAluno(@Param("aluno") UUID aluno, @Param("desde") Instant desde);
 }

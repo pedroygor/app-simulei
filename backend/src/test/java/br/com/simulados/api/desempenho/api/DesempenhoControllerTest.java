@@ -13,6 +13,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -64,5 +66,32 @@ class DesempenhoControllerTest {
                 .andExpect(jsonPath("$.geral.pertoDoChute").value(false))
                 .andExpect(jsonPath("$.porAssunto").isEmpty())
                 .andExpect(jsonPath("$.pontosFracos").isEmpty());
+    }
+
+    @Test
+    void evolucaoTemPadraoDeQuatroSemanasEValidaOLimite() throws Exception {
+        var usuario = new Usuario();
+        usuario.setNome("Aluna");
+        usuario.setEmail("evolucao@exemplo.com");
+        usuario.setSenhaHash("hash-irrelevante-aqui");
+        usuario.setRole(Role.ALUNO);
+        var id = usuarioRepository.save(usuario).getId();
+        var token = jwt().jwt(j -> j.subject(id.toString())).authorities(new SimpleGrantedAuthority("ROLE_ALUNO"));
+
+        mockMvc.perform(get("/desempenho/evolucao").with(token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.amostraMinima").value(5))
+                .andExpect(jsonPath("$.semanas.length()").value(4))
+                .andExpect(jsonPath("$.semanas[0].inicio").isString())
+                .andExpect(jsonPath("$.semanas[0].geral.percentual").value(nullValue()))
+                .andExpect(jsonPath("$.semanas[0].porArea").isEmpty());
+        mockMvc.perform(get("/desempenho/evolucao").param("semanas", "12").with(token))
+                .andExpect(jsonPath("$.semanas.length()").value(12));
+        for (var invalido : List.of("0", "53")) {
+            mockMvc.perform(get("/desempenho/evolucao").param("semanas", invalido).with(token))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.campos[0].campo").value("semanas"));
+        }
+        mockMvc.perform(get("/desempenho/evolucao")).andExpect(status().isUnauthorized());
     }
 }
