@@ -68,3 +68,21 @@ export function desmarcar(tentativaId: string, questaoId: number): Promise<void>
 export function finalizarTentativa(tentativaId: string): Promise<Tentativa> {
   return requisitar<Tentativa>(`/tentativas/${tentativaId}/finalizar`, { method: "POST" });
 }
+
+/** Espelha o ProvasEmAndamentoResponse: até 3 provas abertas, as mais recentes primeiro. */
+export type ProvaAberta = {
+  tentativaId: string;
+  simuladoId: string;
+  titulo: string;
+  iniciadoEm: string;
+  /** null = sem cronômetro. */
+  prazo: string | null;
+  questoes: number;
+  respondidas: number;
+};
+
+export type ProvasAbertas = { agora: string; provas: ProvaAberta[] };
+
+export function buscarProvasEmAndamento(): Promise<ProvasAbertas> {
+  return requisitar<ProvasAbertas>("/tentativas/em-andamento");
+}

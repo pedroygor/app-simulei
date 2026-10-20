@@ -1,16 +1,15 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { AlternadorDeTema } from "@/components/alternador-de-tema";
 import { RotaProtegida } from "@/components/auth/rota-protegida";
+import { PainelDoAluno } from "@/components/painel/painel-do-aluno";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useSessao } from "@/providers/auth-provider";
 
 /**
- * Área logada. Por enquanto confirma que o ciclo de sessão funciona de ponta a
- * ponta — vai virar a home do produto quando as telas de simulado existirem.
+ * A home do aluno logado: o painel (4d). A saudação usa só o primeiro nome — o
+ * completo não cabe ao lado dos botões a 360px.
  */
 export default function PaginaInicial() {
   return (
@@ -32,43 +31,17 @@ function ConteudoDaHome() {
   return (
     <main className="mx-auto w-full max-w-2xl px-4 py-8">
       <header className="mb-8 flex items-center justify-between gap-4">
-        <h1 className="font-heading text-2xl font-bold tracking-tight">Simulei</h1>
-        <div className="flex items-center gap-2">
+        <h1 className="font-heading min-w-0 truncate text-2xl font-bold tracking-tight">
+          Olá, {usuario?.nome.split(" ")[0]}
+        </h1>
+        <div className="flex shrink-0 items-center gap-2">
           <AlternadorDeTema />
           <Button variant="outline" onClick={aoSair}>
             Sair
           </Button>
         </div>
       </header>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="font-heading">Olá, {usuario?.nome}</CardTitle>
-          <CardDescription>Sua sessão está ativa</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <dl className="grid gap-2 text-sm">
-            <div className="flex justify-between gap-4">
-              <dt className="text-muted-foreground">E-mail</dt>
-              <dd>{usuario?.email}</dd>
-            </div>
-          </dl>
-          <div className="mt-6 grid gap-2">
-            <Button asChild size="xl" className="w-full">
-              <Link href="/simulados/novo">Montar prova</Link>
-            </Button>
-            <Button asChild variant="outline" className="w-full">
-              <Link href="/desempenho">Meu desempenho</Link>
-            </Button>
-            <Button asChild variant="outline" className="w-full">
-              <Link href="/provas">Minhas provas</Link>
-            </Button>
-            <Button asChild variant="outline" className="w-full">
-              <Link href="/questoes">Explorar questões</Link>
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+      <PainelDoAluno />
     </main>
   );
 }
