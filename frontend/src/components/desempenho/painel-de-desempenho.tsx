@@ -8,6 +8,7 @@ import { buscarDesempenho } from "@/lib/api/desempenho";
 import { agruparPorArea } from "@/lib/desempenho/desempenho";
 import { AreaDoDesempenho } from "./area-do-desempenho";
 import { PontosFracos } from "./pontos-fracos";
+import { SuaEvolucao } from "./sua-evolucao";
 import { ResumoDoDesempenho } from "./resumo-do-desempenho";
 
 /**
@@ -36,6 +37,7 @@ export function PainelDeDesempenho() {
     <div className="grid gap-8 pb-8">
       <ResumoDoDesempenho desempenho={desempenho} />
       <PontosFracos desempenho={desempenho} />
+      <SuaEvolucao />
       {agruparPorArea(desempenho).map((area) => (
         <AreaDoDesempenho key={area.area} area={area} amostraMinima={desempenho.amostraMinima} />
       ))}

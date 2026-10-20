@@ -36,3 +36,18 @@ export type Desempenho = {
 export function buscarDesempenho(): Promise<Desempenho> {
   return requisitar<Desempenho>("/desempenho");
 }
+
+export type SemanaDaEvolucao = {
+  /** A segunda-feira da semana (fuso de Brasília), "2026-10-13". */
+  inicio: string;
+  /** percentual null = semana sem prova entregue: um buraco no gráfico, nunca 0%. */
+  geral: Aproveitamento;
+  porArea: DesempenhoNaArea[];
+};
+
+export type Evolucao = { amostraMinima: number; semanas: SemanaDaEvolucao[] };
+
+/** Toda semana da janela, em ordem, inclusive as vazias. Sem `semanas`, o backend usa 4. */
+export function buscarEvolucao(semanas?: number): Promise<Evolucao> {
+  return requisitar<Evolucao>(semanas ? `/desempenho/evolucao?semanas=${semanas}` : "/desempenho/evolucao");
+}
