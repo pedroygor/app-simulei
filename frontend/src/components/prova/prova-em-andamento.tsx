@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ErroDaApi } from "@/lib/api/erros";
 import { desmarcar, finalizarTentativa, responder, type Prova } from "@/lib/api/tentativas";
 import { FilaDeSalvamento } from "@/lib/prova/fila-de-salvamento";
-import { contarEmBranco, indiceInicial, marcadasIniciais } from "@/lib/prova/prova";
+import { contarEmBranco, indiceInicial, marcadasIniciais, primeiraEmBranco } from "@/lib/prova/prova";
 import { AvisoDeRetirada } from "./aviso-de-retirada";
 import { ConfirmarEntrega } from "./confirmar-entrega";
 import { CronometroDaProva } from "./cronometro-da-prova";
@@ -201,6 +201,10 @@ export function ProvaEmAndamento({
         entregando={entrega.isPending}
         erro={entrega.error && !(entrega.error instanceof ErroDaApi && entrega.error.status === 422) ? entrega.error.message : null}
         aoConfirmar={() => entrega.mutate()}
+        aoResponderEmBranco={() => {
+          const destino = primeiraEmBranco(prova.questoes, marcadas);
+          if (destino !== null) irPara(destino);
+        }}
       />
     </div>
   );

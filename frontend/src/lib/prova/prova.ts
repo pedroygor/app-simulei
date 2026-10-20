@@ -29,3 +29,15 @@ export function contarEmBranco(questoes: Pick<QuestaoDaProva, "id">[], marcadas:
 export function marcadasIniciais(questoes: Pick<QuestaoDaProva, "id" | "marcada">[]): Map<number, number | null> {
   return new Map(questoes.map((q) => [q.id, q.marcada]));
 }
+
+/**
+ * Índice da primeira questão em branco AGORA na tela (não no servidor, como o
+ * indiceInicial), pro "Responder as em branco" da entrega. null = nenhuma.
+ */
+export function primeiraEmBranco(
+  questoes: Pick<QuestaoDaProva, "id">[],
+  marcadas: ReadonlyMap<number, number | null>,
+): number | null {
+  const indice = questoes.findIndex((q) => (marcadas.get(q.id) ?? null) === null);
+  return indice === -1 ? null : indice;
+}
