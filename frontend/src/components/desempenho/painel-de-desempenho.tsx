@@ -7,11 +7,12 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { buscarDesempenho } from "@/lib/api/desempenho";
 import { agruparPorArea } from "@/lib/desempenho/desempenho";
 import { AreaDoDesempenho } from "./area-do-desempenho";
+import { PontosFracos } from "./pontos-fracos";
 import { ResumoDoDesempenho } from "./resumo-do-desempenho";
 
 /**
- * Onde o aluno acerta e erra, somando todas as provas entregues (4a). Ranking de
- * pontos fracos e "treinar este assunto" chegam na 4b.
+ * Onde o aluno acerta e erra, somando todas as provas entregues (4a), e por onde
+ * começar a treinar (4b): os assuntos com menor acerto vêm logo depois do geral.
  *
  * Sem staleTime: entregar uma prova muda estes números, e voltar pra cá deve
  * mostrar isso.
@@ -34,6 +35,7 @@ export function PainelDeDesempenho() {
   return (
     <div className="grid gap-8 pb-8">
       <ResumoDoDesempenho desempenho={desempenho} />
+      <PontosFracos desempenho={desempenho} />
       {agruparPorArea(desempenho).map((area) => (
         <AreaDoDesempenho key={area.area} area={area} amostraMinima={desempenho.amostraMinima} />
       ))}

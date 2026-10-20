@@ -8,6 +8,7 @@ const ap = (respondidas: number): Aproveitamento => ({
   emBranco: 0,
   percentual: respondidas === 0 ? null : 0,
   amostraSuficiente: respondidas >= 5,
+  pertoDoChute: false,
 });
 const rotulo = (slug: string) => ({ slug, nome: slug });
 

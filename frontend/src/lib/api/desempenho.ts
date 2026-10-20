@@ -11,6 +11,8 @@ export type Aproveitamento = {
   /** acertos / respondidas; null = nenhuma resposta (não 0%). */
   percentual: number | null;
   amostraSuficiente: boolean;
+  /** Acerto até 30% com amostra suficiente: adivinhando, não sabendo (o chute dá 20%). */
+  pertoDoChute: boolean;
 };
 
 export type DesempenhoNaArea = { area: Area; nome: string; aproveitamento: Aproveitamento };
@@ -26,6 +28,8 @@ export type Desempenho = {
   porArea: DesempenhoNaArea[];
   /** Na ordem da taxonomia. */
   porAssunto: DesempenhoNoAssunto[];
+  /** Até 3 assuntos MEDIDOS, do menor acerto pro maior. */
+  pontosFracos: DesempenhoNoAssunto[];
 };
 
 /** O desempenho de quem está logado: o backend tira o aluno do token. */
