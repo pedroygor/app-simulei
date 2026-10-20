@@ -2,6 +2,7 @@ package br.com.simulados.api.desempenho.application;
 
 import br.com.simulados.api.desempenho.domain.Aproveitamento;
 import br.com.simulados.api.desempenho.domain.AproveitamentoNoAssunto;
+import br.com.simulados.api.desempenho.domain.PontosFracos;
 import br.com.simulados.api.desempenho.infrastructure.DesempenhoRepository;
 import br.com.simulados.api.questao.domain.Area;
 import br.com.simulados.api.simulado.domain.LinhaDoResultado;
@@ -17,7 +18,7 @@ import java.util.stream.Collectors;
 
 /**
  * O desempenho do aluno somando todas as provas entregues (4a): geral, por área e
- * por assunto. Ranking de pontos fracos e "treinar este assunto" são da 4b.
+ * por assunto, e os assuntos com menor acerto (4b).
  */
 @Service
 @RequiredArgsConstructor
@@ -29,12 +30,14 @@ public class ConsultaDeDesempenho {
      * @param provas     quantas provas entregues entraram na conta
      * @param porArea    na ordem do enum (a do ENEM), só as áreas com alguma questão
      * @param porAssunto na ordem da taxonomia, só as questões classificadas
+     * @param pontosFracos até 3 assuntos medidos, do menor acerto pro maior
      */
     public record Desempenho(
             long provas,
             Aproveitamento geral,
             Map<Area, Aproveitamento> porArea,
-            List<AproveitamentoNoAssunto> porAssunto
+            List<AproveitamentoNoAssunto> porAssunto,
+            List<AproveitamentoNoAssunto> pontosFracos
     ) {
     }
 
@@ -63,6 +66,8 @@ public class ConsultaDeDesempenho {
                         l.assuntoSlug(), l.assuntoNome(), Aproveitamento.de(l.placar())))
                 .toList();
 
-        return new Desempenho(repository.provasEntregues(aluno), geral, porArea, porAssunto);
+        // Também em Java, sobre as mesmas linhas: o ranking não custa outra consulta
+        return new Desempenho(repository.provasEntregues(aluno), geral, porArea, porAssunto,
+                PontosFracos.de(porAssunto));
     }
 }

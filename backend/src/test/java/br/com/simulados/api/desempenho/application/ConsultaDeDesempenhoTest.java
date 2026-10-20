@@ -106,6 +106,12 @@ class ConsultaDeDesempenhoTest {
     }
 
     @Test
+    void comPoucasRespostasNenhumAssuntoViraPontoFraco() {
+        // 1 resposta em probabilidade e 1 em ecologia: abaixo da amostra mínima de 5
+        assertThat(consulta.doAluno(aluna).pontosFracos()).isEmpty();
+    }
+
+    @Test
     void questaoSemAssuntoNaoViraLinhaDeAssunto() {
         assertThat(consulta.doAluno(aluna).porAssunto())
                 .extracting(AproveitamentoNoAssunto::assuntoSlug, AproveitamentoNoAssunto::aproveitamento)
@@ -122,6 +128,7 @@ class ConsultaDeDesempenhoTest {
         assertThat(desempenho.geral().percentual()).isNull();
         assertThat(desempenho.porArea()).isEmpty();
         assertThat(desempenho.porAssunto()).isEmpty();
+        assertThat(desempenho.pontosFracos()).isEmpty();
     }
 
     @Test
