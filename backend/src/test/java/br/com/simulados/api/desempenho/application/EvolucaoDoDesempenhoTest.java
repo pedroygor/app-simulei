@@ -6,6 +6,7 @@ import br.com.simulados.api.desempenho.domain.SemanaDeDesempenho;
 import br.com.simulados.api.questao.domain.Alternativa;
 import br.com.simulados.api.questao.domain.Area;
 import br.com.simulados.api.questao.domain.Assunto;
+import br.com.simulados.api.questao.domain.AssuntoNaoEncontradoException;
 import br.com.simulados.api.questao.domain.ConfiancaDaClassificacao;
 import br.com.simulados.api.questao.domain.OrigemDaClassificacao;
 import br.com.simulados.api.questao.domain.Questao;
@@ -40,6 +41,7 @@ import java.util.stream.Collectors;
 
 import static br.com.simulados.api.desempenho.application.EvolucaoDoDesempenho.FUSO;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * Banco real: date_trunc com AT TIME ZONE é o que se testa. O relógio é o de
@@ -152,6 +154,36 @@ class EvolucaoDoDesempenhoTest {
         evolucao.doAluno(aluna, 52);
 
         assertThat(statistics.getPrepareStatementCount()).isEqualTo(1);
+    }
+
+    @Test
+    void evolucaoDeUmAssuntoContaSoAsQuestoesDele() {
+        // Probabilidade: 2 certas, 1 errada, 1 em branco; a de ecologia não pode entrar
+        entregar(estaSemana, "A", "A", "B", null, "B");
+
+        var noAssunto = evolucao.doAlunoNoAssunto(aluna, 2, "probabilidade");
+
+        assertThat(noAssunto.assunto().getNome()).isEqualTo("Probabilidade");
+        assertThat(noAssunto.assunto().getMateria().getNome()).isEqualTo("Matemática");
+        assertThat(noAssunto.semanas().get(1).geral()).isEqualTo(new Aproveitamento(3, 2, 1));
+        assertThat(noAssunto.semanas().get(1).porArea()).containsOnlyKeys(Area.MATEMATICA);
+    }
+
+    @Test
+    void assuntoInexistenteEhNaoEncontradoNaoEvolucaoVazia() {
+        assertThatThrownBy(() -> evolucao.doAlunoNoAssunto(aluna, 4, "assunto-que-nao-existe"))
+                .isInstanceOf(AssuntoNaoEncontradoException.class);
+    }
+
+    @Test
+    void evolucaoDeUmAssuntoCustaDuasQueries() {
+        entregar(estaSemana, "A", "A", "A", "A", "A");
+        var statistics = entityManager.unwrap(Session.class).getSessionFactory().getStatistics();
+        statistics.clear();
+
+        evolucao.doAlunoNoAssunto(aluna, 12, "probabilidade");
+
+        assertThat(statistics.getPrepareStatementCount()).isEqualTo(2);
     }
 
     // --- apoio ---

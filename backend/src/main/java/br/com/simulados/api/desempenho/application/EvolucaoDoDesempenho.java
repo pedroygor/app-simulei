@@ -5,6 +5,9 @@ import br.com.simulados.api.desempenho.domain.SemanaDeDesempenho;
 import br.com.simulados.api.desempenho.infrastructure.DesempenhoRepository;
 import br.com.simulados.api.desempenho.infrastructure.LinhaDaSemana;
 import br.com.simulados.api.questao.domain.Area;
+import br.com.simulados.api.questao.domain.Assunto;
+import br.com.simulados.api.questao.domain.AssuntoNaoEncontradoException;
+import br.com.simulados.api.questao.infrastructure.AssuntoRepository;
 import br.com.simulados.api.simulado.domain.Placar;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -41,6 +44,7 @@ public class EvolucaoDoDesempenho {
     public static final int SEMANAS_PADRAO = 4;
 
     private final DesempenhoRepository repository;
+    private final AssuntoRepository assuntoRepository;
     private final Clock clock;
 
     /**
@@ -50,9 +54,29 @@ public class EvolucaoDoDesempenho {
      */
     @Transactional(readOnly = true)
     public List<SemanaDeDesempenho> doAluno(UUID aluno, int semanas) {
+        return semanas(aluno, semanas, null);
+    }
+
+    /**
+     * A evolução de UM assunto (4c): "treinei, melhorei?". 2 queries: o assunto pelo
+     * slug (com a matéria, pra tela) e a mesma agregação, filtrada. Slug inexistente é
+     * 404, não evolução vazia — vazia diria "você nunca respondeu", quando o assunto
+     * nem existe.
+     */
+    @Transactional(readOnly = true)
+    public EvolucaoNoAssunto doAlunoNoAssunto(UUID aluno, int semanas, String slug) {
+        var assunto = assuntoRepository.buscarPorSlugComMateria(slug)
+                .orElseThrow(() -> new AssuntoNaoEncontradoException(slug));
+        return new EvolucaoNoAssunto(assunto, semanas(aluno, semanas, assunto.getId()));
+    }
+
+    public record EvolucaoNoAssunto(Assunto assunto, List<SemanaDeDesempenho> semanas) {
+    }
+
+    private List<SemanaDeDesempenho> semanas(UUID aluno, int semanas, Integer assunto) {
         var estaSemana = LocalDate.now(clock.withZone(FUSO)).with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
         var primeira = estaSemana.minusWeeks(semanas - 1L);
-        var linhas = repository.semanasDoAluno(aluno, primeira.atStartOfDay(FUSO).toInstant());
+        var linhas = repository.semanasDoAluno(aluno, primeira.atStartOfDay(FUSO).toInstant(), assunto);
 
         // Semana → área → aproveitamento; TreeMap/EnumMap mantêm as duas ordens
         Map<LocalDate, Map<Area, Aproveitamento>> porSemana = new TreeMap<>();

@@ -92,6 +92,20 @@ class DesempenhoControllerTest {
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.campos[0].campo").value("semanas"));
         }
+        mockMvc.perform(get("/desempenho/evolucao").param("assunto", "probabilidade").with(token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.assunto.assunto.nome").value("Probabilidade"))
+                .andExpect(jsonPath("$.assunto.materia.slug").value("matematica"))
+                .andExpect(jsonPath("$.assunto.area").value("MATEMATICA"))
+                .andExpect(jsonPath("$.semanas.length()").value(4));
+        mockMvc.perform(get("/desempenho/evolucao").with(token))
+                .andExpect(jsonPath("$.assunto").value(nullValue()));
+        mockMvc.perform(get("/desempenho/evolucao").param("assunto", "Nao Valido!").with(token))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.campos[0].campo").value("assunto"));
+        mockMvc.perform(get("/desempenho/evolucao").param("assunto", "nao-existe").with(token))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.mensagem").value("Assunto não encontrado: nao-existe"));
         mockMvc.perform(get("/desempenho/evolucao")).andExpect(status().isUnauthorized());
     }
 }

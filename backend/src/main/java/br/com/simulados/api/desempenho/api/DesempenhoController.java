@@ -28,9 +28,17 @@ public class DesempenhoController {
         return DesempenhoResponse.de(consulta.doAluno(UUID.fromString(jwt.getSubject())));
     }
 
-    /** O aproveitamento por semana, geral e por área. `?semanas=` de 1 a 52 (padrão 4). */
+    /**
+     * O aproveitamento por semana, geral e por área; com `?assunto=`, só daquele
+     * assunto. `?semanas=` de 1 a 52 (padrão 4).
+     */
     @GetMapping("/desempenho/evolucao")
     public EvolucaoResponse evolucao(@Valid FiltroDaEvolucao filtro, @AuthenticationPrincipal Jwt jwt) {
-        return EvolucaoResponse.de(evolucao.doAluno(UUID.fromString(jwt.getSubject()), filtro.semanasOuPadrao()));
+        var aluno = UUID.fromString(jwt.getSubject());
+        if (filtro.assunto() == null) {
+            return EvolucaoResponse.de(evolucao.doAluno(aluno, filtro.semanasOuPadrao()));
+        }
+        var noAssunto = evolucao.doAlunoNoAssunto(aluno, filtro.semanasOuPadrao(), filtro.assunto());
+        return EvolucaoResponse.de(noAssunto.assunto(), noAssunto.semanas());
     }
 }

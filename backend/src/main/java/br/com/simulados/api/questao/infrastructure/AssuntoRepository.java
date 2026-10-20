@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface AssuntoRepository extends JpaRepository<Assunto, Integer> {
 
@@ -51,4 +52,8 @@ public interface AssuntoRepository extends JpaRepository<Assunto, Integer> {
      */
     @Query("SELECT a FROM Assunto a JOIN FETCH a.materia m ORDER BY m.ordem, a.ordem")
     List<Assunto> buscarTodosComMateria();
+
+    /** Um assunto pelo slug, com a matéria no mesmo SELECT (a tela mostra "Matéria · Assunto"). */
+    @Query("SELECT a FROM Assunto a JOIN FETCH a.materia WHERE a.slug = :slug")
+    Optional<Assunto> buscarPorSlugComMateria(@Param("slug") String slug);
 }

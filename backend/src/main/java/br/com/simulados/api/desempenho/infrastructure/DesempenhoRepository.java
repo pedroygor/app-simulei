@@ -72,6 +72,10 @@ public interface DesempenhoRepository extends Repository<Tentativa, UUID> {
      * Brasília, segunda a domingo: `finalizado_em` é TIMESTAMPTZ, e sem o AT TIME
      * ZONE uma prova entregue domingo às 22h (já segunda em UTC) cairia na semana
      * seguinte. A prova conta na semana em que foi ENTREGUE.
+     *
+     * `assunto` (id) opcional: com ele, a evolução de UM assunto. O CAST dá tipo ao
+     * parâmetro nulo — sem ele o driver manda null sem tipo e o Postgres recusa
+     * (a mesma armadilha do lower(:param) da busca, na Etapa 2).
      */
     @Query(value = """
             SELECT CAST(date_trunc('week', t.finalizado_em AT TIME ZONE 'America/Sao_Paulo') AS date) AS semana,
@@ -87,8 +91,10 @@ public interface DesempenhoRepository extends Repository<Tentativa, UUID> {
               AND t.status = 'FINALIZADA'
               AND t.finalizado_em >= :desde
               AND q.disponivel
+              AND (CAST(:assunto AS integer) IS NULL OR q.assunto_id = :assunto)
             GROUP BY 1, 2
             ORDER BY 1, 2
             """, nativeQuery = true)
-    List<LinhaDaSemana> semanasDoAluno(@Param("aluno") UUID aluno, @Param("desde") Instant desde);
+    List<LinhaDaSemana> semanasDoAluno(@Param("aluno") UUID aluno, @Param("desde") Instant desde,
+                                       @Param("assunto") Integer assunto);
 }
