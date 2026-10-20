@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * As duas consultas da montagem de prova (3a). Cada escolha do pedido chega
@@ -65,13 +66,24 @@ public class SorteadorDeQuestoes {
      * montado por concatenação — sem injeção, e com um plano só pra qualquer
      * tamanho de pedido.
      *
+     * **Inéditas primeiro** (4b): dentro do grupo, a numeração é `ORDER BY ja_vista,
+     * random()` — saem antes, em ordem aleatória, as questões que o aluno nunca viu;
+     * só se faltarem entram as já vistas, também ao acaso. Sem isto, quem treina o
+     * mesmo assunto de novo pode receber as mesmas questões e "melhorar" por ter
+     * decorado a resposta. "Vista" = esteve numa prova que o aluno INICIOU (há
+     * tentativa), respondida ou não: em branco ele também leu. Prova montada e
+     * nunca começada não conta. O EXISTS usa os índices `tentativas (aluno_id)` e
+     * `simulado_questoes (questao_id)`; continua sendo uma query só.
+     *
      * Volta os ids agrupados pela ordem das escolhas e, dentro do grupo, na ordem
      * do sorteio: a prova sai "Natureza, depois Matemática", como foi pedida.
      *
+     * @param aluno          quem vai fazer a prova (o dono do simulado)
      * @param grupoDoAssunto assunto → nº do grupo (0..n-1), o da escolha que o contém
      * @param quantidades    cota de cada grupo, já calculada pelo DistribuidorDeQuestoes
      */
-    public List<Long> sortear(Map<Integer, Integer> grupoDoAssunto, List<Integer> quantidades, List<Integer> anos) {
+    public List<Long> sortear(UUID aluno, Map<Integer, Integer> grupoDoAssunto, List<Integer> quantidades,
+                              List<Integer> anos) {
         var assuntos = new ArrayList<Integer>(grupoDoAssunto.keySet());
         var grupos = assuntos.stream().map(grupoDoAssunto::get).toList();
 
@@ -86,7 +98,15 @@ public class SorteadorDeQuestoes {
                         ),
                         candidatas AS (
                             SELECT q.id, p.grupo,
-                                   row_number() OVER (PARTITION BY p.grupo ORDER BY random()) AS posicao
+                                   row_number() OVER (
+                                       PARTITION BY p.grupo
+                                       -- false (inédita) vem antes de true (já vista)
+                                       ORDER BY EXISTS (
+                                           SELECT 1 FROM tentativas t
+                                           JOIN simulado_questoes sq ON sq.simulado_id = t.simulado_id
+                                           WHERE t.aluno_id = :aluno AND sq.questao_id = q.id
+                                       ), random()
+                                   ) AS posicao
                             FROM questoes q
                             JOIN pedido p ON p.assunto_id = q.assunto_id
                             WHERE q.disponivel
@@ -98,6 +118,7 @@ public class SorteadorDeQuestoes {
                         WHERE c.posicao <= cota.quantidade
                         ORDER BY c.grupo, c.posicao
                         """)
+                .setParameter("aluno", aluno)
                 .setParameter("assuntos", assuntos.toArray(Integer[]::new))
                 .setParameter("grupos", grupos.toArray(Integer[]::new))
                 .setParameter("quantidades", quantidades.toArray(Integer[]::new))

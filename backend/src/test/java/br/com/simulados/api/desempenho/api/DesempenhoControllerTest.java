@@ -61,6 +61,8 @@ class DesempenhoControllerTest {
                 .andExpect(jsonPath("$.geral.percentual").value(nullValue()))
                 .andExpect(jsonPath("$.geral.amostraSuficiente").value(false))
                 .andExpect(jsonPath("$.porArea").isEmpty())
-                .andExpect(jsonPath("$.porAssunto").isEmpty());
+                .andExpect(jsonPath("$.geral.pertoDoChute").value(false))
+                .andExpect(jsonPath("$.porAssunto").isEmpty())
+                .andExpect(jsonPath("$.pontosFracos").isEmpty());
     }
 }

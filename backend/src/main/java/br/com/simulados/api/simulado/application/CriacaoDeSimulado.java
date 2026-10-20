@@ -82,7 +82,7 @@ public class CriacaoDeSimulado {
                 grupoDoAssunto.put(assunto, g);
             }
         }
-        var questoes = sorteador.sortear(grupoDoAssunto, quantidades, anos);
+        var questoes = sorteador.sortear(dono, grupoDoAssunto, quantidades, anos);
 
         var simulado = simuladoRepository.save(
                 new Simulado(dono, pedido.titulo().strip(), pedido.tempoLimiteSeg(), questoes));

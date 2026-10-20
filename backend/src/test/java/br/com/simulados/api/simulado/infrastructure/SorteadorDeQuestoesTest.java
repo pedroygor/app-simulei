@@ -21,6 +21,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -48,6 +49,7 @@ class SorteadorDeQuestoesTest {
     private Integer probabilidade;
     private Integer estatistica;
     private Integer ecologia;
+    private UUID aluno;
 
     @BeforeEach
     void setUp() {
@@ -69,6 +71,7 @@ class SorteadorDeQuestoesTest {
         }
         entityManager.flush();
         entityManager.clear();
+        aluno = usuario("aluno@exemplo.com");
     }
 
     @Test
@@ -89,7 +92,7 @@ class SorteadorDeQuestoesTest {
     @Test
     void sorteiaACotaDeCadaGrupoNaOrdemDasEscolhas() {
         // Grupo 0 = Natureza (ecologia), grupo 1 = Matemática (probabilidade + estatística)
-        var ids = sorteador.sortear(Map.of(ecologia, 0, probabilidade, 1, estatistica, 1), List.of(2, 7), List.of());
+        var ids = sorteador.sortear(aluno, Map.of(ecologia, 0, probabilidade, 1, estatistica, 1), List.of(2, 7), List.of());
 
         var numeros = numeros(ids);
         assertThat(numeros).hasSize(9).doesNotHaveDuplicates();
@@ -101,14 +104,14 @@ class SorteadorDeQuestoesTest {
     void nuncaSorteiaAnuladaNemIncompleta() {
         // Pede todas as 6 disponíveis de probabilidade, 20 vezes: 107 e 108 nunca saem
         for (int vez = 0; vez < 20; vez++) {
-            var numeros = numeros(sorteador.sortear(Map.of(probabilidade, 0), List.of(6), List.of()));
+            var numeros = numeros(sorteador.sortear(aluno, Map.of(probabilidade, 0), List.of(6), List.of()));
             assertThat(numeros).containsExactlyInAnyOrder(101, 102, 103, 104, 105, 106);
         }
     }
 
     @Test
     void respeitaOsAnos() {
-        var numeros = numeros(sorteador.sortear(Map.of(probabilidade, 0), List.of(2), List.of(2022)));
+        var numeros = numeros(sorteador.sortear(aluno, Map.of(probabilidade, 0), List.of(2), List.of(2022)));
 
         assertThat(numeros).containsExactlyInAnyOrder(105, 106);
     }
@@ -118,7 +121,7 @@ class SorteadorDeQuestoesTest {
         // Em 30 sorteios de 3 entre 6, sair sempre o mesmo trio seria sorteio falso
         var trios = new HashSet<List<Integer>>();
         for (int vez = 0; vez < 30; vez++) {
-            trios.add(numeros(sorteador.sortear(Map.of(probabilidade, 0), List.of(3), List.of())));
+            trios.add(numeros(sorteador.sortear(aluno, Map.of(probabilidade, 0), List.of(3), List.of())));
         }
         assertThat(trios).hasSizeGreaterThan(1);
     }
@@ -129,12 +132,84 @@ class SorteadorDeQuestoesTest {
         statistics.clear();
 
         sorteador.contarPorAssunto(Set.of(probabilidade, estatistica, ecologia), List.of(2023));
-        sorteador.sortear(Map.of(probabilidade, 0, estatistica, 1, ecologia, 2), List.of(2, 2, 2), List.of(2023));
+        sorteador.sortear(aluno, Map.of(probabilidade, 0, estatistica, 1, ecologia, 2), List.of(2, 2, 2), List.of(2023));
 
         assertThat(statistics.getPrepareStatementCount()).isEqualTo(2);
     }
 
     // --- apoio ---
+
+    // --- inéditas primeiro (4b) ---
+
+    @Test
+    void sorteiaAsIneditasAntesDasJaVistas() {
+        verEmProva(aluno, true, 101, 102, 103, 104);
+
+        // Sobram 2 inéditas (105, 106) e a cota é 2: sempre as duas, nunca uma vista
+        for (int i = 0; i < 10; i++) {
+            assertThat(numeros(sorteador.sortear(aluno, Map.of(probabilidade, 0), List.of(2), List.of())))
+                    .containsExactlyInAnyOrder(105, 106);
+        }
+    }
+
+    @Test
+    void quandoAsIneditasAcabamCompletaComAsJaVistas() {
+        verEmProva(aluno, true, 101, 102, 103, 104);
+
+        var numeros = numeros(sorteador.sortear(aluno, Map.of(probabilidade, 0), List.of(4), List.of()));
+
+        // As inéditas vêm primeiro na ordem da prova; depois, 2 das já vistas
+        assertThat(numeros.subList(0, 2)).containsExactlyInAnyOrder(105, 106);
+        assertThat(numeros.subList(2, 4)).allMatch(n -> n >= 101 && n <= 104);
+    }
+
+    @Test
+    void provaMontadaENaoComecadaOuDeOutroAlunoNaoContaComoVista() {
+        verEmProva(aluno, false, 101, 102, 103, 104);
+        verEmProva(usuario("outro@exemplo.com"), true, 101, 102, 103, 104);
+
+        // Sem histórico de verdade, as 6 concorrem igual: em 20 sorteios de 2, alguma
+        // de 101–104 aparece (a chance de nunca aparecer é (1/15)^20)
+        var vistas = new HashSet<Integer>();
+        for (int i = 0; i < 20; i++) {
+            vistas.addAll(numeros(sorteador.sortear(aluno, Map.of(probabilidade, 0), List.of(2), List.of())));
+        }
+        assertThat(vistas).containsAnyOf(101, 102, 103, 104);
+    }
+
+    // --- apoio ---
+
+    private UUID usuario(String email) {
+        return (UUID) entityManager.createNativeQuery(
+                        "INSERT INTO usuarios (id, nome, email, senha_hash) VALUES (gen_random_uuid(), 'Aluno', :email, 'hash') RETURNING id")
+                .setParameter("email", email)
+                .getSingleResult();
+    }
+
+    /** Um simulado do aluno com estas questões; `iniciada` = ele começou a prova (há tentativa). */
+    private void verEmProva(UUID dono, boolean iniciada, int... numeros) {
+        var simulado = (UUID) entityManager.createNativeQuery(
+                        "INSERT INTO simulados (id, criado_por, titulo) VALUES (gen_random_uuid(), :dono, 'Prova') RETURNING id")
+                .setParameter("dono", dono)
+                .getSingleResult();
+        for (int i = 0; i < numeros.length; i++) {
+            entityManager.createNativeQuery("""
+                            INSERT INTO simulado_questoes (simulado_id, questao_id, ordem)
+                            SELECT :simulado, id, :ordem FROM questoes WHERE numero = :numero
+                            """)
+                    .setParameter("simulado", simulado)
+                    .setParameter("ordem", i + 1)
+                    .setParameter("numero", numeros[i])
+                    .executeUpdate();
+        }
+        if (iniciada) {
+            entityManager.createNativeQuery(
+                            "INSERT INTO tentativas (simulado_id, aluno_id, status) VALUES (:simulado, :dono, 'EM_ANDAMENTO')")
+                    .setParameter("simulado", simulado)
+                    .setParameter("dono", dono)
+                    .executeUpdate();
+        }
+    }
 
     // Os ids não dizem o assunto; o número da questão diz (1xx, 2xx, 3xx)
     private List<Integer> numeros(List<Long> ids) {

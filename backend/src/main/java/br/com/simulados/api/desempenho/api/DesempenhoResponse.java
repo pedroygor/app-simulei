@@ -14,7 +14,9 @@ public record DesempenhoResponse(
         int amostraMinima,
         AproveitamentoResponse geral,
         List<PorArea> porArea,
-        List<PorAssunto> porAssunto
+        List<PorAssunto> porAssunto,
+        // Até 3 assuntos medidos, do menor acerto pro maior (4b)
+        List<PorAssunto> pontosFracos
 ) {
 
     /**
@@ -22,11 +24,13 @@ public record DesempenhoResponse(
      * parte: não entra no percentual (ver Aproveitamento).
      */
     public record AproveitamentoResponse(long respondidas, long acertos, long emBranco,
-                                         Integer percentual, boolean amostraSuficiente) {
+                                         Integer percentual, boolean amostraSuficiente,
+                                         // Acerto até 30% com amostra: adivinhando, não sabendo
+                                         boolean pertoDoChute) {
 
         static AproveitamentoResponse de(Aproveitamento a) {
             return new AproveitamentoResponse(a.respondidas(), a.acertos(), a.emBranco(),
-                    a.percentual(), a.amostraSuficiente());
+                    a.percentual(), a.amostraSuficiente(), a.pertoDoChute());
         }
     }
 
@@ -50,6 +54,7 @@ public record DesempenhoResponse(
                 desempenho.porArea().entrySet().stream()
                         .map(e -> new PorArea(e.getKey(), e.getKey().getNome(), AproveitamentoResponse.de(e.getValue())))
                         .toList(),
-                desempenho.porAssunto().stream().map(PorAssunto::de).toList());
+                desempenho.porAssunto().stream().map(PorAssunto::de).toList(),
+                desempenho.pontosFracos().stream().map(PorAssunto::de).toList());
     }
 }
