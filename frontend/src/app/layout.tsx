@@ -28,7 +28,9 @@ const bricolage = Bricolage_Grotesque({
 
 export const metadata: Metadata = {
   title: "Simulei",
-  description: "Simulados do ENEM para cursinhos, professores e alunos",
+  // O produto é gratuito e do aluno (decidido em 15/10/2026); "cursinhos e
+  // professores" era o B2B que saiu dos planos
+  description: "Simulados gratuitos do ENEM: monte provas com questões de edições anteriores e veja onde você erra",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
