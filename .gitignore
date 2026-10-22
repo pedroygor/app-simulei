@@ -30,3 +30,10 @@ __pycache__/
 
 ### Microdados do INEP: dado de terceiro, baixado por ferramentas/inep/baixar_itens_prova.py ###
 dados/inep/
+
+### Dumps do banco: têm dado pessoal (usuários, e-mails, hashes de senha) ###
+# Um dump (backup-antes-v4.sql) ficou versionado de 28/09 a 22/10/2026. Ancorado na
+# raiz: `*.sql` sem a "/" casaria também com as migrations em
+# backend/src/main/resources/db/migration/
+/*.sql
+/*.dump
