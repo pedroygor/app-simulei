@@ -1,0 +1,43 @@
+Simulei — simulados gratuitos do ENEM
+Copyright (C) 2026 Pedro Ygor
+
+O que está sob qual licença neste repositório
+=============================================
+
+Código (tudo fora da pasta dados/)
+  GNU Affero General Public License, versão 3 (AGPL-3.0). Texto integral em LICENSE.
+  Quem hospedar uma versão modificada do Simulei e oferecê-la pela rede precisa
+  disponibilizar o código-fonte dessa versão aos usuários dela.
+
+Dados produzidos por este projeto (pasta dados/)
+  Creative Commons Atribuição-CompartilhaIgual 4.0 Internacional (CC BY-SA 4.0).
+  Texto integral em dados/LICENSE.
+  Inclui a classificação das questões por assunto, as correções de gabarito e
+  anulação conferidas com o INEP, a habilidade oficial e a dificuldade de cada
+  questão, e os registros de revisão.
+
+O que vem de terceiros
+======================
+
+Questões do ENEM
+  Os enunciados, alternativas e imagens NÃO estão neste repositório. São
+  importados em tempo de instalação da API pública enem.dev
+  (https://enem.dev, https://github.com/yunger7/enem-api), projeto da comunidade
+  distribuído sob GPL-2.0, e as provas são do Instituto Nacional de Estudos e
+  Pesquisas Educacionais Anísio Teixeira (INEP).
+
+Microdados do ENEM (INEP)
+  Gabarito oficial, habilidade da Matriz de Referência e parâmetros da TRI vêm dos
+  microdados públicos do ENEM, publicados pelo INEP em
+  https://www.gov.br/inep/pt-br/acesso-a-informacao/dados-abertos/microdados/enem.
+  Os arquivos originais não estão neste repositório; os scripts em ferramentas/inep/
+  os baixam. Os CSVs em dados/conferencia-inep/ são derivados deles.
+
+Matriz de Referência do ENEM (INEP)
+  O texto das competências e habilidades, gravado pela migration V8, é o da Matriz
+  de Referência do ENEM publicada pelo INEP.
+
+Certificado intermediário da RNP
+  ferramentas/inep/rnp-icpedu-gr46-ov-tls-ca-2025.pem é o certificado público
+  intermediário da RNP (emitido pela GlobalSign), versionado porque o servidor do
+  INEP não o envia na conexão TLS.
