@@ -1,0 +1,57 @@
+meta {
+  name: 03 - A prova
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/tentativas/{{tentativaId}}
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{accessToken}}
+}
+
+script:post-response {
+  // A 1ª questão recebe a resposta; a alternativa da 2ª serve pro 422 do 05
+  const [primeira, segunda] = res.body.questoes || [];
+  if (primeira && segunda) {
+    bru.setEnvVar("questaoDaProvaId", primeira.id);
+    bru.setEnvVar("alternativaId", primeira.alternativas[0].id);
+    bru.setEnvVar("outraQuestaoId", segunda.id);
+    bru.setEnvVar("alternativaDeOutraQuestaoId", segunda.alternativas[0].id);
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body.status: eq EM_ANDAMENTO
+  res.body.questoes: length 5
+  res.body.agora: isDefined
+}
+
+tests {
+  test("a prova aberta não entrega gabarito nem correção", function() {
+    for (const q of res.body.questoes) {
+      expect(q).to.not.have.property("gabarito");
+      expect(q).to.not.have.property("correta");
+      expect(q.marcada).to.equal(null);
+    }
+  });
+}
+
+docs {
+  A prova inteira de uma vez, com as alternativas (por id, não por letra):
+  no wi-fi ruim, a rede só é necessária pra salvar cada resposta.
+
+  SEM gabarito, sem `correta`, sem assunto nem habilidade. `marcada` é o id da
+  alternativa já respondida (null = em branco), pra retomar a prova.
+
+  `prazo` (null = sem cronômetro) e `agora` (hora do servidor): a tela mede o
+  desvio do relógio do celular uma vez e conta o tempo a partir do prazo.
+
+  Questão anulada ou incompleta DEPOIS da montagem some daqui e a prova é
+  renumerada (não entra outra no lugar).
+}

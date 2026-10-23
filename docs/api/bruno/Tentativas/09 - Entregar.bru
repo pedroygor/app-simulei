@@ -1,0 +1,30 @@
+meta {
+  name: 09 - Entregar
+  type: http
+  seq: 9
+}
+
+post {
+  url: {{baseUrl}}/tentativas/{{tentativaId}}/finalizar
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{accessToken}}
+}
+
+assert {
+  res.status: eq 200
+  res.body.status: eq FINALIZADA
+  res.body.finalizadoEm: isDefined
+}
+
+docs {
+  Entrega a prova. Aceito mesmo depois do prazo (é o que a tela faz quando o
+  cronômetro zera), e aí `finalizadoEm` vira o próprio prazo: tempo além do
+  limite não é tempo de prova. Prova abandonada com prazo vencido é entregue
+  por um job a cada minuto.
+
+  Entregar de novo: 422.
+}

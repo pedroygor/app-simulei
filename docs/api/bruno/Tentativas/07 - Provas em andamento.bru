@@ -1,0 +1,41 @@
+meta {
+  name: 07 - Provas em andamento
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{baseUrl}}/tentativas/em-andamento
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{accessToken}}
+}
+
+assert {
+  res.status: eq 200
+  res.body.provas: isArray
+}
+
+tests {
+  test("a prova aberta agora vem primeiro, com 1 respondida e sem acertos", function() {
+    const prova = res.body.provas[0];
+    expect(prova.tentativaId).to.equal(bru.getEnvVar("tentativaId"));
+    expect(prova.respondidas).to.equal(1);
+    expect(prova).to.not.have.property("acertos");
+  });
+  test("no máximo 3", function() {
+    expect(res.body.provas.length).to.be.at.most(3);
+  });
+}
+
+docs {
+  O cartão "Continuar" do painel: até 3 provas abertas, as mais recentes
+  primeiro, com questões, respondidas e prazo. Sem acertos (revelaria o
+  gabarito). Prova com prazo vencido fica de fora: o job vai entregá-la.
+
+  O caminho literal `/tentativas/em-andamento` convive com `/tentativas/{id}`:
+  o Spring escolhe o mais específico.
+}

@@ -1,0 +1,52 @@
+meta {
+  name: 10 - Resultado
+  type: http
+  seq: 10
+}
+
+get {
+  url: {{baseUrl}}/tentativas/{{tentativaId}}/resultado
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{accessToken}}
+}
+
+script:post-response {
+  // Um assunto que o aluno acabou de responder, pra evolução por assunto
+  const comAssunto = (res.body.porAssunto || []).find(linha => linha.assunto);
+  if (comAssunto) {
+    bru.setEnvVar("assuntoSlug", comAssunto.assunto.slug);
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body.total.questoes: eq 5
+  res.body.total.respondidas: eq 1
+  res.body.total.emBranco: eq 4
+  res.body.porArea: isArray
+  res.body.porAssunto: isArray
+}
+
+tests {
+  test("agora sim, cada questão traz o gabarito e a marcada", function() {
+    for (const q of res.body.questoes) {
+      expect(q.gabarito).to.be.a("string");
+    }
+    expect(res.body.questoes[0].marcada).to.equal(Number(bru.getEnvVar("alternativaId")));
+  });
+}
+
+docs {
+  Nota, acerto por área e por assunto (do pior pro melhor) e a revisão
+  questão a questão, com o gabarito em letra. É o ÚNICO lugar onde o aluno
+  recebe o gabarito de uma prova (DTO separado do da prova).
+
+  Não existe coluna `nota`: é calculada a cada consulta, com UM GROUP BY,
+  pra acompanhar a coluna `disponivel` (questão anulada depois muda o total).
+  Em branco vale zero na nota, como no ENEM. `percentual` é null quando não
+  há questão (nunca divisão por zero).
+}

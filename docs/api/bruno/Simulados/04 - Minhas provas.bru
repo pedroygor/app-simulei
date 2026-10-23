@@ -1,0 +1,41 @@
+meta {
+  name: 04 - Minhas provas
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/simulados
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{accessToken}}
+}
+
+assert {
+  res.status: eq 200
+  res.body.content: isArray
+  res.body.page.totalElements: gte 1
+}
+
+tests {
+  test("a prova recém-montada vem primeiro, ainda não iniciada", function() {
+    const primeira = res.body.content[0];
+    expect(primeira.simuladoId).to.equal(bru.getEnvVar("simuladoId"));
+    expect(primeira.situacao).to.equal("NAO_INICIADA");
+    expect(primeira.placar).to.equal(null);
+  });
+}
+
+docs {
+  Histórico paginado (20 por página, teto de 100) dos simulados do aluno, do
+  mais novo pro mais velho. Situação: NAO_INICIADA | EM_ANDAMENTO | ENTREGUE.
+
+  `placar` só existe pra prova ENTREGUE. Em andamento mostra só `respondidas`:
+  acertos de prova aberta deixariam o aluno descobrir o gabarito (responde,
+  olha se o número subiu).
+
+  Ordem fixa: `?sort=` é descartado.
+}

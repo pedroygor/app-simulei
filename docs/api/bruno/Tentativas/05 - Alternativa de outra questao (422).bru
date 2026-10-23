@@ -1,0 +1,33 @@
+meta {
+  name: 05 - Alternativa de outra questao (422)
+  type: http
+  seq: 5
+}
+
+put {
+  url: {{baseUrl}}/tentativas/{{tentativaId}}/respostas/{{questaoDaProvaId}}
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{accessToken}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "alternativaId": {{alternativaDeOutraQuestaoId}}
+  }
+}
+
+assert {
+  res.status: eq 422
+}
+
+docs {
+  A alternativa existe, mas é de OUTRA questão. A mesma query que corrige a
+  resposta só devolve linha se a questão é do simulado e a alternativa é dela;
+  sem linha, exceção de negócio -> 422. O banco é a segunda barreira: a FK
+  composta (alternativa_id, questao_id) recusaria a gravação.
+}

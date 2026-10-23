@@ -1,0 +1,23 @@
+meta {
+  name: 08 - Resultado antes de entregar (422)
+  type: http
+  seq: 8
+}
+
+get {
+  url: {{baseUrl}}/tentativas/{{tentativaId}}/resultado
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{accessToken}}
+}
+
+assert {
+  res.status: eq 422
+}
+
+docs {
+  O resultado (com gabarito) só existe pra prova entregue.
+}

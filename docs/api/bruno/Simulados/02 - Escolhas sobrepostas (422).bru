@@ -1,0 +1,43 @@
+meta {
+  name: 02 - Escolhas sobrepostas (422)
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/simulados
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{accessToken}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "titulo": "Sobreposta",
+    "total": 10,
+    "itens": [
+      { "tipo": "AREA", "valor": "MATEMATICA" },
+      { "tipo": "ASSUNTO", "valor": "probabilidade" }
+    ]
+  }
+}
+
+assert {
+  res.status: eq 422
+  res.body.mensagem: isString
+}
+
+docs {
+  O formato está certo (passa no Bean Validation), mas a REGRA não: o assunto
+  Probabilidade já está dentro de Matemática, e uma questão poderia sair duas
+  vezes. Regra sobre a lista inteira mora no service, que lança exceção de
+  negócio -> 422 com a mensagem dizendo qual escolha conflita com qual.
+
+  Outros 422 da montagem, sempre dizendo qual escolha, quanto pediu e quanto há:
+  slug inexistente, escolha sem questão nos anos, quantidade fixa maior que o
+  disponível, total maior que o que existe, mais escolhas que questões.
+}

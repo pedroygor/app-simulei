@@ -1,0 +1,74 @@
+meta {
+  name: 01 - Montar prova
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/simulados
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{accessToken}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "titulo": "Matemática - coleção Bruno",
+    "total": 5,
+    "anos": [],
+    "itens": [
+      { "tipo": "AREA", "valor": "MATEMATICA" }
+    ]
+  }
+}
+
+script:post-response {
+  // Cada rodada monta uma prova nova: o "um aluno faz cada simulado uma vez"
+  // (UNIQUE em tentativas) impediria reaproveitar a de uma rodada anterior
+  if (res.getStatus() === 201) {
+    bru.setEnvVar("simuladoId", res.body.id);
+  }
+}
+
+assert {
+  res.status: eq 201
+  res.body.id: isDefined
+  res.body.composicao: isArray
+}
+
+tests {
+  test("a composição soma o total pedido", function() {
+    const soma = res.body.composicao.reduce((s, parte) => s + parte.quantidade, 0);
+    expect(soma).to.equal(5);
+  });
+  test("a resposta não traz questões nem gabarito", function() {
+    expect(res.body).to.not.have.property("questoes");
+  });
+}
+
+docs {
+  Monta uma prova sorteando questões do banco. Exige autenticação (Login antes).
+
+  O pedido: `total` (5 a 180), `anos` (vazia = todos), `idioma` opcional
+  (INGLES|ESPANHOL; sem ele, língua estrangeira fica de fora ao expandir uma
+  área) e `itens`, cada um uma escolha:
+    { "tipo": "AREA" | "MATERIA" | "ASSUNTO", "valor": enum da área ou slug,
+      "quantidade": opcional }
+  Escolha sem quantidade recebe a sua parte do que sobrar, por igual. Prova
+  multidisciplinar é só combinar escolhas, ex.:
+    [{ "tipo": "ASSUNTO", "valor": "probabilidade", "quantidade": 3 },
+     { "tipo": "MATERIA", "valor": "fisica" }]
+
+  `tempoLimiteSeg` (60 a 21600) liga o cronômetro: o prazo é gravado ao
+  iniciar a tentativa e o servidor recusa resposta depois dele.
+
+  201 + Location: /simulados/{id}, com a composição (quantas de cada escolha).
+  O sorteio prioriza questões que o aluno ainda não viu e nunca pega anulada
+  ou incompleta. 2 queries pro sorteio, qualquer que seja o nº de escolhas.
+
+  Precisa de questões no banco (as cargas do README).
+}

@@ -27,5 +27,6 @@ docs {
   request devolvia 401 (o Security bloqueava o forward interno pro /error).
 
   Agora: 400 no nosso formato, mensagem "Corpo da requisição inválido ou
-  malformado". Um `"role": "FOO"` (enum inexistente) cai no mesmo handler.
+  malformado". Um enum inexistente (ex.: `"tipo": "FOO"` ao montar prova) cai
+  no mesmo handler.
 }

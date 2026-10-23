@@ -1,0 +1,25 @@
+meta {
+  name: 06 - Desmarcar (idempotente)
+  type: http
+  seq: 6
+}
+
+delete {
+  url: {{baseUrl}}/tentativas/{{tentativaId}}/respostas/{{outraQuestaoId}}
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{accessToken}}
+}
+
+assert {
+  res.status: eq 204
+}
+
+docs {
+  Deixa a questão em branco (em branco = sem linha em `respostas`).
+  Idempotente: desmarcar o que não estava marcado, como aqui (a 2ª questão
+  nunca foi respondida), não é erro.
+}
