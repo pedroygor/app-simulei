@@ -1,0 +1,31 @@
+meta {
+  name: 05 - Filtro invalido (400)
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/desempenho/evolucao?semanas=53&assunto=Fisica_Moderna
+  body: none
+  auth: none
+}
+
+params:query {
+  semanas: 53
+  assunto: Fisica_Moderna
+}
+
+headers {
+  Authorization: Bearer {{accessToken}}
+}
+
+assert {
+  res.status: eq 400
+  res.body.campos: length 2
+}
+
+docs {
+  Os parâmetros de query também passam pelo Bean Validation: o controller
+  recebe um record (`FiltroDaEvolucao`) com `@Valid`. `semanas` vai de 1 a 52;
+  `assunto` usa a mesma regex de slug da busca de questões.
+}

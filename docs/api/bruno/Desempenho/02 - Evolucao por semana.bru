@@ -1,0 +1,38 @@
+meta {
+  name: 02 - Evolucao por semana
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/desempenho/evolucao
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{accessToken}}
+}
+
+assert {
+  res.status: eq 200
+  res.body.semanas: length 4
+  res.body.assunto: isNull
+}
+
+tests {
+  test("a semana desta prova tem dado", function() {
+    const ultima = res.body.semanas[res.body.semanas.length - 1];
+    expect(ultima.geral.respondidas).to.be.at.least(1);
+  });
+}
+
+docs {
+  Acerto por semana, geral e por área. Janela padrão de 4 semanas;
+  `?semanas=` de 1 a 52. Por semana e não por prova: cada prova tem conteúdo
+  diferente, e uma prova mais fácil pareceria melhora.
+
+  Semana de segunda a domingo NO FUSO DE BRASÍLIA (o servidor roda em UTC);
+  a prova conta na semana em que foi entregue. Toda semana da janela volta,
+  inclusive as vazias, com percentual null: a tela desenha um buraco, nunca 0%.
+}

@@ -43,7 +43,8 @@ docs {
 
   Questão anulada devolve 404: do ponto de vista do produto ela não existe.
 
-  ATENÇÃO pro futuro: este DTO traz o `gabarito`, porque hoje quem consome é o
-  professor montando simulado. A tela de prova do aluno (Etapa 3) vai precisar
-  de um DTO próprio, SEM gabarito.
+  Este DTO traz o `gabarito`: o banco de questões é treino, e treinar sem
+  conferir não serve (a tela o esconde atrás de "Ver gabarito"). A PROVA é
+  outra coisa: GET /tentativas/{id} usa um DTO próprio, SEM gabarito, e ele só
+  aparece no resultado da prova entregue (ver a pasta Tentativas).
 }

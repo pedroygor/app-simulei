@@ -1,0 +1,25 @@
+meta {
+  name: 05 - Detalhe do simulado
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/simulados/{{simuladoId}}
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{accessToken}}
+}
+
+assert {
+  res.status: eq 200
+  res.body.composicao: isArray
+}
+
+docs {
+  A definição da prova e a composição por área/matéria/assunto (GROUP BY),
+  sem as questões: quem faz a prova pede GET /tentativas/{id}.
+}

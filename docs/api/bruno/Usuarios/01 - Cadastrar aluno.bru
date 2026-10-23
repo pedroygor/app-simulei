@@ -1,0 +1,42 @@
+meta {
+  name: 01 - Cadastrar aluno
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/usuarios
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "nome": "Aluno Teste",
+    "email": "{{email}}",
+    "senha": "{{senha}}"
+  }
+}
+
+tests {
+  test("cria o aluno, ou 409 se ele já existir de uma rodada anterior", function() {
+    expect([201, 409]).to.include(res.getStatus());
+  });
+}
+
+docs {
+  Endpoint PÚBLICO. Cria o usuário usado pelos demais requests (e-mail e senha
+  vêm do ambiente `local`).
+
+  201 Created + header Location: /usuarios/{id}
+  A resposta NUNCA traz senhaHash: o DTO de saída não tem esse campo.
+
+  Todo usuário nasce ALUNO, ativo. O papel é decidido pelo servidor, não pelo
+  payload (ver "02 - Papel enviado e ignorado").
+
+  Rodar duas vezes devolve 409 (ver "04 - Cadastro duplicado").
+}

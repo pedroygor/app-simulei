@@ -1,0 +1,37 @@
+meta {
+  name: 04 - Responder
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{baseUrl}}/tentativas/{{tentativaId}}/respostas/{{questaoDaProvaId}}
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{accessToken}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "alternativaId": {{alternativaId}}
+  }
+}
+
+assert {
+  res.status: eq 204
+}
+
+docs {
+  Marca (ou troca) a alternativa. PUT porque é idempotente: dois toques
+  gravam a mesma coisa (upsert ON CONFLICT DO UPDATE no banco).
+
+  204 sem corpo DE PROPÓSITO: devolver se acertou entregaria o gabarito.
+
+  Toda escrita trava a tentativa (SELECT ... FOR UPDATE): uma resposta não
+  entra depois de um "entregar" feito em outra aba. Depois do prazo (+10 s de
+  tolerância), 422 "O tempo da prova acabou".
+}

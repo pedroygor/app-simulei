@@ -1,0 +1,46 @@
+meta {
+  name: 03 - Pedido invalido (400)
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/simulados
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{accessToken}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "titulo": "",
+    "total": 3,
+    "anos": [2023, 1999],
+    "itens": [
+      { "tipo": "AREA", "valor": "MATEMATICA", "quantidade": -3 }
+    ]
+  }
+}
+
+assert {
+  res.status: eq 400
+  res.body.campos: isArray
+}
+
+tests {
+  test("aponta o campo de cada item, não só a lista", function() {
+    const campos = res.body.campos.map(c => c.campo);
+    expect(campos).to.include.members(["titulo", "total", "anos[1]", "itens[0].quantidade"]);
+  });
+}
+
+docs {
+  Bean Validation dentro das listas. `List<@Valid EscolhaDoSimulado>` entra em
+  cada item (sem o @Valid, `quantidade: -3` passaria) e
+  `List<@Min(2009) Integer>` valida cada ano. O 400 diz o índice:
+  `anos[1]`, `itens[0].quantidade`.
+}

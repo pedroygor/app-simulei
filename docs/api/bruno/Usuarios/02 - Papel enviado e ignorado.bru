@@ -1,0 +1,43 @@
+meta {
+  name: 02 - Papel enviado e ignorado
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/usuarios
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "nome": "Quer Ser Professor",
+    "email": "{{emailDescartavel}}",
+    "senha": "senha-forte-123",
+    "role": "PROFESSOR"
+  }
+}
+
+script:pre-request {
+  // E-mail novo a cada rodada: com um fixo, a 2ª rodada daria 409 e o teste
+  // não diria nada sobre o papel
+  bru.setVar("emailDescartavel", `papel-${Date.now()}@teste.com`);
+}
+
+assert {
+  res.status: eq 201
+  res.body.role: eq ALUNO
+}
+
+docs {
+  Mandar `"role": "PROFESSOR"` não dá erro nem cria professor: o campo não
+  existe no CriarUsuarioRequest e o Jackson o ignora. O servidor decide o
+  papel (desde a V13, só existe ALUNO; o enum fica pra um papel futuro).
+
+  Cria um usuário descartável por rodada (papel-<timestamp>@teste.com).
+}

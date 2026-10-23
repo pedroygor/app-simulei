@@ -1,100 +1,78 @@
-# Collections de API — Simulei
+# Coleção de API do Simulei
 
-Requests prontos pra testar a API na mão, em duas versões equivalentes:
+Requests prontos pra testar a API na mão, no [Bruno](https://www.usebruno.com/) (`bruno/`, arquivos `.bru` em texto plano, versionados com o código).
 
-- **Bruno** — `bruno/` (arquivos `.bru`, versionados em texto plano)
-- **Postman** — `simulei.postman_collection.json` (schema v2.1)
-
-Ambas cobrem os 11 requests da nossa API (Etapa 1) mais 3 da fonte externa
-enem.dev, úteis pra explorar o formato antes do job de importação.
+A coleção percorre o fluxo inteiro do aluno, na ordem das pastas: cadastro → login → banco de questões → montar prova → fazer a prova → resultado → desempenho. Cada request explica, no próprio `docs`, o que o endpoint faz e por quê. Os ids passam de um request pro outro por variável de ambiente (o simulado montado é o que a prova inicia, e assim por diante).
 
 ## Antes de rodar
 
-```bash
-docker compose up -d          # Postgres
-set -a; source .env; set +a   # variáveis de ambiente (inclusive JWT_SECRET)
-./mvnw spring-boot:run        # API em http://localhost:8080
-```
+API no ar e banco com as questões carregadas: veja o [README da raiz](../../README.md#rodando-localmente). As pastas **Questoes**, **Simulados**, **Tentativas** e **Desempenho** precisam das questões no banco.
 
-## Bruno
+## No aplicativo
 
 Não precisa importar: o Bruno lê a pasta direto.
 
 1. **Open Collection** → aponte pra `docs/api/bruno`
-2. Selecione o ambiente **local** no seletor do canto superior direito
-3. Rode na ordem: pasta **Usuarios** (cria os usuários) → pasta **Auth**
+2. Selecione o ambiente **local** no canto superior direito
+3. Rode as pastas na ordem: **Usuarios** → **Auth** → **Questoes** → **Simulados** → **Tentativas** → **Desempenho**
 
-O request `Auth/01 - Login` guarda `accessToken` e `refreshToken` no ambiente
-via script pós-resposta, então os requests protegidos já funcionam em seguida.
+O `Auth/01 - Login` guarda `accessToken` e `refreshToken` no ambiente, e os requests protegidos funcionam em seguida.
 
-### Como smoke test pela linha de comando
+## Pela linha de comando
 
 ```bash
 cd docs/api/bruno
 npx @usebruno/cli run --env local --disable-cookies
 ```
 
-Deve dar **20 requests, 25 assertions, PASS** (com 2023 importado). O `--disable-cookies` é
-necessário pros cenários negativos — veja a seção sobre o cookie jar abaixo.
+Deve dar **47 requests, 13 testes e 91 asserções, PASS**. A coleção pode ser repetida: na 2ª rodada o cadastro dá 409 (esperado) e cada rodada monta uma prova nova, porque cada aluno faz cada simulado uma vez só.
 
-## Postman
+A pasta **enem.dev (fonte externa)** consulta a API pública da fonte das questões, pra explorar o formato dela. Precisa de internet e não depende da nossa API.
 
-**Import** → arraste o arquivo `simulei.postman_collection.json`. As variáveis
-(`baseUrl`, `email`, `senha`, `accessToken`, `refreshToken`) já vêm embutidas
-na collection, não precisa criar environment.
-
-Mesma ordem: pasta **Usuarios** primeiro, depois **Auth**.
-
-Pela linha de comando: `npx newman run docs/api/simulei.postman_collection.json`
+Pra rodar contra outra porta: `--env-var baseUrl=http://localhost:8081`.
 
 ## O cookie jar atrapalha os testes negativos
 
-O refresh token vem em cookie `httpOnly` + `Secure`, com `Path=/auth/refresh`.
-Tanto o Bruno quanto o Postman têm cookie jar próprio, e o cookie guardado
-**sobrescreve** o header `Cookie` que os requests mandam explicitamente.
+O refresh token vem em cookie `httpOnly` + `Secure`, com `Path=/auth/refresh`. O Bruno tem cookie jar próprio, e o cookie guardado **sobrescreve** o header `Cookie` que os requests mandam explicitamente.
 
-Na prática:
+- **Fluxo feliz** (login → refresh): funciona com o jar ligado ou desligado.
+- **Cenário negativo** (`Auth/05 - Refresh com token invalido`): com o jar ligado, o cookie válido entra no lugar do inválido e a resposta vira 200. Pra ver o 401, limpe os cookies ou use `--disable-cookies`.
 
-- **Fluxo feliz** (login → refresh): funciona de qualquer jeito, com jar
-  ligado ou desligado.
-- **Cenário negativo** (`05 - Refresh com token invalido`): com o jar ligado
-  o cookie válido entra no lugar do inválido e a resposta vira 200. Pra ver o
-  401 de verdade, limpe os cookies do cliente ou use `--disable-cookies`.
-
-Detalhe que só vale pra ferramenta de API: no **navegador** isso não acontece
-desse jeito — o cookie `Secure` é aceito em `localhost` (contexto seguro), e o
-frontend vai funcionar com `credentials: 'include'` no fetch.
+No navegador isso não acontece desse jeito: o cookie `Secure` é aceito em `localhost` (contexto seguro), e o frontend funciona com `credentials: 'include'` no fetch.
 
 ## Sobre credenciais
 
-O ambiente `bruno/environments/local.bru` tem e-mail e senha de um usuário de
-teste criado no Postgres local do docker-compose. **Não é segredo** — é dado
-descartável de desenvolvimento.
+O ambiente `bruno/environments/local.bru` tem o e-mail e a senha de um aluno de teste, criado pela própria coleção no Postgres local. **Não é segredo**: é dado descartável de desenvolvimento.
 
-Os tokens (`accessToken`, `refreshToken`) estão declarados como
-`vars:secret`, então o Bruno os guarda fora do arquivo e eles **não entram no
-git**. Isso importa: sem isso, cada rodada da CLI gravaria um JWT válido
-dentro de um arquivo versionado.
+Os tokens (`accessToken`, `refreshToken`) são `vars:secret`: o Bruno os guarda fora do arquivo e eles **não entram no git**. Sem isso, cada rodada gravaria um JWT válido num arquivo versionado.
 
-Se um dia apontar a collection pra staging/produção, **não edite o
-`local.bru`**: crie um `environments/prod.bru` e coloque no `.gitignore`.
+Pra apontar a coleção pra outro ambiente, **não edite o `local.bru`**: crie outro arquivo em `environments/` e coloque-o no `.gitignore`.
 
 ## Endpoints cobertos
 
-| Método | Rota | Auth | Cenário |
+Rota pública = sem token. As demais exigem `Authorization: Bearer`, e tudo o que é do aluno (simulados, tentativas, desempenho) é filtrado pelo aluno do token: o de outro aluno responde 404, como se não existisse.
+
+| Método | Rota | Auth | Cenários |
 |---|---|---|---|
-| POST | `/usuarios` | pública | 201 professor / 201 aluno / 400 inválido / 409 duplicado / 400 JSON quebrado |
+| POST | `/usuarios` | pública | 201 / `role` enviado é ignorado / 400 inválido / 409 duplicado / 400 JSON quebrado |
 | POST | `/auth/login` | pública | 200 com tokens / 401 senha errada |
-| POST | `/auth/refresh` | cookie | 200 rotação / 401 token inválido |
-| GET | `/usuarios/me` | Bearer | 200 perfil / 401 sem token |
-| GET | `/questoes` | Bearer | 200 paginado / filtros (incl. `materia` e `assunto` por slug) / 400 validação / 400 sort inválido |
-| GET | `/questoes/{id}` | Bearer | 200 com alternativas / 404 anulada ou inexistente |
-| GET | `/questoes/anos` | Bearer | 200 com os anos que têm questão (vêm dos dados, não de constante) |
-| GET | `/taxonomia` | Bearer | 200 com área → matéria → assunto e a contagem de questões por assunto |
-| GET | `/imagens/**` | pública | 200 imagem da questão |
-
-A pasta **Questões** precisa das questões importadas no banco:
-
-```bash
-./mvnw spring-boot:run -Dspring-boot.run.arguments="--importar-questoes --anos=2023"
-```
+| POST | `/auth/refresh` | cookie | 200 com rotação / 401 token inválido |
+| POST | `/auth/logout` | pública | 204, expira o cookie |
+| GET | `/usuarios/me` | Bearer | 200 / 401 sem token |
+| GET | `/questoes` | Bearer | paginado / filtros por área, ano, idioma, matéria e assunto / 400 ordenação inválida |
+| GET | `/questoes/{id}` | Bearer | 200 com alternativas e gabarito |
+| GET | `/questoes/anos` | Bearer | os anos que têm questão |
+| GET | `/taxonomia` | Bearer | área → matéria → assunto, com quantas questões há em cada assunto |
+| GET | `/imagens/**` | pública | imagem da questão |
+| POST | `/simulados` | Bearer | 201 / 422 escolhas sobrepostas / 400 com o campo de cada item |
+| GET | `/simulados` | Bearer | histórico paginado ("Minhas provas") |
+| GET | `/simulados/{id}` | Bearer | composição / 404 alheio ou inexistente |
+| POST | `/simulados/{id}/tentativas` | Bearer | 201 inicia / 200 a mesma tentativa (idempotente) |
+| GET | `/tentativas/{id}` | Bearer | a prova, sem gabarito / 404 alheia ou inexistente |
+| PUT | `/tentativas/{id}/respostas/{questaoId}` | Bearer | 204 / 422 alternativa de outra questão / 422 prova entregue |
+| DELETE | `/tentativas/{id}/respostas/{questaoId}` | Bearer | 204, idempotente |
+| GET | `/tentativas/em-andamento` | Bearer | até 3 provas abertas, sem acertos |
+| POST | `/tentativas/{id}/finalizar` | Bearer | 200 entrega |
+| GET | `/tentativas/{id}/resultado` | Bearer | nota, por área e assunto, gabarito / 422 antes de entregar |
+| GET | `/desempenho` | Bearer | acerto geral, por área e por assunto, pontos fracos |
+| GET | `/desempenho/evolucao` | Bearer | por semana / de um assunto / 404 assunto inexistente / 400 filtro inválido |

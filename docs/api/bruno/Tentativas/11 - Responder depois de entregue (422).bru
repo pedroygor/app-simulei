@@ -1,0 +1,31 @@
+meta {
+  name: 11 - Responder depois de entregue (422)
+  type: http
+  seq: 11
+}
+
+put {
+  url: {{baseUrl}}/tentativas/{{tentativaId}}/respostas/{{questaoDaProvaId}}
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{accessToken}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "alternativaId": {{alternativaId}}
+  }
+}
+
+assert {
+  res.status: eq 422
+}
+
+docs {
+  Prova entregue não aceita escrita: nem responder, nem desmarcar, nem
+  entregar de novo.
+}

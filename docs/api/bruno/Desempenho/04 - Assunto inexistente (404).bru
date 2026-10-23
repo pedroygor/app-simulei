@@ -1,0 +1,28 @@
+meta {
+  name: 04 - Assunto inexistente (404)
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/desempenho/evolucao?assunto=assunto-que-nao-existe
+  body: none
+  auth: none
+}
+
+params:query {
+  assunto: assunto-que-nao-existe
+}
+
+headers {
+  Authorization: Bearer {{accessToken}}
+}
+
+assert {
+  res.status: eq 404
+}
+
+docs {
+  Slug no formato certo, mas fora da taxonomia: 404. Uma evolução vazia
+  diria "você nunca respondeu esse assunto", o que é mentira.
+}

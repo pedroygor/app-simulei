@@ -16,10 +16,9 @@ headers {
 
 body:json {
   {
-    "nome": "Professor Repetido",
+    "nome": "Aluno Repetido",
     "email": "{{email}}",
-    "senha": "{{senha}}",
-    "role": "PROFESSOR"
+    "senha": "{{senha}}"
   }
 }
 
@@ -28,7 +27,7 @@ assert {
 }
 
 docs {
-  Rode depois do "01 - Cadastrar professor": e-mail já existe -> 409 Conflict.
+  Rode depois do "01 - Cadastrar aluno": e-mail já existe -> 409 Conflict.
 
   Erro é exceção no service (EmailJaCadastradoException), traduzida pra HTTP
   num lugar só (GlobalExceptionHandler). O service não conhece status code.

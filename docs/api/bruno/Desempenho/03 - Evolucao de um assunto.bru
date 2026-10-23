@@ -1,0 +1,39 @@
+meta {
+  name: 03 - Evolucao de um assunto
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/desempenho/evolucao?semanas=12&assunto={{assuntoSlug}}
+  body: none
+  auth: none
+}
+
+params:query {
+  semanas: 12
+  assunto: {{assuntoSlug}}
+}
+
+headers {
+  Authorization: Bearer {{accessToken}}
+}
+
+assert {
+  res.status: eq 200
+  res.body.semanas: length 12
+}
+
+tests {
+  test("a resposta diz qual é o assunto", function() {
+    expect(res.body.assunto.assunto.slug).to.equal(bru.getEnvVar("assuntoSlug"));
+  });
+}
+
+docs {
+  A mesma evolução, só de um assunto (a página "treinei, melhorei?").
+  {{assuntoSlug}} é guardado pelo "10 - Resultado" da pasta Tentativas.
+
+  A resposta traz o assunto (nome e matéria) pra tela não precisar de outra
+  consulta. 2 queries: o lookup do slug e a agregação.
+}

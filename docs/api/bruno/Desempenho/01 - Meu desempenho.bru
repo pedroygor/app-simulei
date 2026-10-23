@@ -1,0 +1,51 @@
+meta {
+  name: 01 - Meu desempenho
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/desempenho
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{accessToken}}
+}
+
+assert {
+  res.status: eq 200
+  res.body.provas: gte 1
+  res.body.amostraMinima: eq 5
+  res.body.geral: isDefined
+  res.body.porArea: isArray
+  res.body.porAssunto: isArray
+  res.body.pontosFracos: isArray
+}
+
+tests {
+  test("no máximo 3 pontos fracos, todos com amostra suficiente", function() {
+    expect(res.body.pontosFracos.length).to.be.at.most(3);
+    for (const p of res.body.pontosFracos) {
+      expect(p.aproveitamento.respondidas).to.be.at.least(5);
+    }
+  });
+}
+
+docs {
+  O diagnóstico do aluno sobre todas as provas ENTREGUES (prova aberta
+  revelaria o gabarito). Sem parâmetro: o aluno vem do token.
+
+  O percentual conta só as RESPONDIDAS. Em branco é ambíguo (não sei, acabou
+  o tempo, pulei) e aparece à parte, em `emBranco`. A nota da prova (pasta
+  Tentativas) segue contando em branco como zero.
+
+  Assunto só é "medido" a partir de `amostraMinima` (5) respostas. Abaixo
+  disso o percentual vem, mas não vira ponto fraco. `pontosFracos`: até 3
+  assuntos medidos, do menor acerto pro maior. `pertoDoChute`: 30% ou menos
+  (com 5 alternativas, o chute dá 20%).
+
+  Usa a classificação de HOJE: reclassificar uma questão corrige o histórico.
+  2 queries fixas (GROUP BY no banco), qualquer que seja o nº de provas.
+}

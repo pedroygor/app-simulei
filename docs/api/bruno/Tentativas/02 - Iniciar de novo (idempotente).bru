@@ -1,0 +1,30 @@
+meta {
+  name: 02 - Iniciar de novo (idempotente)
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/simulados/{{simuladoId}}/tentativas
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{accessToken}}
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("devolve a mesma tentativa", function() {
+    expect(res.body.id).to.equal(bru.getEnvVar("tentativaId"));
+  });
+}
+
+docs {
+  Mesmo pedido do 01: 200 com a tentativa que já existe (UNIQUE de
+  simulado + aluno: cada aluno faz cada simulado uma vez).
+}
