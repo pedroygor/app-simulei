@@ -101,6 +101,15 @@ ferramentas/  scripts Python de classificação e de conferência com os microda
 docs/         documentação: taxonomia, conferência com o INEP, identidade visual, coleções da API
 ```
 
+## Documentação
+
+- [Decisões de projeto](docs/decisoes.md): o porquê das escolhas não óbvias, em ordem de data
+- [Arquitetura](docs/arquitetura.md): stack, organização do código, modelo de dados e convenções
+- [Dados](docs/dados.md): as fontes, o que aprendemos medindo a enem.dev e o INEP, as cargas e as ferramentas
+- [Taxonomia](docs/taxonomia.md): os 118 assuntos em 14 matérias
+- [Conferência com o INEP](docs/conferencia-inep.md) e [habilidade × assunto](docs/habilidade-x-assunto.md): como gabaritos e classificação foram conferidos
+- [Identidade visual](docs/identidade-visual.md): cores, tipografia e acessibilidade
+
 ## Contribuindo
 
 Por enquanto o projeto não aceita pull requests, mas issues são muito bem-vindas, principalmente para apontar **questão classificada no assunto errado**. Veja o [CONTRIBUTING.md](CONTRIBUTING.md).
