@@ -202,6 +202,38 @@ class AuthControllerTest {
         login(colega, SENHA).andExpect(status().isOk());
     }
 
+    @Test
+    void emailComOutraGrafiaEhAMesmaConta() throws Exception {
+        cadastrar("Ivo", "Auth.Ivo@Teste.com");
+
+        // Gravado em minúsculas, entra com qualquer grafia
+        login("auth.ivo@teste.com", SENHA).andExpect(status().isOk());
+        login("AUTH.IVO@TESTE.COM", SENHA).andExpect(status().isOk());
+
+        // E a outra grafia não cria uma segunda conta
+        mockMvc.perform(post("/usuarios")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"nome": "Ivo de novo", "email": "auth.ivo@teste.com", "senha": "%s"}
+                                """.formatted(SENHA)))
+                .andExpect(status().isConflict());
+    }
+
+    @Test
+    void trocarAGrafiaDoEmailNaoZeraOBloqueio() throws Exception {
+        // Se cada grafia tivesse contador próprio, 5 erros em uma e o ataque
+        // seguiria pela outra. Quem garante é a chave do limitador
+        var alvo = "auth.grafia@teste.com";
+        cadastrar("Grafia", alvo);
+
+        for (var i = 0; i < 5; i++) {
+            login(i % 2 == 0 ? alvo : alvo.toUpperCase(), "errada-" + i)
+                    .andExpect(status().isUnauthorized());
+        }
+
+        login("Auth.Grafia@Teste.com", SENHA).andExpect(status().isTooManyRequests());
+    }
+
     private void cadastrar(String nome, String email) throws Exception {
         mockMvc.perform(post("/usuarios")
                         .contentType(MediaType.APPLICATION_JSON)

@@ -50,6 +50,19 @@ class UsuarioServiceTest {
     }
 
     @Test
+    void normalizaOEmailAntesDeChecarEGravar() {
+        // O stub só responde à forma normalizada: se o service consultasse o
+        // e-mail cru, o Mockito acusaria o stub não usado
+        when(usuarioRepository.existsByEmail("ana@teste.com")).thenReturn(false);
+        when(passwordEncoder.encode("senha-forte-123")).thenReturn("$2a$hash-fake");
+        when(usuarioRepository.save(any(Usuario.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        var usuario = usuarioService.criar("Ana", "  Ana@Teste.COM ", "senha-forte-123");
+
+        assertThat(usuario.getEmail()).isEqualTo("ana@teste.com");
+    }
+
+    @Test
     void lancaExcecaoQuandoEmailJaExiste() {
         when(usuarioRepository.existsByEmail("ana@teste.com")).thenReturn(true);
 

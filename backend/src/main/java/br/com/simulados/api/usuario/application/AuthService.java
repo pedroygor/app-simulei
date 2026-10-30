@@ -3,6 +3,7 @@ package br.com.simulados.api.usuario.application;
 import br.com.simulados.api.shared.security.JwtService;
 import br.com.simulados.api.shared.security.TokenInvalidoException;
 import br.com.simulados.api.shared.security.UsuarioDetails;
+import br.com.simulados.api.usuario.domain.Emails;
 import br.com.simulados.api.usuario.domain.Usuario;
 import br.com.simulados.api.usuario.infrastructure.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +24,10 @@ public class AuthService {
     public record Tokens(String accessToken, String refreshToken, long expiresInSeconds) {
     }
 
-    public Tokens login(String email, String senha) {
+    public Tokens login(String emailInformado, String senha) {
+        // O banco guarda o e-mail em minúsculas (V14): sem normalizar aqui,
+        // "Ana@x.com" não acharia a conta de "ana@x.com"
+        var email = Emails.normalizar(emailInformado);
         // Antes de gastar bcrypt: se a conta está bloqueada, nem tenta
         limitador.verificar(email);
         try {
