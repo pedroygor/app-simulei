@@ -33,4 +33,15 @@ class UsuarioRepositoryTest {
                 .isInstanceOf(DataIntegrityViolationException.class)
                 .hasMessageContaining("ck_usuarios_role");
     }
+
+    // O CHECK da V14: e-mail com maiúscula não entra nem por fora da API
+    @Test
+    void bancoRecusaEmailComMaiuscula() {
+        assertThatThrownBy(() -> jdbc.update("""
+                INSERT INTO usuarios (id, nome, email, senha_hash, role)
+                VALUES (gen_random_uuid(), 'Ana', 'Ana@teste.com', 'hash', 'ALUNO')
+                """))
+                .isInstanceOf(DataIntegrityViolationException.class)
+                .hasMessageContaining("ck_usuarios_email_minusculo");
+    }
 }

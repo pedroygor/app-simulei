@@ -1,5 +1,6 @@
 package br.com.simulados.api.usuario.application;
 
+import br.com.simulados.api.usuario.domain.Emails;
 import br.com.simulados.api.usuario.domain.TentativasDeLoginExcedidasException;
 import org.springframework.stereotype.Component;
 
@@ -70,9 +71,10 @@ public class LimitadorDeTentativasDeLogin {
         porConta.remove(chave(email));
     }
 
-    // Normaliza pra o atacante não driblar variando maiúsculas
+    // Normaliza pra o atacante não driblar variando maiúsculas. Mesmo com o
+    // AuthService já normalizando, o limitador não depende de quem o chama
     private String chave(String email) {
-        return email == null ? "" : email.trim().toLowerCase();
+        return email == null ? "" : Emails.normalizar(email);
     }
 
     private void removerExpirados() {
