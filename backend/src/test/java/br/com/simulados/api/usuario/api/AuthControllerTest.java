@@ -12,6 +12,7 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -35,6 +36,9 @@ class AuthControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private JdbcTemplate jdbc;
 
     @Test
     void loginDevolveAccessTokenECookieHttpOnlyDeRefresh() throws Exception {
@@ -232,6 +236,21 @@ class AuthControllerTest {
         }
 
         login("Auth.Grafia@Teste.com", SENHA).andExpect(status().isTooManyRequests());
+    }
+
+    @Test
+    void contaSoComGoogleNaoEntraComSenha() throws Exception {
+        // Inserida direto no banco: a API ainda não cria conta pelo Google
+        jdbc.update("""
+                INSERT INTO usuarios (id, nome, email, senha_hash, google_sub, role)
+                VALUES (gen_random_uuid(), 'Só Google', 'auth.sogoogle@teste.com', NULL, 'sub-auth-sogoogle', 'ALUNO')
+                """);
+
+        // O mesmo 401 genérico de senha errada, nunca 500: a senha guardada é
+        // nula, e o encoder tem que tratar isso como "não confere"
+        login("auth.sogoogle@teste.com", SENHA)
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.status").value(401));
     }
 
     private void cadastrar(String nome, String email) throws Exception {
