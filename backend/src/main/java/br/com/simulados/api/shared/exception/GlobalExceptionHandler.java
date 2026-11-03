@@ -1,6 +1,5 @@
 package br.com.simulados.api.shared.exception;
 
-import br.com.simulados.api.shared.security.TokenInvalidoException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -64,10 +63,16 @@ public class GlobalExceptionHandler {
         return ErroResponse.de(HttpStatus.UNAUTHORIZED, "E-mail ou senha inválidos", request.getRequestURI());
     }
 
-    @ExceptionHandler(TokenInvalidoException.class)
+    @ExceptionHandler(NaoAutenticadoException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public ErroResponse trataTokenInvalido(TokenInvalidoException ex, HttpServletRequest request) {
+    public ErroResponse trataNaoAutenticado(NaoAutenticadoException ex, HttpServletRequest request) {
         return ErroResponse.de(HttpStatus.UNAUTHORIZED, ex.getMessage(), request.getRequestURI());
+    }
+
+    @ExceptionHandler(ServicoIndisponivelException.class)
+    @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
+    public ErroResponse trataServicoIndisponivel(ServicoIndisponivelException ex, HttpServletRequest request) {
+        return ErroResponse.de(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage(), request.getRequestURI());
     }
 
     @ExceptionHandler(RecursoNaoEncontradoException.class)

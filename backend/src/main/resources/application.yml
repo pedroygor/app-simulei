@@ -73,6 +73,14 @@ app:
 enem-dev:
   base-url: https://api.enem.dev/v1
 
+google:
+  # Client ID do projeto no Google Cloud. Não é segredo (vai no HTML do front),
+  # mas muda por instalação. Vazio = login com Google desligado (503), e o resto
+  # da aplicação funciona normalmente
+  client-id: ${GOOGLE_CLIENT_ID:}
+  # Chaves públicas com que o Google assina o ID token
+  jwks-uri: https://www.googleapis.com/oauth2/v3/certs
+
 storage:
   imagens:
     # Onde as imagens baixadas da enem.dev são gravadas: na RAIZ do repositório,
