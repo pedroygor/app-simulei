@@ -9,6 +9,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
@@ -32,5 +33,54 @@ class UsuarioRepositoryTest {
                 """))
                 .isInstanceOf(DataIntegrityViolationException.class)
                 .hasMessageContaining("ck_usuarios_role");
+    }
+
+    // O CHECK da V14: e-mail com maiúscula não entra nem por fora da API
+    @Test
+    void bancoRecusaEmailComMaiuscula() {
+        assertThatThrownBy(() -> jdbc.update("""
+                INSERT INTO usuarios (id, nome, email, senha_hash, role)
+                VALUES (gen_random_uuid(), 'Ana', 'Ana@teste.com', 'hash', 'ALUNO')
+                """))
+                .isInstanceOf(DataIntegrityViolationException.class)
+                .hasMessageContaining("ck_usuarios_email_minusculo");
+    }
+
+    // V15: conta só com Google existe, sem senha
+    @Test
+    void bancoAceitaContaSoComGoogle() {
+        var linhas = jdbc.update("""
+                INSERT INTO usuarios (id, nome, email, senha_hash, google_sub, role)
+                VALUES (gen_random_uuid(), 'Ana', 'ana.google@teste.com', NULL, 'sub-ana', 'ALUNO')
+                """);
+
+        assertThat(linhas).isEqualTo(1);
+    }
+
+    // V15: nenhuma conta fica sem jeito de entrar
+    @Test
+    void bancoRecusaContaSemSenhaNemGoogle() {
+        assertThatThrownBy(() -> jdbc.update("""
+                INSERT INTO usuarios (id, nome, email, senha_hash, google_sub, role)
+                VALUES (gen_random_uuid(), 'Ninguém', 'sem.acesso@teste.com', NULL, NULL, 'ALUNO')
+                """))
+                .isInstanceOf(DataIntegrityViolationException.class)
+                .hasMessageContaining("ck_usuarios_forma_de_entrar");
+    }
+
+    // V15: uma conta Google liga a uma conta Simulei só
+    @Test
+    void bancoRecusaAMesmaContaGoogleEmDuasContas() {
+        jdbc.update("""
+                INSERT INTO usuarios (id, nome, email, senha_hash, google_sub, role)
+                VALUES (gen_random_uuid(), 'Bia', 'bia.um@teste.com', NULL, 'sub-bia', 'ALUNO')
+                """);
+
+        assertThatThrownBy(() -> jdbc.update("""
+                INSERT INTO usuarios (id, nome, email, senha_hash, google_sub, role)
+                VALUES (gen_random_uuid(), 'Bia', 'bia.dois@teste.com', NULL, 'sub-bia', 'ALUNO')
+                """))
+                .isInstanceOf(DataIntegrityViolationException.class)
+                .hasMessageContaining("uk_usuarios_google_sub");
     }
 }

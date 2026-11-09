@@ -34,8 +34,17 @@ public class Usuario {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(name = "senha_hash", nullable = false)
+    // Nulo em conta que só entra pelo Google (V15). O CHECK do banco exige
+    // senha OU googleSub. Login por senha numa conta sem senha cai no 401 de
+    // sempre: o encoder trata senha guardada nula como "não confere" (testado
+    // no AuthControllerTest)
+    @Column(name = "senha_hash")
     private String senhaHash;
+
+    // O "sub" do ID token do Google: identifica a pessoa lá e não muda, ao
+    // contrário do e-mail. Nulo em conta sem login com Google
+    @Column(name = "google_sub", unique = true)
+    private String googleSub;
 
     // STRING grava o nome do enum ("ALUNO"); o padrão ORDINAL gravaria a posição,
     // que quebra silenciosamente se a ordem dos valores mudar

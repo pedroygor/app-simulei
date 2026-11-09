@@ -1,6 +1,7 @@
 package br.com.simulados.api.usuario.application;
 
 import br.com.simulados.api.usuario.domain.EmailJaCadastradoException;
+import br.com.simulados.api.usuario.domain.Emails;
 import br.com.simulados.api.usuario.domain.Role;
 import br.com.simulados.api.usuario.domain.Usuario;
 import br.com.simulados.api.usuario.domain.UsuarioNaoEncontradoException;
@@ -45,7 +46,10 @@ public class UsuarioService {
      * chamada interna não passa por ele — a anotação seria ignorada em
      * silêncio. Nesse caso, o método público é que leva a anotação.
      */
-    public Usuario criar(String nome, String email, String senha) {
+    public Usuario criar(String nome, String emailInformado, String senha) {
+        // Antes de qualquer uso: "Ana@x.com" e "ana@x.com" são a mesma conta
+        var email = Emails.normalizar(emailInformado);
+
         // Checagem antecipada pra dar erro amigável; contra requisições
         // concorrentes, o backstop real é a constraint UNIQUE do banco.
         //

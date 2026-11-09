@@ -3,6 +3,7 @@ package br.com.simulados.api.usuario.application;
 import br.com.simulados.api.shared.security.JwtService;
 import br.com.simulados.api.shared.security.TokenInvalidoException;
 import br.com.simulados.api.shared.security.UsuarioDetails;
+import br.com.simulados.api.usuario.domain.Emails;
 import br.com.simulados.api.usuario.domain.Usuario;
 import br.com.simulados.api.usuario.infrastructure.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +24,10 @@ public class AuthService {
     public record Tokens(String accessToken, String refreshToken, long expiresInSeconds) {
     }
 
-    public Tokens login(String email, String senha) {
+    public Tokens login(String emailInformado, String senha) {
+        // O banco guarda o e-mail em minúsculas (V14): sem normalizar aqui,
+        // "Ana@x.com" não acharia a conta de "ana@x.com"
+        var email = Emails.normalizar(emailInformado);
         // Antes de gastar bcrypt: se a conta está bloqueada, nem tenta
         limitador.verificar(email);
         try {
@@ -33,7 +37,7 @@ public class AuthService {
                     .authenticate(new UsernamePasswordAuthenticationToken(email, senha));
             var usuario = ((UsuarioDetails) autenticacao.getPrincipal()).getUsuario();
             limitador.registrarSucesso(email);
-            return gerarTokens(usuario);
+            return tokensPara(usuario);
         } catch (AuthenticationException e) {
             // Conta a falha e deixa a exceção seguir: quem traduz pro 401
             // genérico ("E-mail ou senha inválidos") é o handler
@@ -49,10 +53,15 @@ public class AuthService {
         var usuario = usuarioRepository.findById(usuarioId)
                 .filter(Usuario::isAtivo)
                 .orElseThrow(TokenInvalidoException::new);
-        return gerarTokens(usuario);
+        return tokensPara(usuario);
     }
 
-    private Tokens gerarTokens(Usuario usuario) {
+    /**
+     * Os tokens de uma sessão nova. Público pro login com Google emitir
+     * exatamente o mesmo par do login por senha: depois de entrar, o resto da
+     * aplicação não sabe (nem precisa saber) por qual porta a pessoa entrou.
+     */
+    public Tokens tokensPara(Usuario usuario) {
         return new Tokens(
                 jwtService.gerarAccessToken(usuario),
                 // Rotação: cada refresh emite um refresh token novo
