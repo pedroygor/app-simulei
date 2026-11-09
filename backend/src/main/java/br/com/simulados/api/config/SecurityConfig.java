@@ -73,6 +73,8 @@ public class SecurityConfig {
                         // logout é público: quem já perdeu o token de acesso ainda
                         // precisa conseguir apagar o cookie
                         .requestMatchers(HttpMethod.POST, "/auth/login", "/auth/refresh", "/auth/logout").permitAll()
+                        // A credencial é o ID token do Google, no corpo
+                        .requestMatchers(HttpMethod.POST, "/auth/google", "/auth/google/cadastro").permitAll()
                         // Imagens das questões são públicas de propósito: são
                         // provas do ENEM (domínio público) e precisam carregar
                         // num <img src> simples. Exigir Bearer aqui obrigaria o

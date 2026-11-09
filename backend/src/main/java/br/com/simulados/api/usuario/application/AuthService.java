@@ -37,7 +37,7 @@ public class AuthService {
                     .authenticate(new UsernamePasswordAuthenticationToken(email, senha));
             var usuario = ((UsuarioDetails) autenticacao.getPrincipal()).getUsuario();
             limitador.registrarSucesso(email);
-            return gerarTokens(usuario);
+            return tokensPara(usuario);
         } catch (AuthenticationException e) {
             // Conta a falha e deixa a exceção seguir: quem traduz pro 401
             // genérico ("E-mail ou senha inválidos") é o handler
@@ -53,10 +53,15 @@ public class AuthService {
         var usuario = usuarioRepository.findById(usuarioId)
                 .filter(Usuario::isAtivo)
                 .orElseThrow(TokenInvalidoException::new);
-        return gerarTokens(usuario);
+        return tokensPara(usuario);
     }
 
-    private Tokens gerarTokens(Usuario usuario) {
+    /**
+     * Os tokens de uma sessão nova. Público pro login com Google emitir
+     * exatamente o mesmo par do login por senha: depois de entrar, o resto da
+     * aplicação não sabe (nem precisa saber) por qual porta a pessoa entrou.
+     */
+    public Tokens tokensPara(Usuario usuario) {
         return new Tokens(
                 jwtService.gerarAccessToken(usuario),
                 // Rotação: cada refresh emite um refresh token novo

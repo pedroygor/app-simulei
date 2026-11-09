@@ -3,9 +3,11 @@ package br.com.simulados.api.usuario.api;
 import br.com.simulados.api.shared.security.JwtProperties;
 import br.com.simulados.api.shared.security.TokenInvalidoException;
 import br.com.simulados.api.usuario.application.AuthService;
+import br.com.simulados.api.usuario.application.LoginComGoogle;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
@@ -22,6 +24,7 @@ public class AuthController {
     private static final String COOKIE_REFRESH = "refresh_token";
 
     private final AuthService authService;
+    private final LoginComGoogle loginComGoogle;
     private final JwtProperties jwtProperties;
 
     @PostMapping("/login")
@@ -40,6 +43,23 @@ public class AuthController {
         }
         var tokens = authService.refresh(refreshToken);
         return respostaComCookie(tokens);
+    }
+
+    /**
+     * Entra com o ID token do botão do Google. 404 quando não há conta ligada:
+     * é o sinal pro front abrir "completar cadastro" (não é erro da pessoa).
+     */
+    @PostMapping("/google")
+    public ResponseEntity<TokenResponse> entrarComGoogle(@Valid @RequestBody EntrarComGoogleRequest request) {
+        var tokens = loginComGoogle.entrar(request.credencial());
+        return respostaComCookie(tokens);
+    }
+
+    // 201: a conta nasce aqui. Já devolve a sessão, pra não pedir um login a mais
+    @PostMapping("/google/cadastro")
+    public ResponseEntity<TokenResponse> cadastrarComGoogle(@Valid @RequestBody CadastrarComGoogleRequest request) {
+        var tokens = loginComGoogle.cadastrar(request.credencial(), request.nome());
+        return respostaComCookie(HttpStatus.CREATED, tokens);
     }
 
     /**
@@ -70,6 +90,10 @@ public class AuthController {
     }
 
     private ResponseEntity<TokenResponse> respostaComCookie(AuthService.Tokens tokens) {
+        return respostaComCookie(HttpStatus.OK, tokens);
+    }
+
+    private ResponseEntity<TokenResponse> respostaComCookie(HttpStatus status, AuthService.Tokens tokens) {
         var cookie = ResponseCookie.from(COOKIE_REFRESH, tokens.refreshToken())
                 // httpOnly: o JS do frontend nunca lê esse cookie (regra 8.1)
                 .httpOnly(true)
@@ -80,7 +104,7 @@ public class AuthController {
                 .maxAge(jwtProperties.refreshTtl())
                 .sameSite("Lax")
                 .build();
-        return ResponseEntity.ok()
+        return ResponseEntity.status(status)
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .body(new TokenResponse(tokens.accessToken(), "Bearer", tokens.expiresInSeconds()));
     }
